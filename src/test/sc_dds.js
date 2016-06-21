@@ -16,6 +16,12 @@ describe('sc_dxt5', function() {
 
       assert.equal(dds.width, 512);
       assert.equal(dds.height, 512);
+      assert.equal(dds.data.capacity(), 512 * 512 * 4);
+      // Top left pixel is a pinky colour
+      assert.equal(dds.data.readUint8(0), 255);
+      assert.equal(dds.data.readUint8(1), 227);
+      assert.equal(dds.data.readUint8(2), 137);
+      assert.equal(dds.data.readUint8(3), 125);
     });
   });
 });

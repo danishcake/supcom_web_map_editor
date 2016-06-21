@@ -7,12 +7,13 @@
 import check from "./sc_check";
 import {sc_bitfield} from "./sc_bitfield"
 import {_} from "underscore";
+const ByteBuffer = require('bytebuffer');
 
 class sc_dds_pixel_rgb {
   constructor(r = 0, g = 0, b = 0) {
-    this.__r = r;
-    this.__g = g;
-    this.__b = b;
+    this.__r = Math.floor(r);
+    this.__g = Math.floor(g);
+    this.__b = Math.floor(b);
   }
   
   get r() { return this.__r; }
@@ -23,22 +24,43 @@ class sc_dds_pixel_rgb {
   }
   
   static from_packed_rgb565(rgb_565) {
+    // TODO: Check DXT5 ARGB bit order - what byte is b stored in?
+
     let rgb = new sc_bitfield(rgb_565);
-    return new sc_dds_pixel_rgb((rgb.read_bits(5) * 255) / 31,
-                                (rgb.read_bits(6) * 255) / 63,
-                                (rgb.read_bits(5) * 255) / 31);
+    let b = (rgb.read_bits(5) * 255) / 31;
+    let g = (rgb.read_bits(6) * 255) / 63;
+    let r = (rgb.read_bits(5) * 255) / 31;
+    return new sc_dds_pixel_rgb(r, g, b);
+  }
+
+  /**
+   * Provides a per-channel interpolated colour.
+   * @param rgb0 The first colour
+   * @param rgb1 The second colour
+   * @param factor Scaling factor between the two. If 0 is used rgb0 is returned.
+   */
+  static lerp(rgb0, rgb1, factor) {
+    return new sc_dds_pixel_rgb(rgb0.r + (rgb1.r - rgb0.r) * factor,
+                                rgb0.g + (rgb1.g - rgb0.g) * factor,
+                                rgb0.b + (rgb1.b - rgb0.b) * factor)
   }
 }
 
-
+/**
+ * Table of supported pixel formats.
+ * This includes code to compress and decompress each
+ */
 const sc_dds_pixelformat = {
   RawRGB: {
     load(input, width, height) {
-      return _.chain(_.range(width * height))
-       .map((i) => input.readBytyes(3))
-       .each((pixel) => pixel.unshift(0))
-       .flatten()
-       .value();
+      console.log(`Loading ${width}x${height} RawRGB`);
+      let output = new ByteBuffer(width * height * 4);
+      for (let i = 0; i < width * height; i++) {
+        output.writeUint8(255, i * 4)
+        input.copyTo(output, i * 4 + 1, input, input.offset, input.offset + 3);
+      }
+      // Manually advance read position as copyTo will not have changed it
+      input.skip(width * height * 3);
     },
     save(output) {
       
@@ -46,7 +68,7 @@ const sc_dds_pixelformat = {
   },
   RawARGB: {
     load(input, width, height) {
-     return input.readBytes(width * height * 4);
+      return input.readBytes(width * height * 4);
     },
     save(output) {
       
@@ -57,8 +79,9 @@ const sc_dds_pixelformat = {
       // DXT5 consists of 4x4 blocks with 4:1 compression.
       // This code reads each 4x4 block, decompresses it and writes it to the correct part
       // of a larger array
-      let output = _.range(width * height * 4, 0);
-      let lut_a = [0, 0, 0, 0, 0, 0, 0, 0];
+      let output = new ByteBuffer(width * height * 4);
+      let lut_a = new ByteBuffer(8);
+      let lut_rgb = new ByteBuffer(4 * 3);
       
       for (let y = 0;  y < height / 4; y++) {
         for (let x = 0; x < width / 4; x++) {
@@ -73,25 +96,24 @@ const sc_dds_pixelformat = {
           // 1.2 Build interpolation LUT
           // If min_a is > max_a then [6] and [7] are set to 0 and 255, with [2-5] interpolated
           if (min_a > max_a) {
-            lut_a = [ max_a,
-                      min_a,
-                      Math.floor(min_a + ((max_a - min_a) * 6) / 7),
-                      Math.floor(min_a + ((max_a - min_a) * 5) / 7),
-                      Math.floor(min_a + ((max_a - min_a) * 4) / 7),
-                      Math.floor(min_a + ((max_a - min_a) * 3) / 7),
-                      Math.floor(min_a + ((max_a - min_a) * 2) / 7),
-                      Math.floor(min_a + ((max_a - min_a) * 1) / 7)];
+            lut_a.writeUint8(max_a, 0);
+            lut_a.writeUint8(min_a, 1);
+            lut_a.writeUint8(Math.floor(min_a + ((max_a - min_a) * 6) / 7), 2);
+            lut_a.writeUint8(Math.floor(min_a + ((max_a - min_a) * 5) / 7), 3);
+            lut_a.writeUint8(Math.floor(min_a + ((max_a - min_a) * 4) / 7), 4);
+            lut_a.writeUint8(Math.floor(min_a + ((max_a - min_a) * 3) / 7), 5);
+            lut_a.writeUint8(Math.floor(min_a + ((max_a - min_a) * 2) / 7), 6);
+            lut_a.writeUint8(Math.floor(min_a + ((max_a - min_a) * 1) / 7), 7);
           } else {
-            lut_a  = [ max_a,
-                       min_a, 
-                       Math.floor(min_a + ((max_a - min_a) * 4) / 5), 
-                       Math.floor(min_a + ((max_a - min_a) * 3) / 5),
-                       Math.floor(min_a + ((max_a - min_a) * 2) / 5), 
-                       Math.floor(min_a + ((max_a - min_a) * 1) / 5),
-                       0,
-                       255];
+            lut_a.writeUint8(max_a, 0);
+            lut_a.writeUint8(min_a, 1);
+            lut_a.writeUint8(Math.floor(min_a + ((max_a - min_a) * 4) / 5), 2);
+            lut_a.writeUint8(Math.floor(min_a + ((max_a - min_a) * 3) / 5), 3);
+            lut_a.writeUint8(Math.floor(min_a + ((max_a - min_a) * 2) / 5), 4);
+            lut_a.writeUint8(Math.floor(min_a + ((max_a - min_a) * 1) / 5), 5);
+            lut_a.writeUint8(0, 6);
+            lut_a.writeUint8(255, 7);
           }
-          
           
           // 1.3 Unpack indices and populate output block
           for (let i = 0; i < 16; i++) {
@@ -99,24 +121,43 @@ const sc_dds_pixelformat = {
             let ox = x * 4 + i % 4;
             let oy = y * 4 + Math.floor(i / 4);
             let oi = (oy * width + ox) * 4;
-            output[oi] = lut_a[lut_index];
+            lut_a.copyTo(output, oi, lut_index, lut_index + 1);
           }
           
           // 2 Decode RGB block
           // 2.1 Find RGB extents
-          let c0_rgb565 = rgb_block.read_bits(16);
-          let c1_rgb565 = rgb_block.read_bits(16);
+          let c0_rgb = sc_dds_pixel_rgb.from_packed_rgb565(rgb_block.read_bits(16));
+          let c1_rgb = sc_dds_pixel_rgb.from_packed_rgb565(rgb_block.read_bits(16));
+          let c2_rgb = sc_dds_pixel_rgb.lerp(c0_rgb, c1_rgb, 0.3333333)
+          let c3_rgb = sc_dds_pixel_rgb.lerp(c0_rgb, c1_rgb, 0.6666666)
           
           // 2.2 Build RGB LUT
-          
+          lut_rgb.writeUint8(c0_rgb.r, 0);
+          lut_rgb.writeUint8(c0_rgb.g, 1);
+          lut_rgb.writeUint8(c0_rgb.b, 2);
+          lut_rgb.writeUint8(c1_rgb.r, 3);
+          lut_rgb.writeUint8(c1_rgb.g, 4);
+          lut_rgb.writeUint8(c1_rgb.b, 5);
+          lut_rgb.writeUint8(c2_rgb.r, 6);
+          lut_rgb.writeUint8(c2_rgb.g, 7);
+          lut_rgb.writeUint8(c2_rgb.b, 8);
+          lut_rgb.writeUint8(c3_rgb.r, 9);
+          lut_rgb.writeUint8(c3_rgb.g, 10);
+          lut_rgb.writeUint8(c3_rgb.b, 11);
           
           // 2.3 Unpack indices and populate output block
-          
-          
-          // 3. Done
-          return output;
+          for(let i = 0; i < 16; i++) {
+            let lut_index = rgb_block.read_bits(2) * 3;
+            let ox = x * 4 + i % 4;
+            let oy = y * 4 + Math.floor(i / 4);
+            let oi = (oy * width + ox) * 4 + 1;
+            lut_rgb.copyTo(output, oi, lut_index, lut_index + 3);
+          }
         }
       }
+
+      // 3. Done
+      return output;
     },
     save(output) {
       
@@ -162,7 +203,7 @@ class sc_dds_header {
     
     
     // Sanity checks
-    check.equal(124, size, `DDS_HEADER size should be 124`);
+    check.equal(124, size, "DDS_HEADER size should be 124");
     check.bits_set(flags, 0x00000002, "DDS_HEADER dwFlags width not valid");
     check.bits_set(flags, 0x00000004, "DDS_HEADER dwFlags height not valid");
     check.bits_set(flags, 0x00001000, "DDS_HEADER dwFlags pixelFormat not valid");
@@ -172,24 +213,25 @@ class sc_dds_header {
     // check.one_of([0x00080000, 0x00000008], flags & 0x00080008, "DDS_HEADER dwFlags should indicate pitch or linearsize");
     
     // Determine pixelformat
-    let pixel_format = sc_dds_pixelformat.RawARGB;
+    let pixel_format = undefined;
     if ((pf_flags & 0x00000004) == 0) {
       check.one_of([0x00000041, 0x00000040], pf_flags & 0x00000041, "DDS_HEADER dwFlags should indicate RGB or RGBA pixel format");
 
       if ((pf_flags & 0x00000041) == 0x00000041) {
         // RGBA
+        pixel_format = sc_dds_pixelformat.RawARGB;
         check.equal(32, pf_rgb_bit_count, "DDS_HEADER RGBBitCount not 32 for RGBA format");
-        check.equal(0xFF000000, pf_rbit_mask, "DDS_HEADER ABitMask not 0xFF000000");
-        check.equal(0x00FF0000, pf_gbit_mask, "DDS_HEADER RBitMask not 0x00FF0000");
-        check.equal(0x0000FF00, pf_bbit_mask, "DDS_HEADER GBitMask not 0x0000FF00");
-        check.equal(0x000000FF, pf_abit_mask, "DDS_HEADER BBitMask not 0x000000FF");
+        check.equal(0xFF000000, pf_abit_mask, "DDS_HEADER ABitMask not 0xFF000000");
+        check.equal(0x00FF0000, pf_rbit_mask, "DDS_HEADER RBitMask not 0x00FF0000");
+        check.equal(0x0000FF00, pf_gbit_mask, "DDS_HEADER GBitMask not 0x0000FF00");
+        check.equal(0x000000FF, pf_bbit_mask, "DDS_HEADER BBitMask not 0x000000FF");
       } else if ((pf_flags & 0x00000040) == 0x00000040) {
         // RGB
         pixel_format = sc_dds_pixelformat.RawRGB;
         check.equal(24, pf_rgb_bit_count, "DDS_HEADER RGBBitCount not 24 for RGB format");
-        check.equal(0x00FF0000, pf_gbit_mask, "DDS_HEADER RBitMask not 0x00FF0000");
-        check.equal(0x0000FF00, pf_bbit_mask, "DDS_HEADER GBitMask not 0x0000FF00");
-        check.equal(0x000000FF, pf_abit_mask, "DDS_HEADER BBitMask not 0x000000FF");
+        check.equal(0x00FF0000, pf_rbit_mask, "DDS_HEADER RBitMask not 0x00FF0000");
+        check.equal(0x0000FF00, pf_gbit_mask, "DDS_HEADER GBitMask not 0x0000FF00");
+        check.equal(0x000000FF, pf_bbit_mask, "DDS_HEADER BBitMask not 0x000000FF");
       }
     } else {
       // Some sort of compressed format. Determine if it's one we support
@@ -198,17 +240,9 @@ class sc_dds_header {
       pixel_format = sc_dds_pixelformat.DXT5;
     }
 
-    let data = undefined;
-    if (pixel_format == sc_dds_pixelformat.RawARGB) {
-      // Read the data in as bytes
-      
-    } else if (pixel_format == sc_dds_pixelformat.RawRGB) {
-      
-    } else if (pixel_format == sc_dds_pixelformat.DXT5) {
-      
-    } else {
-      // Explode, should not have got here
-      check.equal(true, false, "Invalid pixel_format ${pixel_format}")
+    if (pixel_format == undefined) {
+      // Should not reach this, explode
+      check.equal(true, false, `Invalid pixel_format ${pixel_format}`)
     }
     
     // Record fields
