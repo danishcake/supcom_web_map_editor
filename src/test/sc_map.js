@@ -188,5 +188,24 @@ describe('sc_map', function() {
       assert.equal(map.decals.decals.length, 0);
       assert.equal(map.decals.decal_groups.length, 0);
     });
+
+    it('should load normal maps', function() {
+      let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
+      let map = new sc.map();
+      map.load(map_data_bb);
+
+      assert.equal(map.normalmap.data.remaining(), 256 * 256 * 4)
+      // TODO: first normal check
+    });
+
+    it('should load texture maps', function() {
+      let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
+      let map = new sc.map();
+      map.load(map_data_bb);
+
+      assert.equal(map.texturemap.chan0_3.remaining(), 128 * 128 * 4)
+      assert.equal(map.texturemap.chan4_7.remaining(), 128 * 128 * 4)
+      // TODO: first pixel test
+    });
   });
 });

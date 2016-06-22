@@ -9,7 +9,7 @@
  * TODO: Add readFloat32Array helper function
  */
 import check from "./sc_check";
-//import {sc_dxt5} from "./sc_dxt5";
+import {sc_dds} from "./sc_dds";
 
 
 /**
@@ -662,14 +662,20 @@ class sc_map_normalmap {
     let height = input.readInt32();
     let count = input.readInt32();
     let data_length = input.readInt32();
-    
+
     // Sanity checks
     check.one_of([256, 512, 1024, 2048, 4096], width, "Suspcious normal map width"); // TODO: Check it should be 128-2048
     check.one_of([256, 512, 1024, 2048, 4096], height, "Suspcious normal map width");
     check.equal(1, count, "Suspicious normal map count");
     check.equal(width * height * 4 / 4 + 128, data_length, "Suspicious normal map length"); // DXT5 achieves 4:1 compression, plus some header
-    
-    let data_dxt5 = input.readBytes(data_length);
+
+    let normal_map = new sc_dds();
+    normal_map.load(input);
+
+    // Record fields
+    this.__width = width;
+    this.__height = height;
+    this.__data = normal_map.data;
   }
   save(output) {}
 }
@@ -683,7 +689,29 @@ class sc_map_texturemap {
   get chan0_3() { return this.__chan0_3; }
   get chan4_7() { return this.__chan4_7; }
 
-  load(input) {}
+  load(input) {
+    let hdr_sz = function(d) { return d * d + 128; };
+
+    let chan_data = [undefined, undefined];
+    for (let chan = 0; chan < 2; chan++) {
+      let chan_length = input.readInt32();
+      // Sanity check texture map length
+      check.one_of([hdr_sz(256), hdr_sz(512), hdr_sz(1024), hdr_sz(2048), hdr_sz(4096)], chan_length, "Suspcious texture map length");
+
+      let chan_dds = new sc_dds();
+      let starting_remaining = input.remaining();
+      chan_dds.load(input);
+      let bytes_read = starting_remaining - input.remaining();
+      // Sanity check correct number of bytes read
+      check.equal(bytes_read, chan_length, `Wrong number of bytes read extracting texture map ${chan} (req ${chan_length} found ${bytes_read}`);
+
+      chan_data[chan] = chan_dds.data;
+    }
+
+    // Record fields
+    this.__chan0_3 = chan_data[0];
+    this.__chan4_7 = chan_data[1];
+  }
   save(output) {}
 }
 
