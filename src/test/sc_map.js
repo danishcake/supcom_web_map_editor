@@ -207,5 +207,24 @@ describe('sc_map', function() {
       assert.equal(map.texturemap.chan4_7.remaining(), 128 * 128 * 4)
       // TODO: first pixel test
     });
+
+    it('should load water maps', function() {
+      let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
+      let map = new sc.map();
+      map.load(map_data_bb);
+
+      assert.equal(map.watermap.watermap_width, 128);
+      assert.equal(map.watermap.watermap_height, 128);
+      assert.equal(map.watermap.foam_mask_width, 128);
+      assert.equal(map.watermap.foam_mask_height, 128);
+      assert.equal(map.watermap.flatness_width, 128);
+      assert.equal(map.watermap.flatness_height, 128);
+      assert.equal(map.watermap.depth_bias_width, 128);
+      assert.equal(map.watermap.depth_bias_height, 128);
+      assert.equal(map.watermap.terrain_type_width, 256);
+      assert.equal(map.watermap.terrain_type_height, 256);
+
+      // TODO: first pixel test
+    });
   });
 });

@@ -11,6 +11,12 @@
 import check from "./sc_check";
 import {sc_dds} from "./sc_dds";
 
+/*
+ * Used to determine valid dds texture sizes
+ * These are square, with a fixed size header
+ * Used by the texturemap and water maps
+ */
+let dds_sz = function(d) { return d * d + 128; };
 
 /**
  * Initial header
@@ -690,13 +696,11 @@ class sc_map_texturemap {
   get chan4_7() { return this.__chan4_7; }
 
   load(input) {
-    let hdr_sz = function(d) { return d * d + 128; };
-
     let chan_data = [undefined, undefined];
     for (let chan = 0; chan < 2; chan++) {
       let chan_length = input.readInt32();
       // Sanity check texture map length
-      check.one_of([hdr_sz(256), hdr_sz(512), hdr_sz(1024), hdr_sz(2048), hdr_sz(4096)], chan_length, "Suspcious texture map length");
+      check.one_of([dds_sz(256), dds_sz(512), dds_sz(1024), dds_sz(2048), dds_sz(4096)], chan_length, "Suspicious texture map length");
 
       let chan_dds = new sc_dds();
       let starting_remaining = input.remaining();
@@ -747,7 +751,40 @@ class sc_map_watermap {
   get terrain_type_width() { return this.__heightmap.width; }
   get terrain_type_height() { return this.__heightmap.height; }
 
-  load(input) {}
+  load(input) {
+    input.readBytes(4); // Skip 4 bytes of unknown
+    let watermap_length = input.readInt32();
+
+    // Sanity check water map length
+    // TBD - non-square maps?
+    // TBD: Check bounds are correct
+    check.one_of([dds_sz(128), dds_sz(256), dds_sz(512), dds_sz(1024), dds_sz(2048)], watermap_length, "Suspicious water map length");
+
+    let watermap_dds = new sc_dds();
+    let starting_remaining = input.remaining();
+    watermap_dds.load(input);
+    let bytes_read = starting_remaining - input.remaining();
+    // Sanity check correct number of bytes read
+    check.equal(bytes_read, watermap_length, `Wrong number of bytes read extracting watermap (req ${watermap_length} found ${bytes_read}`);
+
+    // The remaining buffers are coupled in size to the heightmap
+    let half_length = this.__heightmap.width * this.__heightmap.height / 4;
+    let full_length = this.__heightmap.width * this.__heightmap.height;
+
+    let foam_mask_data = input.readBytes(half_length);
+    let flatness_data = input.readBytes(half_length);
+    let depth_bias_data = input.readBytes(half_length);
+    let terrain_type_data = input.readBytes(full_length);
+
+    // Record fields
+    this.__watermap_data = watermap_dds.data;
+    this.__watermap_width = watermap_dds.width;
+    this.__watermap_height = watermap_dds.height;
+    this.__foam_mask_data = foam_mask_data;
+    this.__flatness_data = flatness_data;
+    this.__depth_bias_data = depth_bias_data;
+    this.__terrain_type_data = terrain_type_data;
+  }
   save(output) {}
 }
 
@@ -778,6 +815,7 @@ export class sc_map {
     this.__decals = new sc_map_decals();
     this.__normalmap = new sc_map_normalmap();
     this.__texturemap = new sc_map_texturemap();
+    this.__watermap = new sc_map_watermap(this.__heightmap);
   }
 
   get header() { return this.__header; }
@@ -790,6 +828,7 @@ export class sc_map {
   get decals() { return this.__decals; }
   get normalmap() { return this.__normalmap; }
   get texturemap() { return this.__texturemap; }
+  get watermap() { return this.__watermap; }
 
   load(input) {
     this.header.load(input);
@@ -802,6 +841,7 @@ export class sc_map {
     this.decals.load(input);
     this.normalmap.load(input);
     this.texturemap.load(input);
+    this.watermap.load(input);
   }
 
   save(output) {
@@ -815,5 +855,6 @@ export class sc_map {
     this.decals.save(output);
     this.normalmap.save(output);
     this.texturemap.save(output);
+    this.watermap.save(output);
   }
 }
