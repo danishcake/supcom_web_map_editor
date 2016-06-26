@@ -68,7 +68,7 @@ const sc_dds_pixelformat = {
   },
   RawARGB: {
     load(input, width, height) {
-      return input.readBytes(width * height * 4);
+      return input.readBytes(width * height * 4).compact();
     },
     save(output) {
       

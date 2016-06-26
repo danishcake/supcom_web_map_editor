@@ -23,8 +23,8 @@ describe('sc_map', function() {
       let map = new sc.map();
       map.load(map_data_bb);
 
-      // DDS header + 256x256 * 4 (512x512 with 4:1 compression)
-      assert.equal(map.preview_image.data.remaining(), 128 + 256 * 256 * 4);
+      // Preview image is a 256x256 image uncompressed DDS image
+      assert.equal(map.preview_image.data.capacity(), 256 * 256 * 4);
     });
 
     it('should load heightmap', function() {
@@ -215,14 +215,19 @@ describe('sc_map', function() {
 
       assert.equal(map.watermap.watermap_width, 128);
       assert.equal(map.watermap.watermap_height, 128);
+      assert.equal(map.watermap.watermap_data.capacity(), 128 * 128 * 4)
       assert.equal(map.watermap.foam_mask_width, 128);
       assert.equal(map.watermap.foam_mask_height, 128);
+      assert.equal(map.watermap.foam_mask_data.capacity(), 128 * 128);
       assert.equal(map.watermap.flatness_width, 128);
       assert.equal(map.watermap.flatness_height, 128);
+      assert.equal(map.watermap.flatness_data.capacity(), 128 * 128);
       assert.equal(map.watermap.depth_bias_width, 128);
       assert.equal(map.watermap.depth_bias_height, 128);
+      assert.equal(map.watermap.depth_bias_data.capacity(), 128 * 128);
       assert.equal(map.watermap.terrain_type_width, 256);
       assert.equal(map.watermap.terrain_type_height, 256);
+      assert.equal(map.watermap.terrain_type_data.capacity(), 256 * 256);
 
       // TODO: first pixel test
     });

@@ -63,8 +63,16 @@ class sc_map_preview_image {
 
   load(input) {
     let preview_image_length = input.readInt32();
+    // Sanity check the preview image length
     check.between(0, 256*256*4+128, preview_image_length, "Invalid preview image length");
-    let data = input.readBytes(preview_image_length);
+
+    let preview_image_data = new sc_dds();
+    let starting_remaining = input.remaining();
+    preview_image_data.load(input);
+
+    // Sanity check correct number of bytes read
+    let bytes_read = starting_remaining - input.remaining();
+    check.equal(bytes_read, preview_image_length, `Wrong number of bytes read extracting prerview image (req ${preview_image_length} found ${bytes_read}`);
 
     // Minor version is included in this section for lack of a better place to put it
     // TODO: Restore this to 56 when I find some good test data
@@ -72,7 +80,7 @@ class sc_map_preview_image {
     check.equal(56, minor_version, "Incorrect minor version in header");
 
     // Record fields
-    this.__data = data;
+    this.__data = preview_image_data.data;
   }
   save(output) {} // TODO: Add serialise to ByteBuffer
 }
@@ -771,10 +779,12 @@ class sc_map_watermap {
     let half_length = this.__heightmap.width * this.__heightmap.height / 4;
     let full_length = this.__heightmap.width * this.__heightmap.height;
 
-    let foam_mask_data = input.readBytes(half_length);
-    let flatness_data = input.readBytes(half_length);
-    let depth_bias_data = input.readBytes(half_length);
-    let terrain_type_data = input.readBytes(full_length);
+    // Note we compact the buffers to ensure 'capacity' is sane. It's a bit more memory usage
+    // however if we ever <i>really</i> need to optimise stuff
+    let foam_mask_data = input.readBytes(half_length).compact();
+    let flatness_data = input.readBytes(half_length).compact();
+    let depth_bias_data = input.readBytes(half_length).compact();
+    let terrain_type_data = input.readBytes(full_length).compact();
 
     // Record fields
     this.__watermap_data = watermap_dds.data;
