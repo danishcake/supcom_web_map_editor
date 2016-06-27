@@ -472,6 +472,9 @@ class sc_map_water {
   save(output) {} // TODO: Add serialise to ByteBuffer
 }
 
+/**
+ * Layer entry
+ */
 class sc_map_layer {
   constructor() {
     this.__texture_file = undefined;
@@ -495,7 +498,9 @@ class sc_map_layer {
   save(output) {}
 }
 
-
+/**
+ * Layers
+ */
 class sc_map_layers {
   constructor() {
     this.__albedo_data = [];
@@ -531,6 +536,9 @@ class sc_map_layers {
   save(output) {}
 }
 
+/**
+ * Decal entry
+ */
 class sc_map_decal {
   constructor() {
     this.__id = undefined;
@@ -591,6 +599,9 @@ class sc_map_decal {
   save(output) {}
 }
 
+/**
+ * Decal group entry
+ */
 class sc_map_decal_group {
   constructor() {
     this.__id = undefined;
@@ -695,6 +706,11 @@ class sc_map_normalmap {
   save(output) {}
 }
 
+/**
+ * Texturemap
+ * Formed of two individual texturemaps for a total of 8 layers
+ * TODO: Document the slightly fruity blending and layer priority
+ */
 class sc_map_texturemap {
   constructor() {
     this.__chan0_3 = undefined;
@@ -798,6 +814,9 @@ class sc_map_watermap {
   save(output) {}
 }
 
+/**
+ * Prop entry
+ */
 class sc_map_prop {
   constructor() {
     this.__blueprint_path = undefined;
@@ -834,6 +853,9 @@ class sc_map_prop {
   save(output) {}
 }
 
+/**
+ * Props
+ */
 class sc_map_props {
   constructor() {
     this.__props = [];
