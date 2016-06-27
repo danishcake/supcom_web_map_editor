@@ -16,7 +16,8 @@ import {sc_dds} from "./sc_dds";
  * These are square, with a fixed size header
  * Used by the texturemap and water maps
  */
-let dds_sz = function(d) { return d * d + 128; };
+let dds_sz2 = function(x, y) { return x * y + 128; };
+let dds_sz = function(d) { return dds_sz2(d, d); };
 
 /**
  * Initial header
@@ -764,9 +765,8 @@ class sc_map_watermap {
     let watermap_length = input.readInt32();
 
     // Sanity check water map length
-    // TBD - non-square maps?
     // TBD: Check bounds are correct
-    check.one_of([dds_sz(128), dds_sz(256), dds_sz(512), dds_sz(1024), dds_sz(2048)], watermap_length, "Suspicious water map length");
+    check.equal(dds_sz2(this.__heightmap.width / 2, this.__heightmap.height / 2), watermap_length, "Suspicious water map length")
 
     let watermap_dds = new sc_dds();
     let starting_remaining = input.remaining();
