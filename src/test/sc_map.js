@@ -231,5 +231,29 @@ describe('sc_map', function() {
 
       // TODO: first pixel test
     });
+
+    it('should load props', function() {
+      let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
+      let map = new sc.map();
+      map.load(map_data_bb);
+
+      assert.equal(map.props.props.length, 908);
+      assert.equal(map.props.props[0].blueprint_path, "/env/evergreen/props/trees/oak01_s2_prop.bp");
+      assert.closeTo(map.props.props[0].position[0], 43.70, 0.01);
+      assert.closeTo(map.props.props[0].position[1], 75.95, 0.01);
+      assert.closeTo(map.props.props[0].position[2], 149.47, 0.01);
+      assert.closeTo(map.props.props[0].rotation_x[0], 0.85, 0.01);
+      assert.closeTo(map.props.props[0].rotation_x[1], 0.00, 0.01);
+      assert.closeTo(map.props.props[0].rotation_x[2], 0.52, 0.01);
+      assert.closeTo(map.props.props[0].rotation_y[0], 0.00, 0.01);
+      assert.closeTo(map.props.props[0].rotation_y[1], 1.00, 0.01);
+      assert.closeTo(map.props.props[0].rotation_y[2], 0, 0.01);
+      assert.closeTo(map.props.props[0].rotation_z[0], -0.52, 0.01);
+      assert.closeTo(map.props.props[0].rotation_z[1], 0, 0.01);
+      assert.closeTo(map.props.props[0].rotation_z[2], 0.85, 0.01);
+      assert.closeTo(map.props.props[0].scale[0], 1.00, 0.01);
+      assert.closeTo(map.props.props[0].scale[1], 1.00, 0.01);
+      assert.closeTo(map.props.props[0].scale[2], 1.00, 0.01);
+    });
   });
 });

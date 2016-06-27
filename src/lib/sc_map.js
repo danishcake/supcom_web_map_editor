@@ -799,7 +799,39 @@ class sc_map_watermap {
 }
 
 class sc_map_prop {
+  constructor() {
+    this.__blueprint_path = undefined;
+    this.__position = [undefined, undefined, undefined];
+    this.__rotation_x = [undefined, undefined, undefined];
+    this.__rotation_y = [undefined, undefined, undefined];
+    this.__rotation_z = [undefined, undefined, undefined];
+    this.__scale = [undefined, undefined, undefined]; // unused
+  }
 
+  get blueprint_path() { return this.__blueprint_path; }
+  get position() { return this.__position; }
+  get rotation_x() { return this.__rotation_x; }
+  get rotation_y() { return this.__rotation_y; }
+  get rotation_z() { return this.__rotation_z; }
+  get scale() { return this.__scale; }
+
+  load(input) {
+    let blueprint_path = input.readCString();
+    let position = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
+    let rotation_x = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
+    let rotation_y = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
+    let rotation_z = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
+    let scale = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
+
+    // Record fields
+    this.__blueprint_path = blueprint_path;
+    this.__position = position;
+    this.__rotation_x = rotation_x;
+    this.__rotation_y = rotation_y;
+    this.__rotation_z = rotation_z;
+    this.__scale = scale;
+  }
+  save(output) {}
 }
 
 class sc_map_props {
@@ -809,7 +841,21 @@ class sc_map_props {
 
   get props() { return this.__props; }
 
-  load(input) {}
+  load(input) {
+    let prop_count = input.readInt32();
+    // Sanity check prop_count
+    check.between(0, 102400, prop_count, "Suspicious number of props found");
+
+    let props = [];
+    for (let i = 0; i < prop_count; i++) {
+      let prop = new sc_map_prop();
+      prop.load(input);
+      props.push(prop);
+    }
+
+    // Record fields
+    this.__props = props;
+  }
   save(output) {}
 }
 
@@ -826,6 +872,7 @@ export class sc_map {
     this.__normalmap = new sc_map_normalmap();
     this.__texturemap = new sc_map_texturemap();
     this.__watermap = new sc_map_watermap(this.__heightmap);
+    this.__props = new sc_map_props();
   }
 
   get header() { return this.__header; }
@@ -839,6 +886,7 @@ export class sc_map {
   get normalmap() { return this.__normalmap; }
   get texturemap() { return this.__texturemap; }
   get watermap() { return this.__watermap; }
+  get props() { return this.__props; }
 
   load(input) {
     this.header.load(input);
@@ -852,6 +900,7 @@ export class sc_map {
     this.normalmap.load(input);
     this.texturemap.load(input);
     this.watermap.load(input);
+    this.props.load(input);
   }
 
   save(output) {
@@ -866,5 +915,6 @@ export class sc_map {
     this.normalmap.save(output);
     this.texturemap.save(output);
     this.watermap.save(output);
+    this.props.save(output);
   }
 }
