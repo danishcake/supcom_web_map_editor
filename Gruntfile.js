@@ -11,14 +11,14 @@ module.exports = function (grunt) {
   grunt.initConfig({
     // Configure a mochaTest task
     mochaTest: {
-      test: {
+      test_io_lib: {
         options: {
           reporter: 'spec',
           //captureFile: 'results.txt', // Optionally capture the reporter output to a file
           quiet: false, // Optionally suppress output to standard out (defaults to false)
           clearRequireCache: false // Optionally clear the require cache before running tests (defaults to false)
         },
-        src: ['dist/test/**/*.js']
+        src: ['sc_map_io_lib/dist/test/**/*.js']
       }
     },
 
@@ -28,30 +28,30 @@ module.exports = function (grunt) {
         retainLines: true,
         presets: ['es2015']
       },
-      dist: {
+      dist_io_lib: {
         files: [{
           expand: true,
-          cwd: "src/",
+          cwd: "sc_map_io_lib/src/",
           src: ["**/*.js"],
-          dest: "dist/",
+          dest: "sc_map_io_lib/dist/",
           ext: ".js"
         }]
       }
     },
 
     copy: {
-      testdata: {
+      testdata_io_lib: {
         expand: true,
-        cwd: 'src/test/data',
+        cwd: 'sc_map_io_lib/src/test/data',
         src: '**',
-        dest: 'dist/test/data'
+        dest: 'sc_map_io_lib/dist/test/data'
       }
     }
   });
 
   grunt.registerTask('default', [
-    'babel:dist',
-    'copy:testdata',
-    'mochaTest:test'
+    'babel:dist_io_lib',
+    'copy:testdata_io_lib',
+    'mochaTest:test_io_lib'
   ]);
 };
