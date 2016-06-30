@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>Supreme Commander Map Editor</title>
+    <style href="css/main.css"></style>
+    <link rel="stylesheet" href="css/main.css" type="text/css">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css" type="text/css">
+  </head>
+  <body ng-app="sc_map_edit_bin">
+    <top-menu></top-menu>
+    <editor-menu ng-controller="editor-menu"></editor-menu>
+    <editor-view ng-controller="editor-view"></editor-view>
+  </body>
+  <script src="../node_modules/angular/angular.js"></script>
+  <script src="../node_modules/angular-dialog-service/dist/dialogs.js"></script>
+  <script src="../node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+  <script src="dist/app.js"></script>
+  <script src="dist/controllers/editor-menu.js"></script>
+  <script src="dist/controllers/editor-view.js"></script>
+  <script src="dist/directives/top-menu.js"></script>
+  <script src="dist/directives/editor-menu.js"></script>
+  <script src="dist/directives/editor-view.js"></script>
+  <script src="dist/services/editor-state.js"></script>
+</html>

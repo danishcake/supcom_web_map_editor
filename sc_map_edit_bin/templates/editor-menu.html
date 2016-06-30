@@ -1,0 +1,11 @@
+<div id="editor-menu">
+  <div class="btn-group-vertical">
+    <label class="btn btn-default" ng-model="editor_state.tool" uib-btn-radio="'select'" uncheckable><span class="glyphicon glyphicon-move"></span></label>
+    <label class="btn btn-default" ng-model="editor_state.tool" uib-btn-radio="'heightmap'" uncheckable><span class="glyphicon glyphicon-resize-vertical"></span></label>
+  </div>
+  <div class="btn-group-vertical">
+    <label class="btn btn-default" ng-click="increase_tool_size()"><span class="glyphicon glyphicon-plus"></span></label>
+    <label class="btn btn-default">{{editor_state.tool_size}}</label>
+    <label class="btn btn-default"  ng-click="decrease_tool_size()"><span class="glyphicon glyphicon-minus"></span></label>
+  </div>
+</div>
