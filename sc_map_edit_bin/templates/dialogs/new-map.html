@@ -1,0 +1,36 @@
+<div class="modal-header dialog-header-notify">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <h4 class="modal-title"><span class="glyphicon glyphicon-file"></span> New Map</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+    <div class="col-lg-4">Size</div>
+    <div class="col-lg-8">
+      <div class="btn-group">
+        <label class="btn btn-default" ng-model="map.size" uib-btn-radio="0">Tiny (5x5)</label>
+        <label class="btn btn-default" ng-model="map.size" uib-btn-radio="1">Small (10x10)</label>
+        <label class="btn btn-default" ng-model="map.size" uib-btn-radio="2">Medium (20x20)</label>
+        <label class="btn btn-default" ng-model="map.size" uib-btn-radio="3">Large (40x40)</label>
+        <label class="btn btn-default" ng-model="map.size" uib-btn-radio="4">Huge (80x80)</label>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4"><h6>Name</h6></div>
+    <div class="col-lg-8"><input ng-model="map.name" ng-change="update_validity()" ng-class="validity.name ? '' : 'error-highlight'" type="text" class="form-control" placeholder="Map name (e.g. Seton's Clutch)"/></div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4"><h6>Description</h6></div>
+    <div class="col-lg-8"><input ng-model="map.description" ng-change="update_validity()" ng-class="validity.description ? '' : 'error-highlight'" type="text" class="form-control" placeholder="Map description (e.g. a brief description to provide some flavor)"/></div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4"><h6>Author</h6></div>
+    <div class="col-lg-8"><input ng-model="map.author" ng-change="update_validity()" ng-class="validity.author ? '' : 'error-highlight'" type="text" class="form-control" placeholder="Your name (or 7331 internet haxor tag)"/></div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <span class="pull-left">You can change most of these settings later using the 'Metadata' dialog. Map size is fixed.</span>
+  <button type="button" class="btn btn-default pull-right" ng-click="ok()" ng-disabled="!validity.all">OK</button>
+</div>

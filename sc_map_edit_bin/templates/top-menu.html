@@ -1,15 +1,15 @@
 <div id="top-menu">
   <div class="btn-group">
-    <label class="btn btn-default"><span class="glyphicon glyphicon-file"></span>&nbsp;New</label>
-    <label class="btn btn-default"><span class="glyphicon glyphicon-open"></span>&nbsp;Open</label>
-    <label class="btn btn-default"><span class="glyphicon glyphicon-save"></span>&nbsp;Save</label>
-    <label class="btn btn-default"><span class="glyphicon glyphicon-save"></span>&nbsp;Save As</label>
+    <label class="btn btn-default" ng-click="new_map()"><span class="glyphicon glyphicon-file"></span>&nbsp;New</label>
+    <label class="btn btn-default" ng-click="open_map()"><span class="glyphicon glyphicon-open"></span>&nbsp;Open</label>
+    <label class="btn btn-default" ng-click="save_map()"><span class="glyphicon glyphicon-save"></span>&nbsp;Save</label>
+    <label class="btn btn-default" ng-click="save_map_as()"><span class="glyphicon glyphicon-save"></span>&nbsp;Save As</label>
   </div>
 
   <div class="btn-group">
-    <label class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Metadata</label>
-    <label class="btn btn-default"><span class="glyphicon glyphicon-stats"></span>&nbsp;Water</label>
-    <label class="btn btn-default"><span class="glyphicon glyphicon-list"></span>&nbsp;Textures</label>
-    <label class="btn btn-default"><span class="glyphicon glyphicon-plane"></span>&nbsp;Forces</label>
+    <label class="btn btn-default" ng-click="edit_metadata()"><span class="glyphicon glyphicon-pencil"></span>&nbsp;Metadata</label>
+    <label class="btn btn-default" ng-click="edit_water()"><span class="glyphicon glyphicon-stats"></span>&nbsp;Water</label>
+    <label class="btn btn-default" ng-click="edit_textures()"><span class="glyphicon glyphicon-list"></span>&nbsp;Textures</label>
+    <label class="btn btn-default" ng-click="edit_forces()"><span class="glyphicon glyphicon-plane"></span>&nbsp;Forces</label>
   </div>
 </div>
