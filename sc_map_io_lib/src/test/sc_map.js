@@ -260,59 +260,49 @@ describe('sc_map', function() {
 
 
   describe('creating new', function() {
+    const default_5x5_map_args = {
+      name: 'x',
+      author: 'x',
+      description: 'x',
+      size: 0 // 5x5
+    };
+
+    const default_20x20_map_args = {
+      name: 'x',
+      author: 'x',
+      description: 'x',
+      size: 2 // 20x20
+    };
+
     it('should create correct size preview image', function() {
-      const map_args = {
-        name: 'x',
-        author: 'x',
-        description: 'x',
-        size: 0 // 5x5
-      };
       let map = new sc.map();
-      map.create(map_args);
+      map.create(default_5x5_map_args);
 
       assert.equal(256 * 256 * 4, map.preview_image.data.capacity());
     });
 
     it('should create correct size heightmap', function() {
-      const map_5x5_args = {
-        name: 'x',
-        author: 'x',
-        description: 'x',
-        size: 0 // 5x5
-      };
       let map_5x5 = new sc.map();
-      map_5x5.create(map_5x5_args);
+      map_5x5.create(default_5x5_map_args);
 
       assert.equal(256, map_5x5.header.width);
       assert.equal(256, map_5x5.header.height);
 
-
-      const map_20x20_args = {
-        name: 'x',
-        author: 'x',
-        description: 'x',
-        size: 2 // 20x20
-      };
       let map_20x20 = new sc.map();
-      map_20x20.create(map_20x20_args);
+      map_20x20.create(default_20x20_map_args);
 
       assert.equal(1024, map_20x20.header.width);
       assert.equal(1024, map_20x20.header.height);
     });
 
-    it('should fill heightmap with correct starting height', function() {
-      const default_height_map_args = {
-        name: 'x',
-        author: 'x',
-        description: 'x',
-        size: 0 // 5x5
-      };
-      let map_default_height = new sc.map();
-      map_default_height.create(default_height_map_args);
+    it('should fill heightmap with default height if not specified', function() {
+      let map = new sc.map();
+      map.create(default_5x5_map_args);
 
-      assert.equal(1024 * 16, map_default_height.heightmap.data.readUint16());
+      assert.equal(1024 * 16, map.heightmap.data.readUint16());
+    });
 
-
+    it('should fill heightmap with custom height if specified', function() {
       const custom_height_map_args = {
         name: 'x',
         author: 'x',
@@ -320,32 +310,60 @@ describe('sc_map', function() {
         size: 0, // 5x5
         default_height: 42
       };
-      let map_custom_height = new sc.map();
-      map_custom_height.create(custom_height_map_args);
+      let map = new sc.map();
+      map.create(custom_height_map_args);
 
-      assert.equal(42, map_custom_height.heightmap.data.readUint16());
+      assert.equal(42, map.heightmap.data.readUint16());
     });
 
     it('should set default textures if not specified', function() {
-      const default_textures_map_args = {
-        name: 'x',
-        author: 'x',
-        description: 'x',
-        size: 0
-      };
-      let map_default_textures = new sc.map();
-      map_default_textures.create(default_textures_map_args);
+      let map = new sc.map();
+      map.create(default_5x5_map_args);
 
-      assert.equal(map_default_textures.textures.terrain_shader, "TTerrain");
-      assert.equal(map_default_textures.textures.background_texture_path, "/textures/environment/defaultbackground.dds");
-      assert.equal(map_default_textures.textures.sky_cubemap_texture_path, "/textures/environment/defaultskycube.dds");
-      assert.equal(map_default_textures.textures.environment_cubemaps.length, 1);
-      assert.equal(map_default_textures.textures.environment_cubemaps[0].name, "<default>");
-      assert.equal(map_default_textures.textures.environment_cubemaps[0].file, "/textures/environment/defaultenvcube.dds");
+      assert.equal(map.textures.terrain_shader, "TTerrain");
+      assert.equal(map.textures.background_texture_path, "/textures/environment/defaultbackground.dds");
+      assert.equal(map.textures.sky_cubemap_texture_path, "/textures/environment/defaultskycube.dds");
+      assert.equal(map.textures.environment_cubemaps.length, 1);
+      assert.equal(map.textures.environment_cubemaps[0].name, "<default>");
+      assert.equal(map.textures.environment_cubemaps[0].file, "/textures/environment/defaultenvcube.dds");
     });
 
-    it('should set custom textures if specified', function() {
-      // TBD: Is this useful to support? Leave unimplemented for now.
+    it('should set default lighting if not specified', function() {
+      let map = new sc.map();
+      map.create(default_5x5_map_args);
+
+      assert.closeTo(map.lighting.lighting_multiplier, 1.5, 0.001);
+
+      assert.closeTo(map.lighting.lighting_sun_direction[0], 0.7071, 0.001);
+      assert.closeTo(map.lighting.lighting_sun_direction[1], 0.7071, 0.001);
+      assert.closeTo(map.lighting.lighting_sun_direction[2], 0, 0.001);
+
+      assert.closeTo(map.lighting.lighting_sun_ambience[0], 0.2, 0.001);
+      assert.closeTo(map.lighting.lighting_sun_ambience[1], 0.2, 0.001);
+      assert.closeTo(map.lighting.lighting_sun_ambience[2], 0.2, 0.001);
+
+      assert.closeTo(map.lighting.lighting_sun_colour[0], 1, 0.001);
+      assert.closeTo(map.lighting.lighting_sun_colour[1], 1, 0.001);
+      assert.closeTo(map.lighting.lighting_sun_colour[2], 1, 0.001);
+
+      assert.closeTo(map.lighting.shadow_fill_colour[0], 0.7, 0.001);
+      assert.closeTo(map.lighting.shadow_fill_colour[1], 0.7, 0.001);
+      assert.closeTo(map.lighting.shadow_fill_colour[2], 0.75, 0.001);
+
+      assert.closeTo(map.lighting.specular_colour[0], 0, 0.001);
+      assert.closeTo(map.lighting.specular_colour[1], 0, 0.001);
+      assert.closeTo(map.lighting.specular_colour[2], 0, 0.001);
+      assert.closeTo(map.lighting.specular_colour[3], 0, 0.001);
+
+      assert.closeTo(map.lighting.bloom, 0.08, 0.001);
+
+      assert.closeTo(map.lighting.fog_colour[0], 0.8, 0.001);
+      assert.closeTo(map.lighting.fog_colour[1], 1, 0.001);
+      assert.closeTo(map.lighting.fog_colour[2], 0.8, 0.001);
+
+      assert.closeTo(map.lighting.fog_start, 1000, 0.001);
+
+      assert.closeTo(map.lighting.fog_end, 1000, 0.001);
     });
 
     it('should create correct size texturemap', function() {

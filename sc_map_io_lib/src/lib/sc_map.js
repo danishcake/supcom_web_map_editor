@@ -299,7 +299,29 @@ class sc_map_lighting {
   save(output) {} // TODO: Add serialise to ByteBuffer
 
   create(map_args) {
-
+    this.__lighting_multiplier = 1.5;
+    this.__lighting_sun_direction[0] = 0.7071;
+    this.__lighting_sun_direction[1] = 0.7071;
+    this.__lighting_sun_direction[2] = 0;
+    this.__lighting_sun_ambience[0] = 0.2;
+    this.__lighting_sun_ambience[1] = 0.2;
+    this.__lighting_sun_ambience[2] = 0.2;
+    this.__lighting_sun_colour[0] = 1;
+    this.__lighting_sun_colour[1] = 1;
+    this.__lighting_sun_colour[2] = 1;
+    this.__shadow_fill_colour[0] = 0.7;
+    this.__shadow_fill_colour[1] = 0.7;
+    this.__shadow_fill_colour[2] = 0.75;
+    this.__specular_colour[0] = 0;
+    this.__specular_colour[1] = 0;
+    this.__specular_colour[2] = 0;
+    this.__specular_colour[3] = 0;
+    this.__bloom = 0.08;
+    this.__fog_colour[0] = 0.8;
+    this.__fog_colour[1] = 1;
+    this.__fog_colour[2] = 0.8;
+    this.__fog_start= 1000;
+    this.__fog_end = 1000;
   }
 }
 
