@@ -10,6 +10,8 @@
  */
 import check from "./sc_check";
 import {sc_dds} from "./sc_dds";
+const ByteBuffer = require('bytebuffer');
+
 
 /*
  * Used to determine valid dds texture sizes
@@ -18,6 +20,15 @@ import {sc_dds} from "./sc_dds";
  */
 let dds_sz2 = function(x, y) { return x * y + 128; };
 let dds_sz = function(d) { return dds_sz2(d, d); };
+
+/*
+ * Used to determine the heightmap size from a zero based enum
+ */
+let hm_sz = function(idx) {
+  check.between(0, 4, idx, "Invalid map size");
+  const lut = [256, 512, 1024, 2048, 4096];
+  return lut[idx];
+};
 
 /**
  * Initial header
@@ -50,6 +61,11 @@ class sc_map_header {
     this.__height = height;
   }
   save(output) {} // TODO: Add serialise to ByteBuffer
+
+  create(map_args) {
+    this.__width = hm_sz(map_args.size);
+    this.__height = hm_sz(map_args.size);
+  }
 }
 
 /**
@@ -84,6 +100,12 @@ class sc_map_preview_image {
     this.__data = preview_image_data.data;
   }
   save(output) {} // TODO: Add serialise to ByteBuffer
+
+  create(map_args) {
+    // Blank dds, excluding header
+    // TBD: Change this to store the DDS header and ARGB data (as is available post load?)
+    this.__data = new ByteBuffer(256 * 256 * 4);
+  }
 }
 
 /**
@@ -108,8 +130,8 @@ class sc_map_heightmap {
     let scale = input.readFloat32();     // Vertical scale (typicaly 1/128)
 
     // Sanity checks
-    check.one_of([256, 512, 1024, 2048, 4096], width, "Invalid heightmap width");
-    check.one_of([256, 512, 1024, 2048, 4096], height, "Invalid heightmap height");
+    check.one_of([hm_sz(0), hm_sz(1), hm_sz(2), hm_sz(3), hm_sz(4)], width, "Invalid heightmap width");
+    check.one_of([hm_sz(0), hm_sz(1), hm_sz(2), hm_sz(3), hm_sz(4)], height, "Invalid heightmap height");
 
     let data = input.readBytes((width + 1) * (height + 1) * 2);
 
@@ -120,6 +142,21 @@ class sc_map_heightmap {
     this.__data = data;
   }
   save(output) {} // TODO: Add serialise to ByteBuffer
+
+  create(map_args) {
+    this.__width = hm_sz(map_args.size);
+    this.__height = hm_sz(map_args.size);
+    this.__scale = 1 / 128;
+    const hm_count = (this.__width + 1) * (this.__height + 1);
+    this.__data = new ByteBuffer(hm_count * 2);
+
+    const hm_default = map_args.default_height || 16 * 1024;
+    // Fill with some default height
+    for (let i = 0; i < hm_count; i++) {
+      this.__data.writeUint16(hm_default);
+    }
+    this.__data.reset();
+  }
 }
 
 /**
@@ -182,6 +219,15 @@ class sc_map_textures {
     this.__environment_cubemaps = environment_cubemaps;
   }
   save(output) {} // TODO: Add serialise to ByteBuffer
+
+  create(map_args) {
+    this.__terrain_shader = "TTerrain";
+    this.__background_texture_path = "/textures/environment/defaultbackground.dds";
+    this.__sky_cubemap_texture_path = "/textures/environment/defaultskycube.dds";
+    this.__environment_cubemaps = [
+      new sc_map_environment_cubemap("<default>", "/textures/environment/defaultenvcube.dds")
+    ];
+  }
 }
 
 /**
@@ -251,6 +297,10 @@ class sc_map_lighting {
     this.__fog_end = fog_end;
   }
   save(output) {} // TODO: Add serialise to ByteBuffer
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -273,6 +323,10 @@ class sc_map_water_texture {
     check.between(1, 512, this.__texture_file.length, "Suspicious water texture filename length");
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -341,6 +395,10 @@ class sc_map_wave_generator {
   }
 
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -444,7 +502,7 @@ class sc_map_water {
     // Sanity checks
     check.between(0, elevation, elevation_deep, "Deep elevation higher than elevation");
     check.between(0, elevation_deep, elevation_abyss, "Abyss elevation higher than deep elevation");
-    
+
     // Record fields
     this.__has_water = has_water;
     this.__elevation = elevation;
@@ -470,6 +528,10 @@ class sc_map_water {
     this.__wave_generators = wave_generators;
   }
   save(output) {} // TODO: Add serialise to ByteBuffer
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -496,6 +558,10 @@ class sc_map_layer {
     this.__texture_scale = texture_scale;
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -528,12 +594,16 @@ class sc_map_layers {
       normal_data.push(layer)
     }
 
-    
+
     // Record fields
     this.__albedo_data = albedo_data;
     this.__normal_data = normal_data;
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -552,7 +622,7 @@ class sc_map_decal {
     this.__near_cutoff_lod = undefined;
     this.__owner_army = undefined;
   }
-  
+
   get id() { return this.__id; }
   get decal_type() { return this.__decal_type; }
   get texture_count() { return this.__texture_count; }
@@ -563,15 +633,15 @@ class sc_map_decal {
   get cutoff_lod() { return this.__cutoff_lod; }
   get near_cutoff_lod() { return this.__near_cutoff_lod; }
   get owner_army() { return this.__owner_army; }
-  
+
   load(input) {
     let id = input.readInt32();
     let decal_type = input.readInt32();
     let texture_count = input.readInt32();
-    
+
     // Sanity checks
     check.equal(1, texture_count, "Only single decal textures are supported");
-    
+
     let texture_file = input.readIString();
     let scale = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
     let position = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
@@ -583,7 +653,7 @@ class sc_map_decal {
     // Sanity checks
     check.between(0, 512, texture_file.length, "Suspicious layer texture filename length");
     check.between(0, 16, owner_army, "Suspicious owner army");
-    
+
     // Record fields
     this.__id = id;
     this.__decal_type = decal_type;
@@ -597,6 +667,10 @@ class sc_map_decal {
     this.__owner_army = owner_army;
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -608,11 +682,11 @@ class sc_map_decal_group {
     this.__name = undefined;
     this.__data = [];
   }
-  
+
   get id() { return this.__id; }
   get name() { return this.__name; }
   get data() { return this.__data; }
-  
+
   load(input) {
     let id = input.readInt32();
     let name = input.readCString();
@@ -624,6 +698,10 @@ class sc_map_decal_group {
     }
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -641,7 +719,7 @@ class sc_map_decals {
   load(input) {
     // Skip 8 bytes of unknown
     input.readBytes(8);
-    
+
     let decal_count = input.readInt32();
     let decals = [];
     for (let i = 0; i < decal_count; i++) {
@@ -649,7 +727,7 @@ class sc_map_decals {
       decal.load(input);
       decals.push(decal);
     }
-    
+
     let decal_group_count = input.readInt32();
     let decal_groups = [];
     for (let i = 0; i < decal_group_count; i++) {
@@ -657,15 +735,19 @@ class sc_map_decals {
       decal_group.load(input);
       decal_groups.push(decal_group);
     }
-    
+
     // TODO: Could do some sanity checks here - if I understand decal groups as some sort of
     // index buffer we could check against the ids in decals
-    
+
     // Record fields
     this.__decals = decals;
     this.__decal_groups = decal_groups;
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -704,6 +786,10 @@ class sc_map_normalmap {
     this.__data = normal_map.data;
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -742,6 +828,10 @@ class sc_map_texturemap {
     this.__chan4_7 = chan_data[1];
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -812,6 +902,10 @@ class sc_map_watermap {
     this.__terrain_type_data = terrain_type_data;
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -851,6 +945,10 @@ class sc_map_prop {
     this.__scale = scale;
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -879,6 +977,10 @@ class sc_map_props {
     this.__props = props;
   }
   save(output) {}
+
+  create(map_args) {
+
+  }
 }
 
 export class sc_map {
@@ -938,5 +1040,33 @@ export class sc_map {
     this.texturemap.save(output);
     this.watermap.save(output);
     this.props.save(output);
+  }
+
+  /**
+   * Creates a new map.
+   * @param map_args {Object || undefined}
+   * If map_args is defined it will be used to create a new blank map
+   * and should contain
+   * {
+   *   name: "Name of map",               // not used in this class, serialised by Lua related classes
+   *   author: "Name of author",          // not used in this class, serialised by Lua related classes
+   *   description: "Description of map", // not used in this class, serialised by Lua related classes
+   *   size: integer,                     // 0 -> 5x5, 4 -> 80x80
+   *   default_height: Uint16             // Initial value of empty heightmap. Defaults to 16 * 1024
+   * }
+   */
+  create(map_args) {
+    this.header.create(map_args);
+    this.preview_image.create(map_args);
+    this.heightmap.create(map_args);
+    this.textures.create(map_args);
+    this.lighting.create(map_args);
+    this.water.create(map_args);
+    this.layers.create(map_args);
+    this.decals.create(map_args);
+    this.normalmap.create(map_args);
+    this.texturemap.create(map_args);
+    this.watermap.create(map_args);
+    this.props.create(map_args);
   }
 }
