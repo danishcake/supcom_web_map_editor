@@ -421,6 +421,61 @@ describe('sc_map', function() {
       assert.equal(map.water.wave_generators.length, 0);
     });
 
+    it('should create default layers if not specified', function() {
+      let map = new sc.map();
+      map.create(default_5x5_map_args);
+
+      assert.equal(map.layers.albedo_data.length, 10);
+      assert.equal(map.layers.normal_data.length, 9);
+
+      assert.equal(map.layers.albedo_data[0].texture_file, "/env/evergreen/layers/rockmed_albedo.dds");
+      assert.equal(map.layers.albedo_data[1].texture_file, "/env/swamp/layers/sw_sphagnum_03_albedo.dds");
+      assert.equal(map.layers.albedo_data[2].texture_file, "/env/evergreen2/layers/eg_grass001_albedo.dds");
+      assert.equal(map.layers.albedo_data[3].texture_file, "/env/evergreen/layers/rockmed_albedo.dds");
+      assert.equal(map.layers.albedo_data[4].texture_file, "/env/evergreen2/layers/eg_rock_albedo.dds");
+      assert.equal(map.layers.albedo_data[5].texture_file, "");
+      assert.equal(map.layers.albedo_data[6].texture_file, "");
+      assert.equal(map.layers.albedo_data[7].texture_file, "");
+      assert.equal(map.layers.albedo_data[8].texture_file, "");
+      assert.equal(map.layers.albedo_data[9].texture_file, "/env/evergreen/layers/macrotexture000_albedo.dds");
+
+      assert.closeTo(map.layers.albedo_data[0].texture_scale, 10.0, 0.001);
+      assert.closeTo(map.layers.albedo_data[1].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.albedo_data[2].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.albedo_data[3].texture_scale, 10.0, 0.001);
+      assert.closeTo(map.layers.albedo_data[4].texture_scale, 15.0, 0.001);
+      assert.closeTo(map.layers.albedo_data[5].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.albedo_data[6].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.albedo_data[7].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.albedo_data[8].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.albedo_data[9].texture_scale, 128.0, 0.001);
+
+
+      assert.equal(map.layers.normal_data[0].texture_file, "/env/evergreen/layers/SandLight_normals.dds");
+      assert.equal(map.layers.normal_data[1].texture_file, "/env/evergreen/layers/grass001_normals.dds");
+      assert.equal(map.layers.normal_data[2].texture_file, "/env/evergreen/layers/Dirt001_normals.dds");
+      assert.equal(map.layers.normal_data[3].texture_file, "/env/evergreen/layers/RockMed_normals.dds");
+      assert.equal(map.layers.normal_data[4].texture_file, "/env/evergreen/layers/snow001_normals.dds");
+      assert.equal(map.layers.normal_data[5].texture_file, "");
+      assert.equal(map.layers.normal_data[6].texture_file, "");
+      assert.equal(map.layers.normal_data[7].texture_file, "");
+      assert.equal(map.layers.normal_data[8].texture_file, "");
+      assert.closeTo(map.layers.normal_data[0].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.normal_data[1].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.normal_data[2].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.normal_data[3].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.normal_data[4].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.normal_data[5].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.normal_data[6].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.normal_data[7].texture_scale, 4.0, 0.001);
+      assert.closeTo(map.layers.normal_data[8].texture_scale, 4.0, 0.001);
+    });
+
+    it('should create customer layers if specified', function() {
+      // TODO: This would be useful and relatively easy to implement. It would allow me
+      // to define preset texture sets (snowy/desert/setons etc)
+    });
+
     it('should create correct size texturemap', function() {
 
     });

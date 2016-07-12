@@ -589,9 +589,9 @@ class sc_map_water {
  * Layer entry
  */
 class sc_map_layer {
-  constructor() {
-    this.__texture_file = undefined;
-    this.__texture_scale = undefined;
+  constructor(texture_file, texture_scale) {
+    this.__texture_file = texture_file;
+    this.__texture_scale = texture_scale;
   }
 
   get texture_file() { return this.__texture_file; }
@@ -653,7 +653,28 @@ class sc_map_layers {
   save(output) {}
 
   create(map_args) {
+    // TODO: Fully specify layers. What do blank layers even mean? No albedo/normals applied?
+    // entirely unused?
+    this.__albedo_data[0] = new sc_map_layer("/env/evergreen/layers/rockmed_albedo.dds", 10);
+    this.__albedo_data[1] = new sc_map_layer("/env/swamp/layers/sw_sphagnum_03_albedo.dds", 4);
+    this.__albedo_data[2] = new sc_map_layer("/env/evergreen2/layers/eg_grass001_albedo.dds", 4);
+    this.__albedo_data[3] = new sc_map_layer("/env/evergreen/layers/rockmed_albedo.dds", 10);
+    this.__albedo_data[4] = new sc_map_layer("/env/evergreen2/layers/eg_rock_albedo.dds", 15);
+    this.__albedo_data[5] = new sc_map_layer("", 4);
+    this.__albedo_data[6] = new sc_map_layer("", 4);
+    this.__albedo_data[7] = new sc_map_layer("", 4);
+    this.__albedo_data[8] = new sc_map_layer("", 4);
+    this.__albedo_data[9] = new sc_map_layer("/env/evergreen/layers/macrotexture000_albedo.dds", 128);
 
+    this.__normal_data[0] = new sc_map_layer("/env/evergreen/layers/SandLight_normals.dds", 4);
+    this.__normal_data[1] = new sc_map_layer("/env/evergreen/layers/grass001_normals.dds", 4);
+    this.__normal_data[2] = new sc_map_layer("/env/evergreen/layers/Dirt001_normals.dds", 4);
+    this.__normal_data[3] = new sc_map_layer("/env/evergreen/layers/RockMed_normals.dds", 4);
+    this.__normal_data[4] = new sc_map_layer("/env/evergreen/layers/snow001_normals.dds", 4);
+    this.__normal_data[5] = new sc_map_layer("", 4);
+    this.__normal_data[6] = new sc_map_layer("", 4);
+    this.__normal_data[7] = new sc_map_layer("", 4);
+    this.__normal_data[8] = new sc_map_layer("", 4);
   }
 }
 
