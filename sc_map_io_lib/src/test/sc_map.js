@@ -113,7 +113,7 @@ describe('sc_map', function() {
       assert.closeTo(map.water.unit_reflection, 0.5, 0.001);
       assert.closeTo(map.water.sky_reflection, 1.5, 0.001);
       assert.closeTo(map.water.water_sun_shininess, 50, 0.001);
-      assert.closeTo(map.water.water_sun_strength, 0, 10.001);
+      assert.closeTo(map.water.water_sun_strength, 10, 0.001);
 
       assert.closeTo(map.water.water_sun_direction[0], 0.0999, 0.001);
       assert.closeTo(map.water.water_sun_direction[1], -0.9626, 0.001);
@@ -299,7 +299,7 @@ describe('sc_map', function() {
       let map = new sc.map();
       map.create(default_5x5_map_args);
 
-      assert.equal(1024 * 16, map.heightmap.data.readUint16());
+      assert.equal(1024 * 32, map.heightmap.data.readUint16());
     });
 
     it('should fill heightmap with custom height if specified', function() {
@@ -364,6 +364,61 @@ describe('sc_map', function() {
       assert.closeTo(map.lighting.fog_start, 1000, 0.001);
 
       assert.closeTo(map.lighting.fog_end, 1000, 0.001);
+    });
+
+    it('should set default water parameters if not specified', function() {
+      let map = new sc.map();
+      map.create(default_5x5_map_args);
+
+      // Water levels will default to 75%, 50% and 25% of default height, multiplied
+      // by the heightmap scale
+
+      assert.isTrue(map.water.has_water);
+      assert.closeTo(map.water.elevation, map.heightmap.scale * map.heightmap.data.readUint16() * 0.75, 0.001);
+      assert.closeTo(map.water.elevation_deep, map.heightmap.scale * map.heightmap.data.readUint16() * 0.50, 0.001);
+      assert.closeTo(map.water.elevation_abyss, map.heightmap.scale * map.heightmap.data.readUint16() * 0.25, 0.001);
+
+      assert.closeTo(map.water.surface_colour[0], 0, 0.001);
+      assert.closeTo(map.water.surface_colour[1], 0.7, 0.001);
+      assert.closeTo(map.water.surface_colour[2], 1.5, 0.001);
+
+      assert.closeTo(map.water.colour_lerp[0], 0.064, 0.001);
+      assert.closeTo(map.water.colour_lerp[1], 0.119, 0.001);
+
+      assert.closeTo(map.water.refraction_scale, 0.375, 0.001);
+      assert.closeTo(map.water.fresnel_bias, 0.15, 0.001);
+      assert.closeTo(map.water.fresnel_power, 1.5, 0.001);
+      assert.closeTo(map.water.unit_reflection, 0.5, 0.001);
+      assert.closeTo(map.water.sky_reflection, 1.5, 0.001);
+      assert.closeTo(map.water.water_sun_shininess, 50, 0.001);
+      assert.closeTo(map.water.water_sun_strength, 10, 10.001);
+
+      assert.closeTo(map.water.water_sun_direction[0], 0.0999, 0.001);
+      assert.closeTo(map.water.water_sun_direction[1], -0.9626, 0.001);
+      assert.closeTo(map.water.water_sun_direction[2], 0.2519, 0.001);
+
+      assert.closeTo(map.water.water_sun_colour[0], 0.8127, 0.001);
+      assert.closeTo(map.water.water_sun_colour[1], 0.4741, 0.001);
+      assert.closeTo(map.water.water_sun_colour[2], 0.3386, 0.001);
+
+      assert.closeTo(map.water.water_sun_reflection, 5, 0.001);
+      assert.closeTo(map.water.water_sun_glow, 0.1, 0.001);
+      assert.equal(map.water.water_cubemap_file, "/textures/engine/waterCubemap.dds");
+      assert.equal(map.water.water_ramp_file, "/textures/engine/waterramp.dds");
+
+      assert.closeTo(map.water.normal_repeat[0], 0.0009, 0.001);
+      assert.closeTo(map.water.normal_repeat[1], 0.0090, 0.001);
+      assert.closeTo(map.water.normal_repeat[2], 0.0500, 0.001);
+      assert.closeTo(map.water.normal_repeat[3], 0.5000, 0.001);
+
+      assert.closeTo(map.water.water_textures[0].normal_movement[0], 0.5000, 0.001);
+      assert.closeTo(map.water.water_textures[0].normal_movement[1], -0.9500, 0.001);
+      assert.equal(map.water.water_textures[0].texture_file, "/textures/engine/waves.dds");
+      assert.equal(map.water.water_textures[1].texture_file, "/textures/engine/waves.dds");
+      assert.equal(map.water.water_textures[2].texture_file, "/textures/engine/waves.dds");
+      assert.equal(map.water.water_textures[3].texture_file, "/textures/engine/waves.dds");
+
+      assert.equal(map.water.wave_generators.length, 0);
     });
 
     it('should create correct size texturemap', function() {

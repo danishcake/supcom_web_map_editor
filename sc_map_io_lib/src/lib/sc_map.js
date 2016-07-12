@@ -150,7 +150,7 @@ class sc_map_heightmap {
     const hm_count = (this.__width + 1) * (this.__height + 1);
     this.__data = new ByteBuffer(hm_count * 2);
 
-    const hm_default = map_args.default_height || 16 * 1024;
+    const hm_default = map_args.default_height || 32 * 1024;
     // Fill with some default height
     for (let i = 0; i < hm_count; i++) {
       this.__data.writeUint16(hm_default);
@@ -345,10 +345,6 @@ class sc_map_water_texture {
     check.between(1, 512, this.__texture_file.length, "Suspicious water texture filename length");
   }
   save(output) {}
-
-  create(map_args) {
-
-  }
 }
 
 /**
@@ -417,10 +413,6 @@ class sc_map_wave_generator {
   }
 
   save(output) {}
-
-  create(map_args) {
-
-  }
 }
 
 /**
@@ -552,7 +544,44 @@ class sc_map_water {
   save(output) {} // TODO: Add serialise to ByteBuffer
 
   create(map_args) {
+    this.__has_water = true;
+    let terrain_height = map_args.default_height || 32 * 1024;
 
+    // TODO: Figure out a nice way to do the below bit
+    this.__elevation = terrain_height * 0.75 / 128;
+    this.__elevation_deep = terrain_height * 0.50 / 128;
+    this.__elevation_abyss = terrain_height * 0.25 / 128;
+    this.__surface_colour[0] = 0.0;
+    this.__surface_colour[1] = 0.7;
+    this.__surface_colour[2] = 1.5;
+    this.__colour_lerp[0] = 0.064;
+    this.__colour_lerp[1] = 0.119;
+    this.__refraction_scale = 0.375;
+    this.__fresnel_bias = 0.15;
+    this.__fresnel_power = 1.5;
+    this.__unit_reflection = 0.5;
+    this.__sky_reflection = 1.5;
+    this.__water_sun_shininess = 50;
+    this.__water_sun_strength = 10;
+    this.__water_sun_direction[0] = 0.0999;
+    this.__water_sun_direction[1] = -0.9626;
+    this.__water_sun_direction[2] = 0.2519;
+    this.__water_sun_colour[0] = 0.8127;
+    this.__water_sun_colour[1] = 0.4741;
+    this.__water_sun_colour[2] = 0.3386;
+    this.__water_sun_reflection = 5;
+    this.__water_sun_glow = 0.1;
+    this.__water_cubemap_file = "/textures/engine/waterCubemap.dds";
+    this.__water_ramp_file = "/textures/engine/waterramp.dds";
+    this.__normal_repeat[0] = 0.0009;
+    this.__normal_repeat[1] = 0.0090;
+    this.__normal_repeat[2] = 0.0500;
+    this.__normal_repeat[3] = 0.5000;
+
+    for (let i = 0; i < 4; i++) {
+      let water_texture = new sc_map_water_texture([0.5000, -0.9500], "/textures/engine/waves.dds");
+      this.__water_textures[i] = water_texture;
+    }
   }
 }
 
