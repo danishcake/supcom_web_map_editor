@@ -194,7 +194,7 @@ describe('sc_map', function() {
       let map = new sc.map();
       map.load(map_data_bb);
 
-      assert.equal(map.normalmap.data.remaining(), 256 * 256 * 4)
+      assert.equal(map.normalmap.data.remaining(), 256 * 256 * 4);
       // TODO: first normal check
     });
 
@@ -203,8 +203,8 @@ describe('sc_map', function() {
       let map = new sc.map();
       map.load(map_data_bb);
 
-      assert.equal(map.texturemap.chan0_3.remaining(), 128 * 128 * 4)
-      assert.equal(map.texturemap.chan4_7.remaining(), 128 * 128 * 4)
+      assert.equal(map.texturemap.chan0_3.remaining(), 128 * 128 * 4);
+      assert.equal(map.texturemap.chan4_7.remaining(), 128 * 128 * 4);
       // TODO: first pixel test
     });
 
@@ -474,6 +474,35 @@ describe('sc_map', function() {
     it('should create customer layers if specified', function() {
       // TODO: This would be useful and relatively easy to implement. It would allow me
       // to define preset texture sets (snowy/desert/setons etc)
+    });
+
+    it('should create empty decals', function() {
+      let map = new sc.map();
+      map.create(default_5x5_map_args);
+
+      assert.equal(map.decals.decals.length, 0);
+      assert.equal(map.decals.decal_groups.length, 0);
+    });
+
+    it('should create correct size normalmap', function() {
+      let map = new sc.map();
+      map.create(default_5x5_map_args);
+
+      // TBD - is this the correct direction for the normals?
+      assert.equal(256, map.normalmap.width);
+      assert.equal(256, map.normalmap.height);
+      assert.equal(256 * 256 * 4, map.normalmap.data.capacity());
+
+
+      let normal = [map.normalmap.data.readUint8(0),
+                    map.normalmap.data.readUint8(1),
+                    map.normalmap.data.readUint8(2),
+                    map.normalmap.data.readUint8(3)];
+      assert.equal(0, normal[0]);
+      assert.equal(0, normal[1]);
+      assert.equal(1, normal[2]);
+      assert.equal(0, normal[3]);
+
     });
 
     it('should create correct size texturemap', function() {

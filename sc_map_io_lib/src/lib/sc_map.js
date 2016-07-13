@@ -860,8 +860,19 @@ class sc_map_normalmap {
   save(output) {}
 
   create(map_args) {
+    this.__width = hm_sz(map_args.size);
+    this.__height = hm_sz(map_args.size);
+    this.__data = new ByteBuffer(this.__width * this.__height * 4);
 
-  }
+    // Fill normalmap with 'pointing up' vector.
+    // TODO: Check this is up!
+    for (let i = 0; i < this.__width * this.__height; i++) {
+      this.__data.writeUint8(0);
+      this.__data.writeUint8(0);
+      this.__data.writeUint8(1);
+      this.__data.writeUint8(0);
+    }
+   }
 }
 
 /**
