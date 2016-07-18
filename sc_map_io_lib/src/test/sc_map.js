@@ -502,11 +502,20 @@ describe('sc_map', function() {
       assert.equal(0, normal[1]);
       assert.equal(1, normal[2]);
       assert.equal(0, normal[3]);
-
     });
 
     it('should create correct size texturemap', function() {
+      let map_5x5 = new sc.map();
+      map_5x5.create(default_5x5_map_args);
 
+      assert.equal(128 * 128 * 4, map_5x5.texturemap.chan0_3.capacity());
+      assert.equal(128 * 128 * 4, map_5x5.texturemap.chan4_7.capacity());
+
+      let map_20x20 = new sc.map();
+      map_20x20.create(default_20x20_map_args);
+
+      assert.equal(512 * 512 * 4, map_20x20.texturemap.chan0_3.capacity());
+      assert.equal(512 * 512 * 4, map_20x20.texturemap.chan4_7.capacity());
     });
 
     it('should create correct metadata', function() {

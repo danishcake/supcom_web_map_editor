@@ -18,17 +18,28 @@ const ByteBuffer = require('bytebuffer');
  * These are square, with a fixed size header
  * Used by the texturemap and water maps
  */
-let dds_sz2 = function(x, y) { return x * y + 128; };
-let dds_sz = function(d) { return dds_sz2(d, d); };
+const dds_sz2 = function(x, y) { return x * y + 128; };
+const dds_sz = function(d) { return dds_sz2(d, d); };
 
-/*
- * Used to determine the heightmap size from a zero based enum
- */
-let hm_sz = function(idx) {
+/* Used to determine height map size from a zero based size enum */
+const hm_sz = function(idx) {
   check.between(0, 4, idx, "Invalid map size");
   const lut = [256, 512, 1024, 2048, 4096];
   return lut[idx];
 };
+
+/* Used to determine texture map size from a zero based size enum */
+const tm_sz = function(idx) {
+  check.between(0, 4, idx, "Invalid map size");
+  const lut = [128, 256, 512, 1024, 2048];
+  return lut[idx];
+};
+
+/* Used to determine normal map size from a zero based size enum */
+const nm_sz = hm_sz;
+
+
+
 
 /**
  * Initial header
@@ -860,8 +871,8 @@ class sc_map_normalmap {
   save(output) {}
 
   create(map_args) {
-    this.__width = hm_sz(map_args.size);
-    this.__height = hm_sz(map_args.size);
+    this.__width = nm_sz(map_args.size);
+    this.__height = nm_sz(map_args.size);
     this.__data = new ByteBuffer(this.__width * this.__height * 4);
 
     // Fill normalmap with 'pointing up' vector.
@@ -894,7 +905,7 @@ class sc_map_texturemap {
     for (let chan = 0; chan < 2; chan++) {
       let chan_length = input.readInt32();
       // Sanity check texture map length
-      check.one_of([dds_sz(256), dds_sz(512), dds_sz(1024), dds_sz(2048), dds_sz(4096)], chan_length, "Suspicious texture map length");
+      check.one_of([dds_sz(tm_sz(0)), dds_sz(tm_sz(1)), dds_sz(tm_sz(2)), dds_sz(tm_sz(3)), dds_sz(tm_sz(4))], chan_length, "Suspicious texture map length");
 
       let chan_dds = new sc_dds();
       let starting_remaining = input.remaining();
@@ -913,7 +924,8 @@ class sc_map_texturemap {
   save(output) {}
 
   create(map_args) {
-
+    this.__chan0_3 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4);
+    this.__chan4_7 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4);
   }
 }
 
