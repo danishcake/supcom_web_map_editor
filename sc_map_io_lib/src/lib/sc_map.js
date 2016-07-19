@@ -37,8 +37,16 @@ const tm_sz = function(idx) {
 
 /* Used to determine normal map size from a zero based size enum */
 const nm_sz = hm_sz;
-
-
+/* Used to determine water map size from a zero based size enum */
+const wmwm_sz = tm_sz;
+/* Used to determine foam mask size from a zero based size enum */
+const wmfm_sz = tm_sz;
+/* Used to determine water flatness data size from a zero based size enum */
+const wmfl_sz = tm_sz;
+/* Used to determine water depth bias size from a zero based size enum */
+const wmdb_sz = tm_sz;
+/* Used to determine terrain type size from a zero based size enum */
+const wmtt_sz = hm_sz;
 
 
 /**
@@ -937,8 +945,6 @@ class sc_map_watermap {
     this.__heightmap = heightmap;
 
     this.__watermap_data = undefined;
-    this.__watermap_width = undefined;
-    this.__watermap_height = undefined
     this.__foam_mask_data = undefined;
     this.__flatness_data = undefined;
     this.__depth_bias_data = undefined;
@@ -946,8 +952,8 @@ class sc_map_watermap {
   }
 
   get watermap_data() { return this.__watermap_data; }
-  get watermap_width() { return this.__watermap_width; }
-  get watermap_height() { return this.__watermap_height; }
+  get watermap_width() { return this.__heightmap.width / 2; }
+  get watermap_height() { return this.__heightmap.height / 2; }
   get foam_mask_data() { return this.__foam_mask_data; }
   get foam_mask_width() { return this.__heightmap.width / 2; }
   get foam_mask_height() { return this.__heightmap.height / 2; }
@@ -989,8 +995,6 @@ class sc_map_watermap {
 
     // Record fields
     this.__watermap_data = watermap_dds.data;
-    this.__watermap_width = watermap_dds.width;
-    this.__watermap_height = watermap_dds.height;
     this.__foam_mask_data = foam_mask_data;
     this.__flatness_data = flatness_data;
     this.__depth_bias_data = depth_bias_data;
@@ -999,7 +1003,19 @@ class sc_map_watermap {
   save(output) {}
 
   create(map_args) {
+    this.__watermap_data = new ByteBuffer(wmwm_sz(map_args.size) * wmwm_sz(map_args.size) * 4); // 32bpp
+    this.__foam_mask_data = new ByteBuffer(wmfm_sz(map_args.size) * wmfm_sz(map_args.size)); // 8bpp
+    this.__flatness_data = new ByteBuffer(wmfl_sz(map_args.size) * wmfl_sz(map_args.size)); // 8bpp
+    this.__depth_bias_data = new ByteBuffer(wmdb_sz(map_args.size) * wmdb_sz(map_args.size)); // 8bpp
+    this.__terrain_type_data = new ByteBuffer(wmtt_sz(map_args.size) * wmtt_sz(map_args.size)); // 8bpp
 
+    // On NodeJs I seem to be hitting the Buffer constructor instead of ArrayBuffer, leading to non-zero initialised
+    // memory. Explicitly zero to avoid this.
+    this.__watermap_data.fill(0).reset();
+    this.__foam_mask_data.fill(0).reset();
+    this.__flatness_data.fill(0).reset();
+    this.__depth_bias_data.fill(0).reset();
+    this.__terrain_type_data.fill(0).reset();
   }
 }
 

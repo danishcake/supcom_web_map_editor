@@ -518,6 +518,41 @@ describe('sc_map', function() {
       assert.equal(512 * 512 * 4, map_20x20.texturemap.chan4_7.capacity());
     });
 
+    it('should create correct watermap', function() {
+      let map_5x5 = new sc.map();
+      map_5x5.create(default_5x5_map_args);
+
+      assert.equal(128 * 128 * 4, map_5x5.watermap.watermap_data.capacity());
+      assert.equal(128, map_5x5.watermap.watermap_width);
+      assert.equal(128, map_5x5.watermap.watermap_height);
+      assert.equal(128 * 128, map_5x5.watermap.foam_mask_data.capacity());
+      assert.equal(128, map_5x5.watermap.foam_mask_width);
+      assert.equal(128, map_5x5.watermap.foam_mask_height);
+      assert.equal(128 * 128, map_5x5.watermap.flatness_data.capacity());
+      assert.equal(128, map_5x5.watermap.flatness_width);
+      assert.equal(128, map_5x5.watermap.flatness_height);
+      assert.equal(128 * 128, map_5x5.watermap.depth_bias_data.capacity());
+      assert.equal(128, map_5x5.watermap.depth_bias_width);
+      assert.equal(128, map_5x5.watermap.depth_bias_height);
+      assert.equal(256 * 256, map_5x5.watermap.terrain_type_data.capacity());
+      assert.equal(256, map_5x5.watermap.terrain_type_width);
+      assert.equal(256, map_5x5.watermap.terrain_type_height);
+
+      // Not yet understanding the purpose of these fields, the best I can do is zero their contents.
+      assert.equal(0, map_5x5.watermap.watermap_data.readUint8());
+      assert.equal(0, map_5x5.watermap.foam_mask_data.readUint8());
+      assert.equal(0, map_5x5.watermap.flatness_data.readUint8());
+      assert.equal(0, map_5x5.watermap.depth_bias_data.readUint8());
+      assert.equal(0, map_5x5.watermap.terrain_type_data.readUint8());
+    });
+
+    it('should create empty prop list', function() {
+      let map_5x5 = new sc.map();
+      map_5x5.create(default_5x5_map_args);
+
+      assert.equal(0, map_5x5.props.props.length);
+    });
+
     it('should create correct metadata', function() {
 
     });
