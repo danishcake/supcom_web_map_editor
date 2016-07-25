@@ -55,6 +55,11 @@ module.exports = function (grunt) {
         src: '**',
         dest: 'sc_map_io_lib/dist/test/data'
       },
+      deploy_thirdparty_io_lib: {
+        expand: true,
+        src: ['thirdparty/**/*.js'],
+        dest: 'sc_map_io_lib/dist'
+      },
       deploy_io_lib: {
         expand: true,
         cwd: 'sc_map_io_lib/dist/lib',
@@ -69,6 +74,7 @@ module.exports = function (grunt) {
     'babel:dist_io_lib',
     'babel:dist_edit_bin',
     'copy:testdata_io_lib',
+    'copy:deploy_thirdparty_io_lib',
     'copy:deploy_io_lib',
     'mochaTest:test_io_lib'
   ]);
@@ -76,6 +82,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'babel:dist_io_lib',
     'babel:dist_edit_bin',
+    'copy:deploy_thirdparty_io_lib',
     'copy:deploy_io_lib'
   ]);
 };
