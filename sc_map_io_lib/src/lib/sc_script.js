@@ -102,12 +102,10 @@ export class sc_script_base {
 
   /**
    * Obtains a global variable.
-   * @param path_elements A globally acccessible value, potentially nested
+   * @param path_elements {String} A globally acccessible value, potentially nested.
    * eg ScenarioInfo.name
-   * @param element_type Type to be accessed - String or Number
-   * eg lua.lua_tostring
    */
-  query_global(path, element_type) {
+  query_global(path) {
     let path_elements = path.split(".");
     let first_element = path_elements[0];
     let remaining_elements = path_elements.slice(1);
@@ -116,77 +114,71 @@ export class sc_script_base {
     // Push first element onto stack
     lua.lua_getglobal(this.__lua_state, first_element);
 
-    if (remaining_elements.length === 0) {
-      result = this.__query_top_of_stack(element_type);
-    } else {
-      if (lua.lua_istable(this.__lua_state, -1)) {
-        result = this.__query_nested(remaining_elements, element_type);
+    // Push the remaining elements onto the stack
+    for (let i = 0 ; i < remaining_elements.length; i++){
+
+      if (!lua.lua_istable(this.__lua_state, -1)) {
+        throw new Error(`Expected a table at the top of the stack but found ${lua.lua_typename(this.__lua_state, lua.lua_type(this.__lua_state, -1))}. Path was ${path_elements.slice(0, i)}`);
       }
-    }
-    // Balance the stack
-    lua.lua_pop(this.__lua_state);
 
-    if (result === undefined) {
-      throw new Error(`Unable to find ${path}, or wrong type. Got ${result}`);
-    } else {
-      console.log(`Returning ${result}`);
+      lua.lua_getfield(this.__lua_state, -1, remaining_elements[i]);
     }
 
-    // Consider the result - is an error value?
+    // Convert the result
+    result = this.convert_top_of_stack();
+
+    // Balance the stack by popping an equal number of elements
+    for (let i = 0 ; i < path_elements.length; i++) {
+      lua.lua_pop(this.__lua_state, 1);
+    }
+
     return result;
   }
 
+
   /**
-   * Queries into a table given a broken down path of keys. The
-   * queried table is expected to be at the top of the stack
-   * TODO: Could this be merged with query_global if I checked the top of the stack
-   * for a table?
+   * Converts the object at the top of the stack into its Javascript
+   * equivalent. Throws on contact with functions and userdata.
+   * Naively assumes no loops!
+   * Only supports string keys
+   * Stack is left balanced (eg the top will still be there and need removing)
    */
-  __query_nested(path_elements, element_type) {
-    let first_element = path_elements[0];
-    let remaining_elements = path_elements.slice(1);
-    let result = undefined;
+  convert_top_of_stack() {
+    if (lua.lua_type(this.__lua_state, -1) === lua.LUA_TSTRING) {
+      return lua.lua_tostring(this.__lua_state, -1);
+    } else if (lua.lua_type(this.__lua_state, -1) === lua.LUA_TNUMBER) {
+      return lua.lua_tonumber(this.__lua_state, -1);
+    } else if (lua.lua_type(this.__lua_state, -1) === lua.LUA_TBOOLEAN) {
+      return lua.lua_toboolean(this.__lua_state, -1);
+    } else if (lua.lua_type(this.__lua_state, -1) === lua.LUA_TTABLE) {
+      // Iterate over keys and create object
+      let ret = {};
 
-    lua.lua_getfield(this.__lua_state, -1, first_element);
+      lua.lua_pushnil(this.__lua_state);
+      while (lua.lua_next(this.__lua_state, -2)) {
+        if (!lua.lua_type(this.__lua_state, -2) == lua.LUA_TTABLE) {
+          throw new Error(`Table key must be a string but found ${lua.lua_typename(this.__lua_state, lua.lua_type(this.__lua_state, -2))}`);
+        }
+        let key = lua.lua_tostring(this.__lua_state, -2);
+        ret[key] = this.convert_top_of_stack();
 
-    if (remaining_elements.length === 0) {
-      result = this.__query_top_of_stack(element_type);
-    } else {
-      if (lua.lua_istable(this.__lua_state, -1)) {
-        result = this.__query_nested(remaining_elements);
+        // Pop value, leave key for next iteration
+        // lua_next pushed nothing on last iteration, so stack balanced
+        lua.lua_pop(this.__lua_state, 1);
       }
+
+      return ret;
+    } else {
+      throw new Error(`Unsupported type ${lua.lua_typename(this.__lua_state, lua.lua_type(this.__lua_state, -1))}`);
     }
-
-    // Balance the stack
-    lua.lua_pop(this.__lua_state);
-    return result;
-  }
-
-  /**
-   * Queries the top of the Lua stack for an element of the specified type.
-   * Only Number or String are supported.
-   * TODO: This is a bit naff, refactor it. Could just evaluate some lua?
-   */
-  __query_top_of_stack(element_type) {
-
-    switch(element_type)
-    {
-      case String:
-        if (lua.lua_isstring(this.__lua_state, -1)) {
-          return lua.lua_tostring(this.__lua_state, -1);
-        }
-      case Number:
-        if (lua.lua_isnumber(this.__lua_state, -1)) {
-          return lua.lua_tonumber(this.__lua_state, -1);
-        }
-      default:
-        break;
-    }
-    return null;
   }
 }
 
 
+/**
+ * Scenario script class
+ * Loads and parses a map _scenario.lua file
+ */
 export class sc_script_scenario extends sc_script_base {
   constructor() {
     super();
@@ -211,11 +203,11 @@ export class sc_script_scenario extends sc_script_base {
     super.run_script(input);
 
     // Query the resulting globals
-    let name = this.query_global("ScenarioInfo.name", String);
-    let description = this.query_global("ScenarioInfo.description", String);
-    let map_filename = this.query_global("ScenarioInfo.map", String);
-    let save_filename = this.query_global("ScenarioInfo.save", String);
-    let script_filename = this.query_global("ScenarioInfo.script", String);
+    let name = this.query_global("ScenarioInfo.name");
+    let description = this.query_global("ScenarioInfo.description");
+    let map_filename = this.query_global("ScenarioInfo.map");
+    let save_filename = this.query_global("ScenarioInfo.save");
+    let script_filename = this.query_global("ScenarioInfo.script");
 
     // Record fields
     this.__name = name;
@@ -223,6 +215,98 @@ export class sc_script_scenario extends sc_script_base {
     this.__map_filename = map_filename;
     this.__save_filename = save_filename;
     this.__script_filename = script_filename;
+
+    // TODO: Map size and forces
+  }
+
+  save(output) {}
+  create(script_args) {}
+}
+
+/**
+ * Script marker. Represents a 'thing' in the map - spawn point,
+ * mass, hydrocarbon etc.
+ * Does not represent wreckage.
+ *
+ * Valid types: 'Blank Marker': Spawn point
+ *              'Mass': Mass point
+ *              'Hydrocarbon': Hydrocarbon point
+ *              'Defenive point': AI marker
+ *              'Combat Zone': AI marker
+ *              'Expansion Area': AI marker
+ *              'Rally Point': AI marker
+ *              'Protected Experimental Construction': AI marker
+ */
+class sc_script_marker {
+  constructor() {
+    this.__type = undefined;
+    this.__orientation = undefined;
+    this.__position = undefined;
+  }
+
+  get type() { return this.__type; }
+  get orientation() { return this.__orientation; }
+  get position() { return this.__position; }
+
+  load(name, input) {
+    // Load the common fields
+    this.__name = name;
+    this.__type = input.type;
+    this.__orientation = input.orientation;
+    this.__position = input.position;
+
+    // TODO: Load the type specific fields
+  }
+  save(output) {}
+  create(script_args) {}
+}
+
+
+export class sc_script_save extends sc_script_base {
+  constructor() {
+    super();
+    this.__markers = {};
+  }
+
+  get markers() { return this.__markers; }
+
+  /**
+   * Executes input as a Lua script and extracts save fields
+   */
+  load(input) {
+    // 1. Load the script into the Lua state
+    super.run_script(input);
+
+    //    MasterChain = {
+    //    ['_MASTERCHAIN_'] = {
+    //        Markers = {
+    //            ['ARMY_1'] = {
+    //                ['color'] = STRING( 'ff800080' ),
+    //                ['type'] = STRING( 'Blank Marker' ),
+    //                ['prop'] = STRING( '/env/common/props/markers/M_Blank_prop.bp' ),
+    //                ['orientation'] = VECTOR3( 0, -0, 0 ),
+    //                ['position'] = VECTOR3( 35.5, 75.9766, 154.5 ),
+    //            },
+
+    // 1. Parse the markers (mass/hydro/spawn points/AI markers etc )
+    let scenario_markers = super.query_global('Scenario.MasterChain._MASTERCHAIN_.Markers');
+
+    // 2. Iterate over the markers in Scenario.MasterChain._MASTERCHAIN_.Markers and create objects
+    let markers = {};
+    for (let marker_idx in scenario_markers) {
+      console.log(`Loading ${marker_idx}: ${JSON.stringify(scenario_markers[marker_idx])}`);
+
+      let marker = new sc_script_marker();
+      marker.load(marker_idx, scenario_markers[marker_idx]);
+      markers[marker_idx] = marker;
+    }
+
+    // 3. Now we have to resolve the army spawn locations. The names of these
+    // were determined during the parsing of the _scenario.lua files
+    // I don't actually need to parse the armies in the save file as we dont support
+    // most of the fruity capabilities that provides (prespawned units etc)... yet
+    // Record fields
+    this.__markers = markers;
   }
 
   save(output) {}
