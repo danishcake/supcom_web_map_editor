@@ -32,6 +32,14 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', function() 
 
 
   /**
+   * Creates a web_gl camera and mouse move/zoom events
+   */
+  let initialiseCamera = function(scope) {
+    scope.camera = new webgl_camera(512, 512)
+  }
+
+
+  /**
    * Initialises WebGL context, shaders etc and starts first draw
    */
   let initialiseWebGl = function(scope, element) {
@@ -48,6 +56,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', function() 
 
 
         // Initialise meshes
+        //let terrain_mesh = new webgl_mesh(gl);
 
         // Initialise shaders (placholders, load dynamically)
         let vs_src = "attribute vec3 aVertexPosition;\n" +

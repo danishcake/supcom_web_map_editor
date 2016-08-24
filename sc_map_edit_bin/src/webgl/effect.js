@@ -69,6 +69,11 @@ class webgl_effect {
           type: active_attribute.type,
           index: gl.getAttribLocation(this.__program, active_attribute.name)
         };
+
+        if (active_attribute.type !== gl.FLOAT) {
+          throw new Error(`Attribute type ${active_attribute.type} is not float. Only float supported`);
+        }
+
       } else {
         break;
       }
@@ -97,4 +102,41 @@ class webgl_effect {
       }
     }
   }
+
+
+  /**
+   * Activate the effect for future rendering.
+   * You have to setup each uniform and bind each attribute before rendering
+   */
+  start()
+  {
+     gl.useProgram(this.__program);
+
+     for(var attribute in this.__attributes)
+     {
+        gl.enableVertexAttribArray(this.__attributes[attribute].index);
+     }
+  }
+
+  /**
+   * Deactivates the current effect
+   */
+  stop = function()
+  {
+     gl.useProgram(null);
+  }
+
+
+  /**
+  * Sets a uniform to the specified value
+  * TODO: I could enforce some type safety here
+  * TODO: I could provide more overloads here
+  */
+  set_uniform_mat4(uniform_id, val) { gl.uniformMatrix4fv(this.__uniforms[uniform_id].index, false, val); }
+  set_uniform_vec4(uniform_id, val) { gl.uniform3fv(this.__uniforms[uniform_id].index, false, val); }
+
+
+
+  get attributes() { return this.__attributes; }
+  get uniforms() { return this.__uniforms; }
 }
