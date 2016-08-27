@@ -8,6 +8,9 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', function() 
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);      // Clear the color and depth buffers
 
+    // Draw heightmap
+    scope.scene.heightmap.draw(scope.terrainShader, scope.camera)
+
     // Trigger next redraw in approximately 16ms (for 60Hz monitors)
     scope.scheduleRedraw();
   };
@@ -36,6 +39,15 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', function() 
    */
   let initialiseCamera = function(scope) {
     scope.camera = new webgl_camera(512, 512)
+  }
+
+  /**
+   * Creates web gl scene objects
+   */
+  let initialiseScene = function(scope) {
+    scope.scene = {
+      heightmap: new webgl_heightmap(scope.gl, 512, 512)
+    };
   }
 
 
@@ -88,6 +100,8 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', function() 
     link: function(scope, element) {
       initialiseRenderScheduleFn(scope);
       initialiseWebGl(scope, element);
+      initialiseCamera(scope);
+      initialiseScene(scope);
     }
   };
 });

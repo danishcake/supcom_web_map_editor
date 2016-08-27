@@ -81,8 +81,8 @@ class webgl_heightmap {
   draw(effect, camera) {
     effect.start();
 
-    __bind_effect(effect, camera);
-    __draw_mesh();
+    this.__bind_effect(effect, camera);
+    this.__draw_mesh();
 
     effect.stop();
   }

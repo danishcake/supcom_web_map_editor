@@ -70,8 +70,8 @@ class webgl_effect {
           index: gl.getAttribLocation(this.__program, active_attribute.name)
         };
 
-        if (active_attribute.type !== gl.FLOAT) {
-          throw new Error(`Attribute type ${active_attribute.type} is not float. Only float supported`);
+        if (active_attribute.type !== gl.FLOAT_VEC3) {
+          throw new Error(`Attribute type ${active_attribute.type} is not Vector3f. Only Vector3f supported`);
         }
 
       } else {
@@ -108,22 +108,22 @@ class webgl_effect {
    * Activate the effect for future rendering.
    * You have to setup each uniform and bind each attribute before rendering
    */
-  start()
-  {
-     gl.useProgram(this.__program);
+  start() {
+    let gl = this.gl;
+    gl.useProgram(this.__program);
 
-     for(var attribute in this.__attributes)
-     {
-        gl.enableVertexAttribArray(this.__attributes[attribute].index);
-     }
+    for(var attribute in this.__attributes)
+    {
+      gl.enableVertexAttribArray(this.__attributes[attribute].index);
+    }
   }
 
   /**
    * Deactivates the current effect
    */
-  stop = function()
-  {
-     gl.useProgram(null);
+  stop() {
+    let gl = this.gl;
+    gl.useProgram(null);
   }
 
 
@@ -132,8 +132,8 @@ class webgl_effect {
   * TODO: I could enforce some type safety here
   * TODO: I could provide more overloads here
   */
-  set_uniform_mat4(uniform_id, val) { gl.uniformMatrix4fv(this.__uniforms[uniform_id].index, false, val); }
-  set_uniform_vec4(uniform_id, val) { gl.uniform3fv(this.__uniforms[uniform_id].index, false, val); }
+  set_uniform_mat4(uniform_id, val) { this.gl.uniformMatrix4fv(this.__uniforms[uniform_id].index, false, new Float32Array(val)); }
+  set_uniform_vec3(uniform_id, val) { this.gl.uniform3fv(this.__uniforms[uniform_id].index, false, new Float32Array(val)); }
 
 
 
