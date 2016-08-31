@@ -66,7 +66,7 @@ class webgl_heightmap {
 
     // Convert to VBO
     this.__vertex_buffer = gl.createBuffer();
-    this.__vertex_buffer_size = triangles.length;
+    this.__vertex_buffer_size = triangles.length / 3;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.__vertex_buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangles), gl.STATIC_DRAW);
@@ -104,7 +104,7 @@ class webgl_heightmap {
     effect.set_uniform_mat4("uPMatrix", camera.projection);
 
     /* Check effect compatibility */
-    if (effect.attributes["aPosition"] == undefined)
+    if (effect.attributes["aVertexPosition"] === undefined)
     {
       console.log("Model required aPosition in effect");
       return;
@@ -112,7 +112,7 @@ class webgl_heightmap {
 
     // Bind vertex buffer and draw it
     gl.bindBuffer(gl.ARRAY_BUFFER, this.__vertex_buffer);
-    gl.vertexAttribPointer(effect.attributes.aPosition.index, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(effect.attributes.aVertexPosition.index, 3, gl.FLOAT, false, 0, 0);
   }
 
 
@@ -121,7 +121,8 @@ class webgl_heightmap {
    */
   __draw_mesh() {
     let gl = this.__gl;
-
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.__vertex_buffer);
     gl.drawArrays(gl.TRIANGLES, 0, this.__vertex_buffer_size);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }
 }

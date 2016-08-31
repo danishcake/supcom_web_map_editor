@@ -15,6 +15,7 @@ class webgl_camera {
     this.__up_vector = V3.$(0, -1, 0);
 
     // Calculate initial model_view/perspective matrices
+    this.tick();
   }
 
 
@@ -30,9 +31,9 @@ class webgl_camera {
     // Assuming frustrum short edge length is sqrt(2) * z_height * 0.5
     // z_height = 32 / sqrt(2) = 22.6ish
     // TODO: Make this above terrain height
-    let nearest_z_position = V3.$(this.__focus.x, this.__focus.y, 22.6);
-    let furthest_z_position = V3.$(this.__focus.x, this.__focus.y, this.__long_edge * 2 / Math.sqrt(2));
-    let delta = furthest_z_position - nearest_z_position;
+    let nearest_z_position = V3.$(this.__focus[0], this.__focus[1], 22.6);
+    let furthest_z_position = V3.$(this.__focus[0], this.__focus[1], this.__long_edge * 2 / Math.sqrt(2));
+    let delta = V3.sub(furthest_z_position, nearest_z_position);
 
     let camera_position = V3.add(nearest_z_position, V3.scale(delta, this.__zoom));
 
@@ -78,9 +79,9 @@ class webgl_camera {
   }
 
   set_focus(focus) {
-    this.__focus.x = focus.x;
-    this.__focus.y = focus.y;
-    this.__focus.z = 0;
+    this.__focus[0] = focus[0];
+    this.__focus[1] = focus[1];
+    this.__focus[2] = 0;
   }
 
   /**
