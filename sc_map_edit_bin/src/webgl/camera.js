@@ -4,7 +4,8 @@
  * in a similar fashion to that within SupCom
  */
 class webgl_camera {
-  constructor(width, height) {
+  constructor(gl, width, height) {
+    this.__gl = gl;
     this.__width = width;
     this.__height = height;
     this.__long_edge = Math.max(this.__width, this.__height);
@@ -32,14 +33,16 @@ class webgl_camera {
     // z_height = 32 / sqrt(2) = 22.6ish
     // TODO: Make this above terrain height
     let nearest_z_position = V3.$(this.__focus[0], this.__focus[1], 22.6);
-    let furthest_z_position = V3.$(this.__focus[0], this.__focus[1], this.__long_edge * 2 / Math.sqrt(2));
+    let furthest_z_position = V3.$(this.__focus[0], this.__focus[1], this.__long_edge * 1.1 / 2.0);
     let delta = V3.sub(furthest_z_position, nearest_z_position);
 
-    let camera_position = V3.add(nearest_z_position, V3.scale(delta, this.__zoom));
+    let camera_position = V3.sub(furthest_z_position, V3.scale(delta, this.__zoom));
 
     this.__model_view = M4x4.makeLookAt(camera_position, this.__focus, this.__up_vector);
     // TODO: Aspect ratio of 1 should be varied with resolution - query gl object?
-    this.__perspective = M4x4.makePerspective(this.__fov, 1, -1, 1);
+    let aspect_ratio = this.__gl.drawingBufferWidth / this.__gl.drawingBufferHeight;
+
+    this.__perspective = M4x4.makePerspective(this.__fov, aspect_ratio, -1, 1);
   }
 
 

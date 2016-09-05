@@ -4,6 +4,8 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', function() 
    * Rendering callback. Draws the scene and schedules a redraw
    */
   let render = function(scope) {
+    scope.camera.tick();
+
     let gl = scope.gl;
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);      // Clear the color and depth buffers
@@ -38,7 +40,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', function() 
    * Creates a web_gl camera and mouse move/zoom events
    */
   let initialiseCamera = function(scope) {
-    scope.camera = new webgl_camera(512, 512)
+    scope.camera = new webgl_camera(scope.gl, 512, 512)
   }
 
   /**
@@ -72,13 +74,18 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', function() 
 
         // Initialise shaders (placholders, load dynamically)
         let vs_src = "attribute vec3 aVertexPosition;\n" +
+                     "varying vec2 vTextureCoord;\n" +
                      "uniform mat4 uMVMatrix;\n" +
                      "uniform mat4 uPMatrix;\n" +
+                     "uniform vec2 uMapSize;\n" +
                      "void main(void) {\n" +
-                     "   gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
+                     "    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
+                     "    vTextureCoord = aVertexPosition.xy / uMapSize;\n" +
                      "}\n";
-        let fs_src = "void main(void) {\n" +
-                     "gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n" +
+        let fs_src = "precision mediump float;\n" +
+                     "varying vec2 vTextureCoord;\n" +
+                     "void main(void) {\n" +
+                     "    gl_FragColor = vec4(vTextureCoord.x, 1.0, 1.0, 1.0);\n" +
                      "}\n";
         scope.terrainShader = new webgl_effect(gl, vs_src, fs_src);
 

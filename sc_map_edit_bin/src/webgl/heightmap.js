@@ -3,6 +3,7 @@
  */
 class webgl_heightmap {
   constructor(gl, width, height) {
+    this.__map_size = [width, height];
     this.__gl = gl;
     this.__generate_mesh(width, height);
   }
@@ -102,6 +103,7 @@ class webgl_heightmap {
 
     effect.set_uniform_mat4("uMVMatrix", camera.modelview);
     effect.set_uniform_mat4("uPMatrix", camera.projection);
+    effect.set_uniform_vec2("uMapSize", this.__map_size)
 
     /* Check effect compatibility */
     if (effect.attributes["aVertexPosition"] === undefined)

@@ -30,14 +30,14 @@ class webgl_effect {
     gl.compileShader(this.__vs_obj);
     if (!gl.getShaderParameter(this.__vs_obj, gl.COMPILE_STATUS))
     {
-      throw new Error(`An error occurred compiling the shaders: ${gl.getShaderInfoLog(this.__vs_obj)}`);
+      throw new Error(`An error occurred compiling the vertex shader: ${gl.getShaderInfoLog(this.__vs_obj)}`);
     }
 
     gl.shaderSource(this.__fs_obj, this.__fs_src);
     gl.compileShader(this.__fs_obj);
     if (!gl.getShaderParameter(this.__fs_obj, gl.COMPILE_STATUS))
     {
-      throw new Error(`An error occurred compiling the shaders: ${gl.getShaderInfoLog(this.__fs_obj)}`);
+      throw new Error(`An error occurred compiling the fragment shader: ${gl.getShaderInfoLog(this.__fs_obj)}`);
     }
 
     // Link the shaders into a program
@@ -49,7 +49,7 @@ class webgl_effect {
     // If creating the shader program failed, alert
     if (!gl.getProgramParameter(this.__program, gl.LINK_STATUS))
     {
-      new new Error("Unable to initialize the shader program.");
+      throw new Error(`Unable to initialize the shader program: ${gl.getProgramInfoLog(this.__program)}`);
     }
   }
 
@@ -133,7 +133,9 @@ class webgl_effect {
   * TODO: I could provide more overloads here
   */
   set_uniform_mat4(uniform_id, val) { this.gl.uniformMatrix4fv(this.__uniforms[uniform_id].index, false, new Float32Array(val)); }
-  set_uniform_vec3(uniform_id, val) { this.gl.uniform3fv(this.__uniforms[uniform_id].index, false, new Float32Array(val)); }
+  set_uniform_vec4(uniform_id, val) { this.gl.uniform4fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
+  set_uniform_vec3(uniform_id, val) { this.gl.uniform3fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
+  set_uniform_vec2(uniform_id, val) { this.gl.uniform2fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
 
 
 
