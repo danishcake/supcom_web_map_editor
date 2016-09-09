@@ -16,7 +16,10 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
     });
   };
   $scope.open_map = function() {
-    dialogs.error('Open Map','Not implemented.');
+    let dlg = dialogs.create("templates/dialogs/open-map.html", "open-map", {}, modal_dlg_opts);
+    dlg.result.then(function(map) {
+      dialogs.error('Open Map','Not (fully) implemented.');
+    });
   };
   $scope.save_map = function() {
     dialogs.error('Save Map','Not implemented.');

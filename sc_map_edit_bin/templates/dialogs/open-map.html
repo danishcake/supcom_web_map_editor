@@ -1,0 +1,49 @@
+<div class="modal-header dialog-header-notify">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <h4 class="modal-title"><span class="glyphicon glyphicon-open"></span> Open Map</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+    <div class="col-lg-12">
+      <uib-tabset active="data.open_mode_tab_index">
+        <uib-tab index="0" heading="Archive">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <label class="btn btn-default" ng-click="open_archive()"><span class="glyphicon glyphicon-open"></span>&nbsp;x.zip</label>
+            </div>
+          </div>
+        </uib-tab>
+        <uib-tab index="1" heading="Individual Files">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="btn-group-vertical">
+                <label class="btn" ng-click="open_scenario()" ng-class="data.validity.scenario_set ? 'btn-success' : 'btn-default'">
+                  <span class="glyphicon glyphicon-open pull-left"></span>&nbsp;x_scenario.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scenario_set"></span></label>
+                <label class="btn" ng-click="open_save()" ng-class="data.validity.save_set ? 'btn-success' : 'btn-default'">
+                  <span class="glyphicon glyphicon-open pull-left"></span>&nbsp;x_script.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.save_set"></span>
+                </label>
+                <label class="btn" ng-click="open_script()" ng-class="data.validity.script_set ? 'btn-success' : 'btn-default'">
+                  <span class="glyphicon glyphicon-open pull-left"></span>&nbsp;x_save.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.script_set"></span>
+                </label>
+                <label class="btn" ng-click="open_scmap()" ng-class="data.validity.scmap_set ? 'btn-success' : 'btn-default'">
+                  <span class="glyphicon glyphicon-open pull-left"></span>&nbsp;x.scmap&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scmap_set"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info" role="alert" ng-hide="data.validity.all_set">
+            <span ng-show="!data.validity.all_set">You need to select all of the map files to continue</span>
+          </div>
+          <label class="btn btn-default pull-right" ng-click="" ng-disabled="!data.validity.all_set">OK</label>
+
+        </uib-tab>
+      </uib-tabset>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <span class="pull-left">Supreme Commander maps are split over several files - a large binary file and several lua scripts. You can either open an archive containing all the required files, or load them individually.</span>
+</div>
