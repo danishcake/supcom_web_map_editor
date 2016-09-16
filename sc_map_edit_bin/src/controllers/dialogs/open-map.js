@@ -32,8 +32,8 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
   $scope.open_scenario = function() {
     $scope.data.validity.scenario_set = true;
     $scope.update_validity();
-  }
-  ;
+  };
+
   $scope.open_save = function() {
     $scope.data.validity.save_set = true;
     $scope.update_validity();

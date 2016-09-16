@@ -9,7 +9,7 @@
  * mymap_script.lua     // Scripts associated with the map. Usually fixed contents that can be ignored
  */
 const ByteBuffer = require('bytebuffer');
-const Lua5_1 = require('../thirdparty/lua5.1.5.min');
+const Lua5_1 = require('../thirdparty/lua5.1.5.min').Lua5_1;
 const lua = Lua5_1.C;
 
 /**
