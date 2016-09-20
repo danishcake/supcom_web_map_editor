@@ -83,16 +83,20 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('build', [
-    'babel:dist_io_lib',
+  grunt.registerTask('build_edit_bin', [
     'babel:dist_edit_bin',
+  ]);
+
+  grunt.registerTask('build_io_lib', [
+    'babel:dist_io_lib',
     'copy:deploy_thirdparty_io_lib',
     'browserify:dist_io_lib',
     'copy:deploy_io_lib'
   ]);
 
   grunt.registerTask('default', [
-    'build',
+    'build_io_lib',
+    'build_edit_bin',
     'copy:testdata_io_lib',
     'mochaTest:test_io_lib'
   ]);
