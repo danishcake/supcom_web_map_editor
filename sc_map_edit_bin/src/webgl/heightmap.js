@@ -2,10 +2,10 @@
  * Heightmap mesh class.
  */
 class webgl_heightmap {
-  constructor(gl, width, height) {
-    this.__map_size = [width, height];
+  constructor(gl, heightmap) {
+    this.__map_size = [heightmap.width, heightmap.height];
     this.__gl = gl;
-    this.__generate_mesh(width, height);
+    this.__generate_mesh(heightmap);
   }
 
 
@@ -25,13 +25,13 @@ class webgl_heightmap {
    * Currently the plan is to use a displacement map (the heightmap) to achieve nice runtime
    * editable heightmaps without regenerating the mesh continuously
    */
-  __generate_mesh(width, height) {
+  __generate_mesh(heightmap) {
     let gl = this.__gl;
 
     // Generate static vertices
     let verts = [];
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
+    for (let y = 0; y < heightmap.height; y++) {
+      for (let x = 0; x < heightmap.width; x++) {
         //verts.push(x, y, 0);
         verts.push(x);
         verts.push(y);
@@ -40,10 +40,10 @@ class webgl_heightmap {
     }
 
     // Generate static index buffer
-    let idx = function(x, y) { return (y * width + x) * 3; };
+    let idx = function(x, y) { return (y * heightmap.width + x) * 3; };
     let triangles = [];
-    for (let y = 0; y < height - 1; y++) {
-      for (let x = 0; x < width - 1; x++) {
+    for (let y = 0; y < heightmap.height - 1; y++) {
+      for (let x = 0; x < heightmap.width - 1; x++) {
         triangles.push(verts[idx(x,     y) + 0]);
         triangles.push(verts[idx(x,     y) + 1]);
         triangles.push(verts[idx(x,     y) + 2]);

@@ -12,12 +12,7 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
   $scope.new_map = function() {
     let dlg = dialogs.create("templates/dialogs/new-map.html", "new-map", {}, modal_dlg_opts);
     dlg.result.then(function(map_parameters) {
-      editor_state.map = new sc_map_io_lib.sc.map();
-      editor_state.map.create(map_parameters);
-      editor_state.scripts.scenario = new sc_map_io_lib.sc.script.scenario();
-      editor_state.scripts.scenario.create(map_parameters);
-      editor_state.scripts.save = new sc_map_io_lib.sc.script.save();
-      editor_state.scripts.save.create(map_parameters);
+      editor_state.create_map(map_parameters);
     });
   };
   $scope.open_map = function() {

@@ -1,4 +1,4 @@
-angular.module('sc_map_edit_bin.directives').directive('editorView', function() {
+angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_state", function(editor_state) {
 
   /**
    * Rendering callback. Draws the scene and schedules a redraw
@@ -40,15 +40,16 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', function() 
    * Creates a web_gl camera and mouse move/zoom events
    */
   let initialiseCamera = function(scope) {
-    scope.camera = new webgl_camera(scope.gl, 512, 512)
+    scope.camera = new webgl_camera(scope.gl, editor_state.map.heightmap.width, editor_state.map.heightmap.height);
   }
+
 
   /**
    * Creates web gl scene objects
    */
   let initialiseScene = function(scope) {
     scope.scene = {
-      heightmap: new webgl_heightmap(scope.gl, 512, 512)
+      heightmap: new webgl_heightmap(scope.gl, editor_state.map.heightmap)
     };
   }
 
@@ -101,14 +102,28 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', function() 
       }
   };
 
+
+
+
   return {
     restrict: 'E',
     templateUrl: 'templates/editor-view.html',
     link: function(scope, element) {
       initialiseRenderScheduleFn(scope);
       initialiseWebGl(scope, element);
-      initialiseCamera(scope);
-      initialiseScene(scope);
+
+      /**
+       * Register for map changes
+       */
+      let new_map_callbacks = [
+        _.partial(initialiseScene, scope),
+        _.partial(initialiseCamera, scope)
+      ];
+      let update_map = () => {
+        _.each(new_map_callbacks, (cb) => cb());
+      };
+      editor_state.on_new_map(update_map);
+      update_map();
     }
   };
-});
+}]);
