@@ -10,6 +10,7 @@ angular.module('sc_map_edit_bin', ['ui.bootstrap',
 
 angular.module('sc_map_edit_bin.controllers', ['sc_map_edit_bin.services',
                                                'ui.bootstrap',
+                                               'monospaced.mousewheel',
                                                'dialogs.main']);
 angular.module('sc_map_edit_bin.directives', []);
 angular.module('sc_map_edit_bin.services', []);

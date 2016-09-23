@@ -1,5 +1,6 @@
 /**
  * Heightmap mesh class.
+ * TODO: Release resources before replacing
  */
 class webgl_heightmap {
   constructor(gl, heightmap) {

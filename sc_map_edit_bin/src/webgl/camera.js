@@ -14,6 +14,7 @@ class webgl_camera {
     this.__focus = V3.$(this.__width / 2, this.__height / 2, 0);
     this.__zoom = 0;
     this.__up_vector = V3.$(0, -1, 0);
+    this.__steps = 128;
 
     // Calculate initial model_view/perspective matrices
     this.tick();
@@ -66,9 +67,7 @@ class webgl_camera {
    * Zooms in a single notch
    */
   zoom_in() {
-    if (this.__zoom < 1) {
-      this.__zoom += 1 / 128;
-    }
+    zoom_steps(1);
   }
 
 
@@ -76,10 +75,17 @@ class webgl_camera {
    * Zooms out by a single notch
    */
   zoom_out() {
-    if (this.__zoom > 0) {
-      this.__zoom -= 1 / 128;
-    }
+    zoom_steps(-1);
   }
+
+
+  /**
+   * Zooms in or out by the specified number of steps
+   */
+  zoom_steps(steps) {
+    this.__zoom = Math.max(0, Math.min(1, this.__zoom + steps / this.__steps));
+  }
+
 
   set_focus(focus) {
     this.__focus[0] = focus[0];
