@@ -65,6 +65,12 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
 
       // 2. If that succeeded then continue initialisation
       if (gl) {
+        // Get the necessary extensions
+        let ext = gl.getExtension("OES_element_index_uint");
+        if (!ext) {
+          console.log("Could not enable OES_element_index_uint extension");
+        }
+
         gl.clearColor(0.0, 0.0, 0.0, 1.0);                        // Set clear color to black, fully opaque
         gl.enable(gl.DEPTH_TEST);                                 // Enable depth testing
         gl.depthFunc(gl.LEQUAL);                                  // Near things obscure far things

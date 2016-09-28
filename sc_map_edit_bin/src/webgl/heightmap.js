@@ -20,11 +20,11 @@ class webgl_heightmap {
    *
    * 7    8    9
    *
-   * These will be created in a temporary variable, then sampled in the order
+   * These will be created and an index buffer used to provide lookup
    * [1, 2, 4], [2, 5, 4], [2, 3, 5], [3, 6, 5],...
    *
-   * Currently the plan is to use a displacement map (the heightmap) to achieve nice runtime
-   * editable heightmaps without regenerating the mesh continuously
+   * As geometry changes the dynamic vertex array buffer will be changed
+   * using gl.BufferSubData
    */
   __generate_mesh(heightmap) {
     let gl = this.__gl;
@@ -33,7 +33,6 @@ class webgl_heightmap {
     let verts = [];
     for (let y = 0; y < heightmap.height; y++) {
       for (let x = 0; x < heightmap.width; x++) {
-        //verts.push(x, y, 0);
         verts.push(x);
         verts.push(y);
         verts.push(0);
@@ -41,38 +40,34 @@ class webgl_heightmap {
     }
 
     // Generate static index buffer
-    let idx = function(x, y) { return (y * heightmap.width + x) * 3; };
-    let triangles = [];
+    let idx = function(x, y) { return y * heightmap.width + x; };
+    let indices = [];
     for (let y = 0; y < heightmap.height - 1; y++) {
       for (let x = 0; x < heightmap.width - 1; x++) {
-        triangles.push(verts[idx(x,     y) + 0]);
-        triangles.push(verts[idx(x,     y) + 1]);
-        triangles.push(verts[idx(x,     y) + 2]);
-        triangles.push(verts[idx(x + 1, y) + 0]);
-        triangles.push(verts[idx(x + 1, y) + 1]);
-        triangles.push(verts[idx(x + 1, y) + 2]);
-        triangles.push(verts[idx(x,     y + 1) + 0]);
-        triangles.push(verts[idx(x,     y + 1) + 1]);
-        triangles.push(verts[idx(x,     y + 1) + 2]);
-        triangles.push(verts[idx(x + 1, y) + 0]);
-        triangles.push(verts[idx(x + 1, y) + 1]);
-        triangles.push(verts[idx(x + 1, y) + 2]);
-        triangles.push(verts[idx(x + 1, y + 1) + 0]);
-        triangles.push(verts[idx(x + 1, y + 1) + 1]);
-        triangles.push(verts[idx(x + 1, y + 1) + 2]);
-        triangles.push(verts[idx(x,     y + 1) + 0]);
-        triangles.push(verts[idx(x,     y + 1) + 1]);
-        triangles.push(verts[idx(x,     y + 1) + 2]);
+        indices.push(idx(x + 0, y + 0));
+        indices.push(idx(x + 1, y + 0));
+        indices.push(idx(x + 0, y + 1));
+        indices.push(idx(x + 1, y + 0));
+        indices.push(idx(x + 1, y + 1));
+        indices.push(idx(x + 0, y + 1));
       }
     }
 
-    // Convert to VBO
-    this.__vertex_buffer = gl.createBuffer();
-    this.__vertex_buffer_size = triangles.length / 3;
+    // Build static index buffer
+    this.__index_buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.__index_buffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
+
+    // Build dynamic array buffer
+    this.__vertex_buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.__vertex_buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangles), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.DYNAMIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    // Each six indicies define two triangles
+    this.__element_count = indices.length / 3;
   }
 
 
@@ -113,9 +108,12 @@ class webgl_heightmap {
       return;
     }
 
-    // Bind vertex buffer and draw it
+    // Bind vertex buffer to vertex attribute
     gl.bindBuffer(gl.ARRAY_BUFFER, this.__vertex_buffer);
     gl.vertexAttribPointer(effect.attributes.aVertexPosition.index, 3, gl.FLOAT, false, 0, 0);
+
+    // Bind the index buffer
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.__index_buffer);
   }
 
 
@@ -124,8 +122,12 @@ class webgl_heightmap {
    */
   __draw_mesh() {
     let gl = this.__gl;
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.__vertex_buffer);
-    gl.drawArrays(gl.TRIANGLES, 0, this.__vertex_buffer_size);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    gl.drawElements(gl.TRIANGLES, this.__element_count * 3, gl.UNSIGNED_INT, 0)
+
+    // TBD: Unbind stuff?
+    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    // gl.vertexAttribPointer(effect.attributes.aVertexPosition.index, 3, gl.FLOAT, false, 0, 0);
+    // gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }
 }
