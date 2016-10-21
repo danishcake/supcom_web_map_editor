@@ -294,7 +294,6 @@ export class sc_script_save extends sc_script_base {
     // 2. Iterate over the markers in Scenario.MasterChain._MASTERCHAIN_.Markers and create objects
     let markers = {};
     for (let marker_idx in scenario_markers) {
-      console.log(`Loading ${marker_idx}: ${JSON.stringify(scenario_markers[marker_idx])}`);
 
       let marker = new sc_script_marker();
       marker.load(marker_idx, scenario_markers[marker_idx]);

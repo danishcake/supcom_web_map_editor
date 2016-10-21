@@ -1155,9 +1155,8 @@ export class sc_map {
 
   /**
    * Creates a new map.
-   * @param map_args {Object || undefined}
-   * If map_args is defined it will be used to create a new blank map
-   * and should contain
+   * @param map_args {Object}
+   * At a minimum map_args must contain the size field.
    * {
    *   name: "Name of map",               // not used in this class, serialised by Lua related classes
    *   author: "Name of author",          // not used in this class, serialised by Lua related classes
