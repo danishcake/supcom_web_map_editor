@@ -134,13 +134,20 @@ class webgl_effect {
 
   /**
   * Sets a uniform to the specified value
-  * TODO: I could enforce some type safety here
+  * TODO: I could enforce some type safety here, or just use 'set_uniform' and inspect types at enumeration
   * TODO: I could provide more overloads here
+  * TODO: Automate unbinding by tracking what is bound
+  * TODO: Track texture usage so I can use more than one texture
   */
   set_uniform_mat4(uniform_id, val) { this.gl.uniformMatrix4fv(this.__uniforms[uniform_id].index, false, new Float32Array(val)); }
   set_uniform_vec4(uniform_id, val) { this.gl.uniform4fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
   set_uniform_vec3(uniform_id, val) { this.gl.uniform3fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
   set_uniform_vec2(uniform_id, val) { this.gl.uniform2fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
+  set_uniform_sampler2d(uniform_id, val) {
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, val);
+    this.gl.uniform1i(this.__uniforms[uniform_id].index, 0);
+  }
 
 
   /**
