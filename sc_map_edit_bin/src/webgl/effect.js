@@ -70,10 +70,15 @@ class webgl_effect {
           index: gl.getAttribLocation(this.__program, active_attribute.name)
         };
 
-        if (active_attribute.type !== gl.FLOAT_VEC3) {
-          throw new Error(`Attribute type ${active_attribute.type} is not Vector3f. Only Vector3f supported`);
+        switch (active_attribute.type) {
+          case gl.FLOAT_VEC3:
+            this.__attributes[active_attribute.name].element_type = gl.FLOAT;
+            this.__attributes[active_attribute.name].element_count = 3;
+            break;
+          default:
+            throw new Error(`Attribute type ${active_attribute.type} is not Vector3f. Only Vector3f supported`);
+            break;
         }
-
       } else {
         break;
       }
@@ -136,6 +141,17 @@ class webgl_effect {
   set_uniform_vec4(uniform_id, val) { this.gl.uniform4fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
   set_uniform_vec3(uniform_id, val) { this.gl.uniform3fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
   set_uniform_vec2(uniform_id, val) { this.gl.uniform2fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
+
+
+  /**
+   * Binds a vertex attribute
+   */
+  bind_attribute(attribute_id, buffer) {
+    let attribute = this.__attributes[attribute_id];
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+    this.gl.vertexAttribPointer(attribute.index, attribute.element_count, attribute.element_type, false, 0, 0);
+  }
 
 
 
