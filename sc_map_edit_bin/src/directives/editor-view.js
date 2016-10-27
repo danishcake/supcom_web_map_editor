@@ -49,7 +49,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
    */
   let initialiseScene = function(scope) {
     scope.scene = {
-      heightmap: new webgl_heightmap(scope.gl, editor_state.map.heightmap)
+      heightmap: new webgl_heightmap(scope.gl, editor_state.edit_heightmap)
     };
   }
 
@@ -86,14 +86,18 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
         //let terrain_mesh = new webgl_mesh(gl);
 
         // Initialise shaders (placholders, load dynamically)
+        // TODO: I should probably offset by half a texel
         let vs_src = "attribute vec3 aVertexPosition;\n" +
                      "varying vec2 vTextureCoord;\n" +
                      "uniform mat4 uMVMatrix;\n" +
                      "uniform mat4 uPMatrix;\n" +
                      "uniform vec2 uMapSize;\n" +
+                     "uniform highp sampler2D uHeightmap;\n" +
                      "void main(void) {\n" +
-                     "    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);\n" +
                      "    vTextureCoord = aVertexPosition.xy / uMapSize;\n" +
+                     "    float height = texture2D(uHeightmap, vTextureCoord).a;\n" +
+                     "    vec3 displacedPosition = aVertexPosition + vec3(0, 0, height * 0.001);\n" +
+                     "    gl_Position = uPMatrix * uMVMatrix * vec4(displacedPosition, 1.0);\n" +
                      "}\n";
         let fs_src = "precision mediump float;\n" +
                      "varying vec2 vTextureCoord;\n" +

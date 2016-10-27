@@ -40,6 +40,9 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     service.scripts.scenario.create(initial_map_params);
     service.scripts.save.create(initial_map_params);
 
+    // Build editable heightmap
+    service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);
+
     // Call each registered map change subscriber
     _.each(service.callbacks.on_new_map, callback => callback());
   };
