@@ -5,6 +5,28 @@
 class webgl_effect {
   constructor(gl, vertex_shader_src, fragment_shader_src) {
     this.gl = gl;
+
+    // Build a type LUT for debugging
+    this.__uniform_type_lut = {};
+    this.__uniform_type_lut[gl.FLOAT_VEC2]   = "FLOAT_VEC2";
+    this.__uniform_type_lut[gl.FLOAT_VEC3]   = "FLOAT_VEC3";
+    this.__uniform_type_lut[gl.FLOAT_VEC4]   = "FLOAT_VEC4";
+    this.__uniform_type_lut[gl.INT_VEC2]     = "INT_VEC2";
+    this.__uniform_type_lut[gl.INT_VEC3]     = "INT_VEC3";
+    this.__uniform_type_lut[gl.INT_VEC4]     = "INT_VEC4";
+    this.__uniform_type_lut[gl.BOOL_VEC2]    = "BOOL_VEC2";
+    this.__uniform_type_lut[gl.BOOL_VEC3]    = "BOOL_VEC3";
+    this.__uniform_type_lut[gl.BOOL_VEC4]    = "BOOL_VEC4";
+    this.__uniform_type_lut[gl.FLOAT_MAT2]   = "FLOAT_MAT2";
+    this.__uniform_type_lut[gl.FLOAT_MAT3]   = "FLOAT_MAT3";
+    this.__uniform_type_lut[gl.FLOAT_MAT4]   = "FLOAT_MAT4";
+    this.__uniform_type_lut[gl.BOOL]         = "BOOL";
+    this.__uniform_type_lut[gl.INT]          = "INT";
+    this.__uniform_type_lut[gl.FLOAT]        = "FLOAT";
+    this.__uniform_type_lut[gl.SAMPLER_2D]   = "SAMPLER_2D";
+    this.__uniform_type_lut[gl.SAMPLER_CUBE] = "SAMPLER_CUBE";
+
+
     this.__compile(vertex_shader_src, fragment_shader_src);
     this.__enumerate_attributes();
     this.__enumerate_uniforms();
@@ -64,7 +86,9 @@ class webgl_effect {
     while (true) {
       let active_attribute = gl.getActiveAttrib(this.__program, n++);
       if (active_attribute) {
-        console.log("Attribute name: " + active_attribute.name + " size: " + active_attribute.size + " type: " + active_attribute.type);
+        console.log("Attribute name: " + active_attribute.name +
+                    " size: " + active_attribute.size +
+                    " type: " + this.__get_type_string(active_attribute.type));
         this.__attributes[active_attribute.name] = {
           type: active_attribute.type,
           index: gl.getAttribLocation(this.__program, active_attribute.name)
@@ -97,7 +121,9 @@ class webgl_effect {
     while (true) {
       let active_uniform = gl.getActiveUniform(this.__program, n++);
       if (active_uniform) {
-        console.log("Uniform name: " + active_uniform.name + " size: " + active_uniform.size + " type: " + active_uniform.type);
+        console.log("Uniform name: " + active_uniform.name +
+                    " size: " + active_uniform.size +
+                    " type: " + this.__get_type_string(active_uniform.type));
         this.__uniforms[active_uniform.name] = {
           type: active_uniform.type,
           index: gl.getUniformLocation(this.__program, active_uniform.name)
@@ -106,6 +132,14 @@ class webgl_effect {
         break;
       }
     }
+  }
+
+
+  /**
+   * Returns a string representation of the given OpenGL type
+   */
+  __get_type_string(type) {
+    return this.__uniform_type_lut[type] || `UNKNOWN TYPE (${type})`;
   }
 
 
@@ -133,20 +167,106 @@ class webgl_effect {
 
 
   /**
-  * Sets a uniform to the specified value
-  * TODO: I could enforce some type safety here, or just use 'set_uniform' and inspect types at enumeration
+   * Checks uniform exists and is of correct type
+   * @return false on mismatch
+   */
+  __check_uniform_type(uniform_id, uniform_type) {
+    if (this.__uniforms[uniform_id] === undefined) {
+      console.log(`No such uniform '${uniform_id}'`);
+      return false;
+    }
+
+    if (this.__uniforms[uniform_id].type !== uniform_type) {
+      console.log(`Uniform '${uniform_id} is wrong type (required ${this.__get_type_string(uniform_type)} found ${this.__get_type_string(this.__uniforms[uniform_id].type)}'`);
+      return false;
+    }
+
+    return true;
+  }
+
+
+  /*
   * TODO: I could provide more overloads here
   * TODO: Automate unbinding by tracking what is bound
   * TODO: Track texture usage so I can use more than one texture
   */
-  set_uniform_mat4(uniform_id, val) { this.gl.uniformMatrix4fv(this.__uniforms[uniform_id].index, false, new Float32Array(val)); }
-  set_uniform_vec4(uniform_id, val) { this.gl.uniform4fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
-  set_uniform_vec3(uniform_id, val) { this.gl.uniform3fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
-  set_uniform_vec2(uniform_id, val) { this.gl.uniform2fv(this.__uniforms[uniform_id].index, new Float32Array(val)); }
+
+
+  /**
+  * Sets a uniform to the specified value
+  * @param uniform_id {String} Name of uniform as it appears in GLSL
+  * @param val {Array} float[16]
+  */
+  set_uniform_mat4(uniform_id, val) {
+    if (!this.__check_uniform_type(uniform_id, this.gl.FLOAT_MAT4)) {
+      return false;
+    }
+
+    this.gl.uniformMatrix4fv(this.__uniforms[uniform_id].index, false, new Float32Array(val));
+    return true;
+  }
+
+
+  /**
+   * Sets a uniform to the specified value
+   * @param uniform_id {String} Name of uniform as it appears in GLSL
+   * @param val {Array} float[4]
+   */
+  set_uniform_vec4(uniform_id, val) {
+    if (!this.__check_uniform_type(uniform_id, this.gl.FLOAT_VEC4)) {
+      return false;
+    }
+
+    this.gl.uniform4fv(this.__uniforms[uniform_id].index, new Float32Array(val));
+    return true;
+  }
+
+
+  /**
+   * Sets a uniform to the specified value
+   * @param uniform_id {String} Name of uniform as it appears in GLSL
+   * @param val {Array} float[3]
+   */
+  set_uniform_vec3(uniform_id, val) {
+    if (!this.__check_uniform_type(uniform_id, this.gl.FLOAT_VEC3)) {
+      return false;
+    }
+
+    this.gl.uniform3fv(this.__uniforms[uniform_id].index, new Float32Array(val));
+    return true;
+  }
+
+
+  /**
+   * Sets a uniform to the specified value
+   * @param uniform_id {String} Name of uniform as it appears in GLSL
+   * @param val {Array} float[2]
+   */
+  set_uniform_vec2(uniform_id, val) {
+    if (!this.__check_uniform_type(uniform_id, this.gl.FLOAT_VEC2)) {
+      return false;
+    }
+
+    this.gl.uniform2fv(this.__uniforms[uniform_id].index, new Float32Array(val));
+    return true;
+  }
+
+
+  /**
+   * Sets a texture sampler to the specified texture.
+   * Always uses texture slot 0 and leaves texture bound
+   * @param uniform_id {String} Name of uniform as it appears in GLSL
+   * @param val {Number} Texture ID
+   */
   set_uniform_sampler2d(uniform_id, val) {
+    if (!this.__check_uniform_type(uniform_id, this.gl.SAMPLER_2D)) {
+      return false;
+    }
+
     this.gl.activeTexture(this.gl.TEXTURE0);
     this.gl.bindTexture(this.gl.TEXTURE_2D, val);
     this.gl.uniform1i(this.__uniforms[uniform_id].index, 0);
+    return true;
   }
 
 
@@ -158,6 +278,7 @@ class webgl_effect {
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
     this.gl.vertexAttribPointer(attribute.index, attribute.element_count, attribute.element_type, false, 0, 0);
+    return true;
   }
 
 
