@@ -64,6 +64,12 @@ export class sc_edit_heightmap {
 
 
   /**
+   * Gets the height scale
+   */
+  get scale() { return this.__source_heightmap.scale; }
+
+
+  /**
    * Get the region marked as region since it was last reset
    */
   get dirty_region() { return this.__dirty_region; }

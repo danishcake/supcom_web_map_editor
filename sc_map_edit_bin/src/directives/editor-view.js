@@ -93,16 +93,18 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
                      "uniform mat4 uPMatrix;\n" +
                      "uniform vec2 uMapSize;\n" +
                      "uniform highp sampler2D uHeightmap;\n" +
+                     "uniform highp float uHeightmapScale;\n" +
                      "void main(void) {\n" +
                      "    vTextureCoord = aVertexPosition.xy / uMapSize;\n" +
                      "    float height = texture2D(uHeightmap, vTextureCoord).a;\n" +
-                     "    vec3 displacedPosition = aVertexPosition + vec3(0, 0, height * 0.001);\n" +
+                     "    vTextureCoord.x *= (height / 16384.0);\n" +
+                     "    vec3 displacedPosition = aVertexPosition + vec3(0, 0, height * uHeightmapScale);\n" +
                      "    gl_Position = uPMatrix * uMVMatrix * vec4(displacedPosition, 1.0);\n" +
                      "}\n";
         let fs_src = "precision mediump float;\n" +
                      "varying vec2 vTextureCoord;\n" +
                      "void main(void) {\n" +
-                     "    gl_FragColor = vec4(vTextureCoord.x, 1.0, 1.0, 1.0);\n" +
+                     "    gl_FragColor = vec4(vTextureCoord.x, vTextureCoord.y, 1.0, 1.0);\n" +
                      "}\n";
         scope.terrainShader = new webgl_effect(gl, vs_src, fs_src);
 

@@ -195,6 +195,21 @@ class webgl_effect {
   /**
   * Sets a uniform to the specified value
   * @param uniform_id {String} Name of uniform as it appears in GLSL
+  * @param val {Array} float
+  */
+  set_uniform_float(uniform_id, val) {
+    if (!this.__check_uniform_type(uniform_id, this.gl.FLOAT)) {
+      return false;
+    }
+
+    this.gl.uniform1f(this.__uniforms[uniform_id].index, false, val);
+    return true;
+  }
+
+
+  /**
+  * Sets a uniform to the specified value
+  * @param uniform_id {String} Name of uniform as it appears in GLSL
   * @param val {Array} float[16]
   */
   set_uniform_mat4(uniform_id, val) {
