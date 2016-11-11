@@ -10,7 +10,7 @@
         <uib-tab index="0" heading="Archive">
           <div class="panel panel-default">
             <div class="panel-body">
-              <label class="btn btn-default" ng-click="open_archive()"><span class="glyphicon glyphicon-open"></span>&nbsp;x.zip</label>
+              <file-upload onopen="load_archive">x.zip</file-upload>
             </div>
           </div>
         </uib-tab>
@@ -18,17 +18,10 @@
           <div class="panel panel-default">
             <div class="panel-body">
               <div class="btn-group-vertical">
-                <label class="btn" ng-click="open_scenario()" ng-class="data.validity.scenario_set ? 'btn-success' : 'btn-default'">
-                  <span class="glyphicon glyphicon-open pull-left"></span>&nbsp;x_scenario.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scenario_set"></span></label>
-                <label class="btn" ng-click="open_save()" ng-class="data.validity.save_set ? 'btn-success' : 'btn-default'">
-                  <span class="glyphicon glyphicon-open pull-left"></span>&nbsp;x_script.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.save_set"></span>
-                </label>
-                <label class="btn" ng-click="open_script()" ng-class="data.validity.script_set ? 'btn-success' : 'btn-default'">
-                  <span class="glyphicon glyphicon-open pull-left"></span>&nbsp;x_save.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.script_set"></span>
-                </label>
-                <label class="btn" ng-click="open_scmap()" ng-class="data.validity.scmap_set ? 'btn-success' : 'btn-default'">
-                  <span class="glyphicon glyphicon-open pull-left"></span>&nbsp;x.scmap&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scmap_set"></span>
-                </label>
+                <file-upload onopen="open_scenario" ng-class="data.validity.scenario_set ? 'btn-success' : 'btn-default'">x_scenario.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scenario_set"></span></file-upload>
+                <file-upload onopen="open_save" ng-class="data.validity.save_set ? 'btn-success' : 'btn-default'">x_save.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.save_set"></span></file-upload>
+                <file-upload onopen="open_script" ng-class="data.validity.script_set ? 'btn-success' : 'btn-default'">x_script.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.script_set"></span></file-upload>
+                <file-upload onopen="open_scmap" ng-class="data.validity.scmap_set ? 'btn-success' : 'btn-default'">x.scmap&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scmap_set"></span></file-upload>
               </div>
             </div>
           </div>
@@ -36,7 +29,7 @@
           <div class="alert alert-info" role="alert" ng-hide="data.validity.all_set">
             <span ng-show="!data.validity.all_set">You need to select all of the map files to continue</span>
           </div>
-          <label class="btn btn-default pull-right" ng-click="" ng-disabled="!data.validity.all_set">OK</label>
+          <label class="btn btn-default pull-right" ng-click="load_individual_files()" ng-disabled="!data.validity.all_set">OK</label>
 
         </uib-tab>
       </uib-tabset>
