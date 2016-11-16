@@ -152,7 +152,7 @@ class sc_map_heightmap {
     check.one_of([hm_sz(0), hm_sz(1), hm_sz(2), hm_sz(3), hm_sz(4)], width, "Invalid heightmap width");
     check.one_of([hm_sz(0), hm_sz(1), hm_sz(2), hm_sz(3), hm_sz(4)], height, "Invalid heightmap height");
 
-    let data = input.readBytes((width + 1) * (height + 1) * 2);
+    let data = input.readBytes((width + 1) * (height + 1) * 2).compact();
 
     // Record fields
     this.__width = width;

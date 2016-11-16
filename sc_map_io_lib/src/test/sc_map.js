@@ -36,6 +36,7 @@ describe('sc_map', function() {
       assert.equal(map.heightmap.height, 256);
       assert.closeTo(map.heightmap.scale, 1/128, 1/409600);
       assert.equal(map.heightmap.data.remaining(), 257 * 257 * 2);
+      assert.equal(map.heightmap.data.capacity(), 257 * 257 * 2);
     });
 
     it('should load textures', function() {
@@ -195,6 +196,7 @@ describe('sc_map', function() {
       map.load(map_data_bb);
 
       assert.equal(map.normalmap.data.remaining(), 256 * 256 * 4);
+      assert.equal(map.normalmap.data.capacity(), 256 * 256 * 4);
       // TODO: first normal check
     });
 
@@ -204,7 +206,9 @@ describe('sc_map', function() {
       map.load(map_data_bb);
 
       assert.equal(map.texturemap.chan0_3.remaining(), 128 * 128 * 4);
+      assert.equal(map.texturemap.chan0_3.capacity(), 128 * 128 * 4);
       assert.equal(map.texturemap.chan4_7.remaining(), 128 * 128 * 4);
+      assert.equal(map.texturemap.chan4_7.capacity(), 128 * 128 * 4);
       // TODO: first pixel test
     });
 
