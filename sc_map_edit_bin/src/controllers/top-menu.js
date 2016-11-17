@@ -18,7 +18,11 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
   $scope.open_map = function() {
     let dlg = dialogs.create("templates/dialogs/open-map.html", "open-map", {}, modal_dlg_opts);
     dlg.result.then(function(map) {
-      dialogs.error('Open Map','Not (fully) implemented.');
+      try {
+        editor_state.load_map(map);
+      } catch(error) {
+        dialogs.error('Failed to open map', error.message);
+      }
     });
   };
   $scope.save_map = function() {

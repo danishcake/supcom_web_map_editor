@@ -19,16 +19,30 @@ export class sc_edit_heightmap {
 
 
   /**
-   * Convert heightmap to equal sized Float32 array
+   * Convert heightmap to equal sized Float32 array and extract data range
+   * Data range is stored per-scanline to allow fast incremental updates
    */
   __import_heightmap() {
     this.__working_heightmap = new Float32Array(this.width * this.height);
+    this.__scanline_range = [];
 
     for (let y = 0; y < this.height; y++) {
+      this.__scanline_range.push({min: 65535, max: 0})
       for (let x = 0; x < this.width; x++) {
         let i = x + y * this.width;
         this.__working_heightmap[i] = this.__source_heightmap.data.readUint16(i * 2);
+        this.__scanline_range[y].min = Math.min(this.__scanline_range[y].min, this.__working_heightmap[i]);
+        this.__scanline_range[y].max = Math.max(this.__scanline_range[y].max, this.__working_heightmap[i]);
       }
+    }
+
+    // Calculate the range of data
+    this.__minimum = _.min(this.__scanline_range, function(item) { return item.min; });
+    this.__maximum = _.min(this.__scanline_range, function(item) { return item.max; });
+    // Ensure these two don't match
+    if (this.__maximum === this.__minimum) {
+      this.__minimum--;
+      this.__maximum++;
     }
   }
 
@@ -79,4 +93,14 @@ export class sc_edit_heightmap {
    * Gets the heightmap as a Float32Array
    */
   get working_heightmap() { return this.__working_heightmap; }
+
+  /**
+   * Gets the minimum height in the entire heightmap
+   */
+  get minimum_height() { return this.__minimum; }
+
+  /**
+   * Gets the maximum height in the entire heightmap
+   */
+  get maximum_height() { return this.__maximum; }
 };

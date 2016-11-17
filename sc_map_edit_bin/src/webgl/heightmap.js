@@ -139,7 +139,9 @@ class webgl_heightmap {
         !effect.set_uniform_mat4("uPMatrix", camera.projection) ||
         !effect.set_uniform_vec2("uMapSize", this.__map_size)   ||
         !effect.set_uniform_sampler2d("uHeightmap", this.__height_texture) ||
-        !effect.set_uniform_float("uHeightmapScale", this.__heightmap.scale) ||
+        !effect.set_uniform_float("uHeightmapScale", this.__heightmap.scale * 0.01) ||
+        !effect.set_uniform_float("uShadeMin", this.__heightmap.minimum_height) ||
+        !effect.set_uniform_float("uShadeMax", this.__heightmap.maximum_height) ||
         !effect.bind_attribute("aVertexPosition", this.__vertex_buffer))
     {
       console.log("Failed to bind effect");

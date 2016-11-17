@@ -1,5 +1,5 @@
 angular.module('sc_map_edit_bin.controllers').controller("open-map",
-["$scope", "$uibModalInstance", "data", function($scope, $uibModalInstance, data) {
+["$scope", "$uibModalInstance", "dialogs", "data", function($scope, $uibModalInstance, dialogs, data) {
 
   $scope.data = {
     open_mode_tab_index: 0,
@@ -11,10 +11,12 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
       scmap_set: false,
       all_set: false
     },
-    buffers: {
-      scenario: null,
-      save: null,
-      script: null,
+    map: {
+      scripts: {
+        scenario: null,
+        save: null,
+        script: null
+      },
       scmap: null
     }
   }
@@ -37,30 +39,62 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
 
   $scope.load_individual_files = function() {
     // Attempt to load the map. On success close the dialog
-    $uibModalInstance.close($scope.data.buffers);
+    $uibModalInstance.close($scope.data.map);
   };
 
   $scope.open_scenario = function(scenario_buffer) {
-    $scope.data.buffers.scenario = scenario_buffer;
-    $scope.data.validity.scenario_set = true;
-    $scope.update_validity();
+    try {
+      let scenario = new sc_map_io_lib.sc.script.scenario()
+      scenario.load(dcodeIO.ByteBuffer.wrap(scenario_buffer, dcodeIO.ByteBuffer.LITTLE_ENDIAN));
+
+      // Sucessfully loaded .scmap
+      $scope.data.map.scripts.scenario = scenario;
+
+      // TODO: Component cross checking here
+      $scope.data.validity.scenario_set = true;
+      $scope.update_validity();
+    } catch(error) {
+      dialogs.error('Error parsing _scenario.lua', error.message);
+    }
   };
 
   $scope.open_save = function(save_buffer) {
-    $scope.data.buffers.save = save_buffer;
-    $scope.data.validity.save_set = true;
-    $scope.update_validity();
+
+    try {
+      let save = new sc_map_io_lib.sc.script.save()
+      save.load(dcodeIO.ByteBuffer.wrap(save_buffer, dcodeIO.ByteBuffer.LITTLE_ENDIAN));
+
+      // Sucessfully loaded .scmap
+      $scope.data.map.scripts.save = save;
+
+      // TODO: Component cross checking here
+      $scope.data.validity.save_set = true;
+      $scope.update_validity();
+    } catch(error) {
+      dialogs.error('Error parsing _save.lua', error.message);
+    }
   };
 
   $scope.open_script = function(script_buffer) {
-    $scope.data.buffers.script = script_buffer;
+
+
     $scope.data.validity.script_set = true;
     $scope.update_validity();
   };
 
   $scope.open_scmap = function(scmap_buffer) {
-    $scope.data.buffers.scmap = scmap_buffer;
-    $scope.data.validity.scmap_set = true;
-    $scope.update_validity();
+    try {
+      let scmap = new sc_map_io_lib.sc.map();
+      scmap.load(dcodeIO.ByteBuffer.wrap(scmap_buffer, dcodeIO.ByteBuffer.LITTLE_ENDIAN));
+
+      // Sucessfully loaded .scmap
+      $scope.data.map.scmap = scmap;
+
+      // TODO: Component cross checking here
+      $scope.data.validity.scmap_set = true;
+      $scope.update_validity();
+    } catch(error) {
+      dialogs.error('Error parsing .scmap', error.message);
+    }
   };
 }]);

@@ -26,6 +26,26 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     service.callbacks.on_new_map.push(callback);
   }
 
+
+  /**
+   * Attempts to load the map. On error makes no change to the state
+   * @param buffers {object}
+   * @return {bool} True on success
+   * @throws {Error} error
+   */
+  service.load_map = function(map) {
+    service.map = map.scmap;
+    service.scripts.scenario = map.scripts.scenario;
+    service.scripts.save = map.scripts.save;
+
+    // Build editable heightmap
+    service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);
+
+    // Call each registered map change subscriber
+    _.each(service.callbacks.on_new_map, callback => callback());
+  };
+
+
   /**
    * Create a new map
    */
