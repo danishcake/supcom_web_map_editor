@@ -202,7 +202,7 @@ class webgl_effect {
       return false;
     }
 
-    this.gl.uniform1f(this.__uniforms[uniform_id].index, false, val);
+    this.gl.uniform1f(this.__uniforms[uniform_id].index, val);
     return true;
   }
 
