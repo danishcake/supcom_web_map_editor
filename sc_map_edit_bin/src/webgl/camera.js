@@ -25,19 +25,34 @@ class webgl_camera {
    * Updates matrices based on current focus, zoom etc
    */
   tick() {
-  // At maximum zoom (1) we will define ourselves as showing 16 units down the shortest axis
+    // At maximum zoom (1) we will define ourselves as showing 16 units down the shortest axis
     // At minimum zoom (0) we will define ourselves as showing the entire map * 1.2 down the shortest axis
     // In between we're initially going to just linearly interpolate the z position
     // I'm sure I can make this MUCH nicer with an easing curve
 
+    // Furthermore while the PoV will be directly overhead for minimal zoom, the last 20% will
+    // have the camera at a slight angle, reaching 30 degrees at maximum zoom.
+
     // Assuming frustrum short edge length is sqrt(2) * z_height * 0.5
     // z_height = 32 / sqrt(2) = 22.6ish
     // TODO: Make this above terrain height
-    let nearest_z_position = V3.$(this.__focus[0], this.__focus[1], 22.6);
+    let nearest_length = 22.6;
+    let nearest_z_position = V3.$(this.__focus[0], this.__focus[1], nearest_length);
     let furthest_z_position = V3.$(this.__focus[0], this.__focus[1], this.__long_edge * 1.1 / 2.0);
     let delta = V3.sub(furthest_z_position, nearest_z_position);
 
+    let zoom_angle = 0;
+    let max_zoom_angle = 30 * Math.PI / 180.0;
+    if (this.__zoom > 0.8) {
+      // Remap 0.8-1.0 to 0.0-max_zoom_angle
+      // Note that this is not really the angle as I don't scale z by cos(angle)
+      // sine is just used as an easing curve
+      zoom_angle = max_zoom_angle * (this.__zoom - 0.8) / 0.2;
+    }
+    let angle_offset = V3.$(0, Math.sin(zoom_angle) * nearest_length, 0);
+
     let camera_position = V3.sub(furthest_z_position, V3.scale(delta, this.__zoom));
+    camera_position = V3.add(camera_position, angle_offset);
 
     this.__model_view = M4x4.makeLookAt(camera_position, this.__focus, this.__up_vector);
     // TODO: Aspect ratio of 1 should be varied with resolution - query gl object?
