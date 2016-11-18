@@ -143,8 +143,12 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       let update_map = () => {
         _.each(new_map_callbacks, (cb) => cb());
       };
+
       editor_state.on_new_map(update_map);
       update_map();
+
+      // Store the editor state so we can direct tool events to it
+      scope.editor_state = editor_state;
     }
   };
 }]);

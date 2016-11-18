@@ -7,7 +7,7 @@
 angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   let service = {};
 
-  // TODO: Make tool a class
+  // TODO: Make tool a class + test
   service.tool = {
       type: 'select',
       size: 20
