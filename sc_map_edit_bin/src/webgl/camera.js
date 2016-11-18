@@ -102,11 +102,25 @@ class webgl_camera {
   }
 
 
+  /**
+   * Sets the centre of the zoom process
+   */
   set_focus(focus) {
     this.__focus[0] = focus[0];
     this.__focus[1] = focus[1];
     this.__focus[2] = 0;
   }
+
+
+  /**
+   * Sets the centre oof the zoom process in screen coordinates.
+   * These will be projected through the inverse camera matrix to obtain
+   * world space coordinates at z=0
+   */
+  set_focus_screenspace(focusX, focusY) {
+    // TODO
+  }
+
 
   /**
    * Identifies the position in the plane (z=0) that a screen-space coordinate maps to
