@@ -33,4 +33,11 @@ export class sc_rect {
 
     return this;
   }
+
+  /**
+   * Returns true if the point lies within the rectangle
+   */
+  contains(x, y) {
+    return (x >= this.left && x <= this.right && y >= this.top && y <= this.bottom);
+  }
 }
