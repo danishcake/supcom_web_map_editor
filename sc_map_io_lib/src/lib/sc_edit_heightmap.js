@@ -41,8 +41,8 @@ export class sc_edit_heightmap extends sc_edit_view_base {
     }
 
     // Calculate the range of data
-    this.__minimum = _.min(this.__scanline_range, function(item) { return item.min; });
-    this.__maximum = _.min(this.__scanline_range, function(item) { return item.max; });
+    this.__minimum = _.min(this.__scanline_range, function(item) { return item.min; }).min;
+    this.__maximum = _.min(this.__scanline_range, function(item) { return item.max; }).max;
     // Ensure these two don't match
     if (this.__maximum === this.__minimum) {
       this.__minimum--;
