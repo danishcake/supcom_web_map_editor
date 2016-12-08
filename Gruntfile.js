@@ -94,6 +94,14 @@ module.exports = function (grunt) {
     'copy:deploy_io_lib'
   ]);
 
+  // A relatively fast build for unit testing that doesn't browserify io_lib
+  grunt.registerTask('test_io_lib', [
+    'babel:dist_io_lib',
+    'copy:deploy_thirdparty_io_lib',
+    'copy:testdata_io_lib',
+    'mochaTest:test_io_lib'
+  ]);
+
   grunt.registerTask('default', [
     'build_io_lib',
     'build_edit_bin',

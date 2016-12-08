@@ -13,8 +13,8 @@ export class sc_rect {
   get top() { return this.__y; }
   get width() { return this.__w; }
   get height() { return this.__h; }
-  get right() { return this.__x + this.__w; }
-  get bottom() { return this.__y + this.__h; }
+  get right() { return this.__x + this.__w - 1; }
+  get bottom() { return this.__y + this.__h - 1; }
 
 
   /**
@@ -26,13 +26,30 @@ export class sc_rect {
     let t = Math.min(this.top, rhs.top);
     let r = Math.max(this.right, rhs.right);
     let b = Math.max(this.bottom, rhs.bottom);
-    this.__w = r - l;
-    this.__h = b - t;
+    this.__w = r - l + 1;
+    this.__h = b - t + 1;
     this.__x = l;
     this.__y = t;
 
     return this;
   }
+
+
+  /**
+   * Expands to encompass the given point
+   * @return Self for easier chaining
+   */
+  expand_point(point) {
+    let l = Math.min(this.left, point[0]);
+    let t = Math.min(this.top, point[1]);
+    let r = Math.max(this.right, point[0]);
+    let b = Math.max(this.bottom, point[1]);
+    this.__w = r - l + 1;
+    this.__h = b - t + 1;
+    this.__x = l;
+    this.__y = t;
+  }
+
 
   /**
    * Returns true if the point lies within the rectangle

@@ -5,12 +5,12 @@ describe('sc_rect', function() {
   describe('edges', function() {
     let rect = new sc_rect(10, 20, 30, 40);
 
-    it('should have right = left + width', function () {
-      assert.equal(rect.right, 40);
+    it('should have right = left + width - 1', function () {
+      assert.equal(rect.right, 39);
     });
 
-    it('should have bottom = top + height', function () {
-      assert.equal(rect.bottom, 60);
+    it('should have bottom = top + height - 1', function () {
+      assert.equal(rect.bottom, 59);
     });
   });
 
@@ -25,11 +25,11 @@ describe('sc_rect', function() {
     });
 
     it('should have right = max(rect1.right, rect2.right)', function () {
-      assert.equal(rect1.right, 40);
+      assert.equal(rect1.right, 39);
     });
 
     it('should have bottom = max(rect1.bottom, rect2.bottom)', function () {
-      assert.equal(rect1.bottom, 50);
+      assert.equal(rect1.bottom, 49);
     });
 
     it('should have top = min(rect1.top, rect2.top)', function () {

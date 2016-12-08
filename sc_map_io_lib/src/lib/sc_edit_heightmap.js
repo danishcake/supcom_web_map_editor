@@ -9,12 +9,17 @@
  */
 
 import {sc_rect} from "./sc_rect"
+import {sc_edit_view_base} from "./views/sc_edit_view"
+import {_} from "underscore";
 
-export class sc_edit_heightmap {
+
+export class sc_edit_heightmap extends sc_edit_view_base {
   constructor(heightmap) {
+    // TODO: Check type of heightmap
+    super(null);
     this.__source_heightmap = heightmap;
     this.__import_heightmap();
-    this.mark_dirty_region(new sc_rect(0, 0, this.width - 1, this.height - 1));
+    this.mark_dirty_region(new sc_rect(0, 0, this.width, this.height));
   }
 
 
@@ -29,10 +34,9 @@ export class sc_edit_heightmap {
     for (let y = 0; y < this.height; y++) {
       this.__scanline_range.push({min: 65535, max: 0})
       for (let x = 0; x < this.width; x++) {
-        let i = x + y * this.width;
-        this.__working_heightmap[i] = this.__source_heightmap.data.readUint16(i * 2);
-        this.__scanline_range[y].min = Math.min(this.__scanline_range[y].min, this.__working_heightmap[i]);
-        this.__scanline_range[y].max = Math.max(this.__scanline_range[y].max, this.__working_heightmap[i]);
+        this.set_pixel([x, y], this.__source_heightmap.data.readUint16((y * this.width + x) * 2));
+        this.__scanline_range[y].min = Math.min(this.__scanline_range[y].min, this.get_pixel([x, y]));
+        this.__scanline_range[y].max = Math.max(this.__scanline_range[y].max, this.get_pixel([x, y]));
       }
     }
 
@@ -67,14 +71,39 @@ export class sc_edit_heightmap {
    * Gets the width. Note that this is the actual width in pixels, which is one larger than the
    * width stored in the heightmap section of the underlying heightmap due to fence post problem.
    */
-  get width() { return this.__source_heightmap.width + 1; }
+  __get_width_impl() { return this.__source_heightmap.width + 1; }
 
 
   /**
    * Gets the height. Note that this is the actual height in pixels, which is one larger than the
    * height stored in the heightmap section of the underlying heightmap due to fence post problem.
    */
-  get height() { return this.__source_heightmap.height + 1; }
+  __get_height_impl() { return this.__source_heightmap.height + 1; }
+
+
+  /**
+   * Returns the value of a pixel at the given coordinate
+   */
+  __get_pixel_impl(position) { return this.__working_heightmap[position[0] + position[1] * this.width]; }
+
+
+  /**
+   * Sets the value of a pixel at the given coordinate
+   */
+  __set_pixel_impl(position, value) {
+    this.__working_heightmap[position[0] + position[1] * this.width] = value;
+    if (this.__dirty_region != null) {
+      this.__dirty_region.expand_point(position);
+    } else {
+      this.__dirty_region = new sc_rect(position[0], position[1], 1, 1);
+    }
+  }
+
+
+  /**
+   * Returns the default pixel value (0)
+   */
+  __oob_pixel_value_impl(position) { return 0; }
 
 
   /**

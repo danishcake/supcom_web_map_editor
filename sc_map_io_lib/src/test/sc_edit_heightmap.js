@@ -41,16 +41,16 @@ describe('sc_edit_heightmap', function() {
       edit_heightmap.mark_dirty_region(new sc_rect(0, 0, 10, 10));
       assert.equal(0, edit_heightmap.dirty_region.top);
       assert.equal(0, edit_heightmap.dirty_region.left);
-      assert.equal(10, edit_heightmap.dirty_region.bottom);
-      assert.equal(10, edit_heightmap.dirty_region.right);
+      assert.equal(9, edit_heightmap.dirty_region.bottom);
+      assert.equal(9, edit_heightmap.dirty_region.right);
     });
 
     it('should merge dirty regions', function() {
       edit_heightmap.mark_dirty_region(new sc_rect(100, 100, 20, 20));
       assert.equal(0, edit_heightmap.dirty_region.top);
       assert.equal(0, edit_heightmap.dirty_region.left);
-      assert.equal(120, edit_heightmap.dirty_region.bottom);
-      assert.equal(120, edit_heightmap.dirty_region.right);
+      assert.equal(119, edit_heightmap.dirty_region.bottom);
+      assert.equal(119, edit_heightmap.dirty_region.right);
     });
   });
 });

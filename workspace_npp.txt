@@ -1,0 +1,96 @@
+<NotepadPlus>
+    <Project name="sc_edit_bin">
+        <Folder name="css">
+            <File name="sc_map_edit_bin\css\main.css" />
+        </Folder>
+        <Folder name="src">
+            <Folder name="controllers">
+                <Folder name="dialogs">
+                    <File name="sc_map_edit_bin\src\controllers\dialogs\new-map.js" />
+                    <File name="sc_map_edit_bin\src\controllers\dialogs\open-map.js" />
+                </Folder>
+                <File name="sc_map_edit_bin\src\controllers\editor-menu.js" />
+                <File name="sc_map_edit_bin\src\controllers\editor-view.js" />
+                <File name="sc_map_edit_bin\src\controllers\top-menu.js" />
+            </Folder>
+            <Folder name="directives">
+                <File name="sc_map_edit_bin\src\directives\editor-menu.js" />
+                <File name="sc_map_edit_bin\src\directives\editor-view.js" />
+                <File name="sc_map_edit_bin\src\directives\file-picker.js" />
+                <File name="sc_map_edit_bin\src\directives\top-menu.js" />
+            </Folder>
+            <Folder name="services">
+                <File name="sc_map_edit_bin\src\services\editor-state.js" />
+            </Folder>
+            <Folder name="webgl">
+                <File name="sc_map_edit_bin\src\webgl\camera.js" />
+                <File name="sc_map_edit_bin\src\webgl\effect.js" />
+                <File name="sc_map_edit_bin\src\webgl\heightmap.js" />
+            </Folder>
+            <File name="sc_map_edit_bin\src\app.js" />
+        </Folder>
+        <Folder name="templates">
+            <Folder name="dialogs">
+                <File name="sc_map_edit_bin\templates\dialogs\new-map.html" />
+                <File name="sc_map_edit_bin\templates\dialogs\open-map.html" />
+            </Folder>
+            <File name="sc_map_edit_bin\templates\editor-menu.html" />
+            <File name="sc_map_edit_bin\templates\editor-view.html" />
+            <File name="sc_map_edit_bin\templates\file-picker.html" />
+            <File name="sc_map_edit_bin\templates\top-menu.html" />
+        </Folder>
+        <File name="sc_map_edit_bin\index.html" />
+    </Project>
+    <Project name="sc_edit_io_lib">
+        <Folder name="src">
+            <Folder name="lib">
+                <Folder name="tools">
+                    <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool.js" />
+                    <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_raise.js" />
+                </Folder>
+                <Folder name="views">
+                    <File name="sc_map_io_lib\src\lib\views\sc_edit_view.js" />
+                    <File name="sc_map_io_lib\src\lib\views\sc_edit_view_symmetry.js" />
+                    <File name="sc_map_io_lib\src\lib\views\sc_edit_patch.js" />
+                    <File name="sc_map_io_lib\src\lib\views\sc_edit_view_methods.js" />
+                </Folder>
+                <File name="sc_map_io_lib\src\lib\sc.js" />
+                <File name="sc_map_io_lib\src\lib\sc_bitfield.js" />
+                <File name="sc_map_io_lib\src\lib\sc_check.js" />
+                <File name="sc_map_io_lib\src\lib\sc_dds.js" />
+                <File name="sc_map_io_lib\src\lib\sc_edit.js" />
+                <File name="sc_map_io_lib\src\lib\sc_edit_heightmap.js" />
+                <File name="sc_map_io_lib\src\lib\sc_edit_symmetry.js" />
+                <File name="sc_map_io_lib\src\lib\sc_map.js" />
+                <File name="sc_map_io_lib\src\lib\sc_rect.js" />
+                <File name="sc_map_io_lib\src\lib\sc_script.js" />
+            </Folder>
+            <Folder name="test">
+                <Folder name="data">
+                    <Folder name="Shuriken_Valley">
+                        <File name="sc_map_io_lib\src\test\data\Shuriken_Valley\shuriken_valley.dds" />
+                        <File name="sc_map_io_lib\src\test\data\Shuriken_Valley\shuriken_valley.large.png" />
+                        <File name="sc_map_io_lib\src\test\data\Shuriken_Valley\Shuriken_Valley.scmap" />
+                        <File name="sc_map_io_lib\src\test\data\Shuriken_Valley\shuriken_valley.small.png" />
+                        <File name="sc_map_io_lib\src\test\data\Shuriken_Valley\Shuriken_Valley_save.lua" />
+                        <File name="sc_map_io_lib\src\test\data\Shuriken_Valley\Shuriken_Valley_scenario.lua" />
+                        <File name="sc_map_io_lib\src\test\data\Shuriken_Valley\Shuriken_Valley_script.lua" />
+                    </Folder>
+                    <File name="sc_map_io_lib\src\test\data\512x512_dxt5.dds" />
+                </Folder>
+                <File name="sc_map_io_lib\src\test\sc_bitfield.js" />
+                <File name="sc_map_io_lib\src\test\sc_dds.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_heightmap.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_symmetry.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_raise.js" />
+                <File name="sc_map_io_lib\src\test\sc_map.js" />
+                <File name="sc_map_io_lib\src\test\sc_rect.js" />
+                <File name="sc_map_io_lib\src\test\sc_script.js" />
+            </Folder>
+        </Folder>
+    </Project>
+    <Project name="root">
+        <File name="Gruntfile.js" />
+    </Project>
+</NotepadPlus>

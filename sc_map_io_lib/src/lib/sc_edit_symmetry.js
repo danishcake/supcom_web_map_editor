@@ -16,7 +16,7 @@ class sc_edit_symmetry_base {
    * @throws If point is outside [0,0]-size
    */
   get_primary_pixel(point, size) {
-    if (!(new sc_rect(0, 0, size[0] - 1, size[1] - 1)).contains(point[0], point[1])) {
+    if (!(new sc_rect(0, 0, size[0], size[1])).contains(point[0], point[1])) {
       throw new Error(`[${point[0]}, ${point[1]}] does not lie inside [0,0]-[${size[0]}, ${size[1]}]`)
     }
 
@@ -31,7 +31,7 @@ class sc_edit_symmetry_base {
    * @throws If point is outside [0,0]-size
    */
   get_secondary_pixels(point, size) {
-    if (!(new sc_rect(0, 0, size[0] - 1, size[1] - 1)).contains(point[0], point[1])) {
+    if (!(new sc_rect(0, 0, size[0], size[1])).contains(point[0], point[1])) {
       throw new Error(`[${point[0]}, ${point[1]}] does not lie inside [0,0]-[${size[0]}, ${size[1]}]`)
     }
 
