@@ -11,10 +11,12 @@ class webgl_camera {
     this.__long_edge = Math.max(this.__width, this.__height);
     this.__short_edge = Math.min(this.__width, this.__height);
     this.__fov = 90;
-    this.__focus = V3.$(this.__width / 2, this.__height / 2, 0);
+    this.__focus = vec3.fromValues(this.__width / 2, this.__height / 2, 0);
     this.__zoom = 0;
-    this.__up_vector = V3.$(0, -1, 0);
+    this.__up_vector = vec3.fromValues(0, -1, 0);
     this.__steps = 128;
+    this.__model_view = mat4.create();
+    this.__perspective = mat4.create();
 
     // Calculate initial model_view/perspective matrices
     this.tick();
@@ -36,10 +38,16 @@ class webgl_camera {
     // Assuming frustrum short edge length is sqrt(2) * z_height * 0.5
     // z_height = 32 / sqrt(2) = 22.6ish
     // TODO: Make this above terrain height
+    let delta = vec3.create();
+    let nearest_z_position = vec3.create();
+    let furthest_z_position = vec3.create();
+    let angle_offset = vec3.create();
+    let camera_position = vec3.create();
+
     let nearest_length = 22.6;
-    let nearest_z_position = V3.$(this.__focus[0], this.__focus[1], nearest_length);
-    let furthest_z_position = V3.$(this.__focus[0], this.__focus[1], this.__long_edge * 1.1 / 2.0);
-    let delta = V3.sub(furthest_z_position, nearest_z_position);
+    vec3.set(nearest_z_position,  this.__focus[0], this.__focus[1], nearest_length);
+    vec3.set(furthest_z_position, this.__focus[0], this.__focus[1], this.__long_edge * 1.1 / 2.0);
+    vec3.sub(delta, furthest_z_position, nearest_z_position);
 
     let zoom_angle = 0;
     let max_zoom_angle = 30 * Math.PI / 180.0;
@@ -49,16 +57,15 @@ class webgl_camera {
       // sine is just used as an easing curve
       zoom_angle = max_zoom_angle * (this.__zoom - 0.8) / 0.2;
     }
-    let angle_offset = V3.$(0, Math.sin(zoom_angle) * nearest_length, 0);
+    vec3.set(angle_offset, 0, Math.sin(zoom_angle) * nearest_length, 0);
 
-    let camera_position = V3.sub(furthest_z_position, V3.scale(delta, this.__zoom));
-    camera_position = V3.add(camera_position, angle_offset);
+    vec3.scale(delta, delta, this.__zoom);
+    vec3.sub(camera_position, furthest_z_position, delta)
+    vec3.add(camera_position, camera_position, angle_offset);
 
-    this.__model_view = M4x4.makeLookAt(camera_position, this.__focus, this.__up_vector);
-    // TODO: Aspect ratio of 1 should be varied with resolution - query gl object?
+    mat4.lookAt(this.__model_view, camera_position, this.__focus, this.__up_vector);
     let aspect_ratio = this.__gl.drawingBufferWidth / this.__gl.drawingBufferHeight;
-
-    this.__perspective = M4x4.makePerspective(this.__fov, aspect_ratio, -1, 1);
+    mat4.perspective(this.__perspective, this.__fov, aspect_ratio, -1, 1);
   }
 
 
@@ -128,6 +135,6 @@ class webgl_camera {
    */
   project_to_world(screen_position) {
     // TODO: Implement
-    return null;
+    return null;n
   }
 }
