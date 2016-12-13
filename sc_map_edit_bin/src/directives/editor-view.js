@@ -4,9 +4,25 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
    * Rendering callback. Draws the scene and schedules a redraw
    */
   let render = function(scope) {
+    let gl = scope.gl;
+
+    var displayWidth  = gl.canvas.clientWidth;
+    var displayHeight = gl.canvas.clientHeight;
+
+    // Check if the canvas is not the same size.
+    if (gl.canvas.width  != displayWidth ||
+        gl.canvas.height != displayHeight) {
+
+      // Make the canvas the same size
+      gl.canvas.width  = displayWidth;
+      gl.canvas.height = displayHeight;
+    }
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+
+    scope.camera.set_render_target_size([gl.canvas.width, gl.canvas.height]);
     scope.camera.tick();
 
-    let gl = scope.gl;
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);      // Clear the color and depth buffers
 
@@ -40,7 +56,9 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
    * Creates a web_gl camera and mouse move/zoom events
    */
   let initialiseCamera = function(scope) {
-    scope.camera = new webgl_camera(scope.gl, editor_state.map.heightmap.width, editor_state.map.heightmap.height);
+    scope.camera = new webgl_camera(scope.gl,
+                                    [editor_state.map.heightmap.width, editor_state.map.heightmap.height],
+                                    [scope.gl.canvas.width, scope.gl.canvas.height]);
   }
 
 
@@ -57,11 +75,10 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
   /**
    * Initialises WebGL context, shaders etc and starts first draw
    */
-  let initialiseWebGl = function(scope, element) {
+  let initialiseWebGl = function(scope, canvas) {
       // 1. Initialse the WebGL context
-      // Note this is really fragile due to the canvas being a nested element
-      let gl = element.children()[0].getContext("webgl") ||
-               element.children()[0].getContext("experimental-webgl");
+      let gl = canvas.getContext("webgl") ||
+               canvas.getContext("experimental-webgl");
 
       // 2. If that succeeded then continue initialisation
       if (gl) {
@@ -130,17 +147,19 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     restrict: 'E',
     templateUrl: 'templates/editor-view.html',
     link: function(scope, element) {
+      const canvas = element.children()[0];
+
       initialiseRenderScheduleFn(scope);
-      initialiseWebGl(scope, element);
+      initialiseWebGl(scope, canvas);
 
       /**
        * Register for map changes
        */
-      let new_map_callbacks = [
+      const new_map_callbacks = [
         _.partial(initialiseScene, scope),
         _.partial(initialiseCamera, scope)
       ];
-      let update_map = () => {
+      const update_map = () => {
         _.each(new_map_callbacks, (cb) => cb());
       };
 

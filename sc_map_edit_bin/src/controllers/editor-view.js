@@ -1,5 +1,5 @@
 angular.module('sc_map_edit_bin.controllers').controller("editor-view",
-["$scope", function($scope) {
+["$scope", "editor_state", function($scope, editor_state) {
 
   /**
    * Zooms the map around the current mouse hover position
@@ -15,11 +15,12 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
   $scope.on_mousemove = function(evt) {
     // This now needs to be reverse projected from screen to camera unit vector, then intersected with the z=0 plane
     // This is then the new focus for the zoom
-    $scope.camera.set_focus_screenspace(evt.clientX, evt.clientY);
+    let world_position = $scope.camera.project_to_world([evt.offsetX, evt.offsetY]);
+    $scope.camera.set_focus(world_position);
 
     // LMB held during move, start/apply a tool step
-    if (evt.buttons & 1) {
-      // TODO: Handle start
+    if ((evt.buttons & 1) && editor_state.tool !== null) {
+      editor_state.tool.apply(editor_state.edit_heightmap, [world_position[0], world_position[1]]);
     }
   };
 
@@ -29,8 +30,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
    */
   $scope.on_mouseup = function(evt) {
     // LMB released, end tool application
-    if (evt.buttons & 1) {
-      // TODO: Handle start
+    if (evt.buttons & 1 && editor_state.tool !== null) {
+      editor_state.tool.end();
     }
   };
 
@@ -39,5 +40,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
    */
   $scope.on_mouseleave = function(evt) {
     // Cursor left, end tool application
+    if (editor_state.tool !== null) {
+      editor_state.tool.end();
+    }
   };
 }]);

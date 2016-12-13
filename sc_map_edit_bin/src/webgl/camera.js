@@ -4,19 +4,25 @@
  * in a similar fashion to that within SupCom
  */
 class webgl_camera {
-  constructor(gl, width, height) {
+  constructor(gl, scene_size, render_target_size) {
     this.__gl = gl;
-    this.__width = width;
-    this.__height = height;
-    this.__long_edge = Math.max(this.__width, this.__height);
-    this.__short_edge = Math.min(this.__width, this.__height);
+    this.__scene_size = scene_size;
+    this.__render_target_size = render_target_size;
+    this.__long_edge = Math.max(this.__scene_size[0], this.__scene_size[1]);
+    this.__short_edge = Math.min(this.__scene_size[0], this.__scene_size[1]);
     this.__fov = 90;
-    this.__focus = vec3.fromValues(this.__width / 2, this.__height / 2, 0);
+    this.__focus = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, 0);
+    this.__camera_position = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, 1);
+    this.__look_at = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, 0);
+    this.__up_vector = vec3.fromValues(0, 1, 0);
     this.__zoom = 0;
-    this.__up_vector = vec3.fromValues(0, -1, 0);
     this.__steps = 128;
     this.__model_view = mat4.create();
     this.__perspective = mat4.create();
+
+    const nearest_length = 22.6;
+    const farthest_length = this.__long_edge * 1.1 / 2.0;
+    this.__camera_position[2] = nearest_length + (farthest_length - nearest_length) * this.__zoom;
 
     // Calculate initial model_view/perspective matrices
     this.tick();
@@ -27,45 +33,9 @@ class webgl_camera {
    * Updates matrices based on current focus, zoom etc
    */
   tick() {
-    // At maximum zoom (1) we will define ourselves as showing 16 units down the shortest axis
-    // At minimum zoom (0) we will define ourselves as showing the entire map * 1.2 down the shortest axis
-    // In between we're initially going to just linearly interpolate the z position
-    // I'm sure I can make this MUCH nicer with an easing curve
-
-    // Furthermore while the PoV will be directly overhead for minimal zoom, the last 20% will
-    // have the camera at a slight angle, reaching 30 degrees at maximum zoom.
-
-    // Assuming frustrum short edge length is sqrt(2) * z_height * 0.5
-    // z_height = 32 / sqrt(2) = 22.6ish
-    // TODO: Make this above terrain height
-    let delta = vec3.create();
-    let nearest_z_position = vec3.create();
-    let furthest_z_position = vec3.create();
-    let angle_offset = vec3.create();
-    let camera_position = vec3.create();
-
-    let nearest_length = 22.6;
-    vec3.set(nearest_z_position,  this.__focus[0], this.__focus[1], nearest_length);
-    vec3.set(furthest_z_position, this.__focus[0], this.__focus[1], this.__long_edge * 1.1 / 2.0);
-    vec3.sub(delta, furthest_z_position, nearest_z_position);
-
-    let zoom_angle = 0;
-    let max_zoom_angle = 30 * Math.PI / 180.0;
-    if (this.__zoom > 0.8) {
-      // Remap 0.8-1.0 to 0.0-max_zoom_angle
-      // Note that this is not really the angle as I don't scale z by cos(angle)
-      // sine is just used as an easing curve
-      zoom_angle = max_zoom_angle * (this.__zoom - 0.8) / 0.2;
-    }
-    vec3.set(angle_offset, 0, Math.sin(zoom_angle) * nearest_length, 0);
-
-    vec3.scale(delta, delta, this.__zoom);
-    vec3.sub(camera_position, furthest_z_position, delta)
-    vec3.add(camera_position, camera_position, angle_offset);
-
-    mat4.lookAt(this.__model_view, camera_position, this.__focus, this.__up_vector);
+    mat4.lookAt(this.__model_view, this.__camera_position, this.__look_at, this.__up_vector);
     let aspect_ratio = this.__gl.drawingBufferWidth / this.__gl.drawingBufferHeight;
-    mat4.perspective(this.__perspective, this.__fov, aspect_ratio, -1, 1);
+    mat4.perspective(this.__perspective, this.__fov, aspect_ratio, 0.0001, 8192);
   }
 
 
@@ -106,6 +76,43 @@ class webgl_camera {
    */
   zoom_steps(steps) {
     this.__zoom = Math.max(0, Math.min(1, this.__zoom + steps / this.__steps));
+
+    const nearest_length = 22.6;
+    const farthest_length = this.__long_edge * 1.1 / 2.0;
+    const old_position = vec3.clone(this.__camera_position);
+    const old_z = this.__camera_position[2];
+    const new_z = nearest_length + (farthest_length - nearest_length) * this.__zoom;
+
+    let zoom_scale_change = new_z / old_z;
+    // At maximum zoom (1) we will define ourselves as showing 16 units down the shortest axis
+    // At minimum zoom (0) we will define ourselves as showing the entire map * 1.2 down the shortest axis
+    // In between we're initially going to just linearly interpolate the z position
+    // I'm sure I can make this MUCH nicer with an easing curve
+    //
+    // Assuming frustrum short edge length is sqrt(2) * z_height * 0.5
+    // z_height = 32 / sqrt(2) = 22.6ish
+    //
+    // __focus, which is the position under the cursor, should not be
+    // changed by zooming in. This means that camera position needs to be updated so that
+    // the mouse coordinates map to the same location
+    // http://stackoverflow.com/questions/13155382/jscrollpane-zoom-relative-to-mouse-position?noredirect=1&lq=1
+    //
+    // Basically if I zoom in by 10% I set the new position to 0.1 * focus + 1.1 * old_position
+    // and if I zoom out 10% I set the new position to -0.1 * focus + 0.9 * old_position
+
+    vec3.scale(this.__camera_position, this.__focus, zoom_scale_change);
+    vec3.scale(old_position, old_position, 1 - zoom_scale_change);
+    vec3.add(this.__camera_position, this.__camera_position, old_position);
+
+
+    this.__camera_position[2] = new_z;
+    this.__look_at[0] = this.__camera_position[0];
+    this.__look_at[1] = this.__camera_position[1];
+  }
+
+
+  set_render_target_size(render_target_size) {
+    this.__render_target_size = render_target_size;
   }
 
 
@@ -120,12 +127,24 @@ class webgl_camera {
 
 
   /**
-   * Sets the centre oof the zoom process in screen coordinates.
-   * These will be projected through the inverse camera matrix to obtain
-   * world space coordinates at z=0
+   * Generic OpenGL style projection.
+   * This could be used to map a world coordinate to nssc coordinate,
+   * but in practice is only used for screen -> world via project_to_world
    */
-  set_focus_screenspace(focusX, focusY) {
-    // TODO
+  __project(m, p) {
+    let position_world  = vec4.create();
+    vec4.transformMat4(position_world, p, m);
+
+    if (position_world[3] === 0) {
+      return vec4.fromValues(0, 0, 0, 0);
+    }
+
+    position_world[3] = 1.0 / position_world[3];
+    position_world[0] *= position_world[3];
+    position_world[1] *= position_world[3];
+    position_world[2] *= position_world[3];
+
+    return position_world;
   }
 
 
@@ -133,8 +152,44 @@ class webgl_camera {
    * Identifies the position in the plane (z=0) that a screen-space coordinate maps to
    * This will be used for changing the focus
    */
-  project_to_world(screen_position) {
-    // TODO: Implement
-    return null;n
+  project_to_world(position_screen) {
+    // Invert view-projection matrix
+    let inverted_mvp = mat4.create();
+    mat4.mul(inverted_mvp, this.__perspective, this.__model_view);
+    mat4.invert(inverted_mvp, inverted_mvp);
+
+    // Express screen position in normalised screen space coordinates, on a frustrum 1 unit from camera position
+    const position_nssc_near = vec4.fromValues( (position_screen[0] - this.__render_target_size[0] / 2) / (this.__render_target_size[0] / 2),
+                                               -(position_screen[1] - this.__render_target_size[1] / 2) / (this.__render_target_size[1] / 2),
+                                                0.0001, 1);
+    const position_nssc_far  = vec4.fromValues( (position_screen[0] - this.__render_target_size[0] / 2) / (this.__render_target_size[0] / 2),
+                                               -(position_screen[1] - this.__render_target_size[1] / 2) / (this.__render_target_size[1] / 2),
+                                                8192, 1);
+
+    // Calculate a ray towards the clicked position
+    let position_world_near = this.__project(inverted_mvp, position_nssc_near);
+    let position_world_far  = this.__project(inverted_mvp, position_nssc_far);
+
+    // Turn the tapped position into a ray
+    let ray = vec3.create();
+    vec3.sub(ray, position_world_far, position_world_near);
+
+    // Normalise to get a unit ray
+    let ray_unit = vec3.create();
+    vec3.normalize(ray_unit, ray);
+
+    // Now cast a ray from the camera position to z=0
+    if (ray_unit[2] !== 0) {
+      let ray = vec3.create();
+      vec3.scale(ray, ray_unit, -this.__camera_position[2] / ray_unit[2]);
+
+      let plane_intersection = vec3.create();
+      vec3.add(plane_intersection, this.__camera_position, ray);
+
+      //console.log(`[${position_screen[0]}, ${position_screen[1]}] -> [${plane_intersection[0]}, ${plane_intersection[1]}, ${plane_intersection[2]}]`);
+      return plane_intersection;
+    } else {
+      return vec3.fromValues(0, 0, 0, 0);
+    }
   }
 }

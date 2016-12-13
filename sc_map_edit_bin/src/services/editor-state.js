@@ -7,10 +7,46 @@
 angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   let service = {};
 
-  // TODO: Make tool a class + test
-  service.tool = {
-      type: 'select',
-      size: 20
+  service.tool = null; // TODO: Add a select tool
+
+  /**
+   * Builds a tool from the current tool_data
+   * @param {object} tool_data Structure defining selected tool options. See editor-menu.js
+   */
+  service.build_tool = function(tool_data) {
+    const outer = tool_data.size;
+    const inner = tool_data.size * 0.5; // TODO: Make this variable
+    const strength = tool_data.strength;
+
+    switch(tool_data.category) {
+      case 'select':
+        service.tool = null;
+        break;
+
+      case 'heightmap':
+        switch(tool_data.heightmap.type) {
+          case 'raise':
+            service.tool = new sc_map_io_lib.sc.edit.tool.raise(outer, inner, strength);
+            break;
+
+          case 'lower':
+            service.tool = new sc_map_io_lib.sc.edit.tool.lower(outer, inner, strength);
+            break;
+
+          default:
+            service.tool = null;
+            break;
+        }
+        break;
+
+      case 'texture':
+        service.tool = null;
+        break;
+
+      default:
+        service.tool = null;
+        break;
+    }
   };
 
 

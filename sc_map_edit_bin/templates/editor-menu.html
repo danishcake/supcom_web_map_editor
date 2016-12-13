@@ -1,11 +1,27 @@
 <div id="editor-menu">
   <div class="btn-group-vertical">
-    <label class="btn btn-default" ng-model="editor_state.tool.type" uib-btn-radio="'select'"><span class="glyphicon glyphicon-move"></span></label>
-    <label class="btn btn-default" ng-model="editor_state.tool.type" uib-btn-radio="'heightmap'"><span class="glyphicon glyphicon-resize-vertical"></span></label>
+    <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'select'" uib-tooltip="Selection tool" tooltip-placement="right"><span class="glyphicon glyphicon-move"></span></label>
+    <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'heightmap'" uib-tooltip="Heightmap tools" tooltip-placement="right"><span class="glyphicon glyphicon-resize-vertical"></span></label>
+    <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'texture'" uib-tooltip="Texture tools" tooltip-placement="right"><span class="glyphicon glyphicon-tint"></span></label>
   </div>
-  <div class="btn-group-vertical">
-    <label class="btn btn-default" ng-click="increase_tool_size()"><span class="glyphicon glyphicon-plus"></span></label>
-    <label class="btn btn-default">{{editor_state.tool.size}}</label>
-    <label class="btn btn-default"  ng-click="decrease_tool_size()"><span class="glyphicon glyphicon-minus"></span></label>
+
+  <!-- Tool size -->
+  <div class="btn-group-vertical" ng-show="tool.category === 'heightmap' || tool.category === 'texture'">
+    <label class="btn btn-default" ng-click="increase_tool_size()" uib-tooltip="Increase size" tooltip-placement="right"><span class="glyphicon glyphicon-plus"></span></label>
+    <label class="btn btn-default">{{tool.size}}</label>
+    <label class="btn btn-default"  ng-click="decrease_tool_size()" uib-tooltip="Decrease size" tooltip-placement="right"><span class="glyphicon glyphicon-minus"></span></label>
+  </div>
+
+  <!-- Tool strength -->
+  <div class="btn-group-vertical" ng-show="tool.category === 'heightmap' || tool.category === 'texture'">
+    <label class="btn btn-default" ng-click="increase_tool_strength()" uib-tooltip="Increase strength" tooltip-placement="right"><span class="glyphicon glyphicon-plus"></span></label>
+    <label class="btn btn-default">{{tool.strength}}</label>
+    <label class="btn btn-default"  ng-click="decrease_tool_strength()" uib-tooltip="Decrease strength" tooltip-placement="right"><span class="glyphicon glyphicon-minus"></span></label>
+  </div>
+
+  <!-- Heightmap tools -->
+  <div class="btn-group-vertical" ng-show="tool.category === 'heightmap'">
+    <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'raise'" uib-tooltip="Raise terrain" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-up"></span></label>
+    <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'lower'" uib-tooltip="Lower terrain" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-down"></span></label>
   </div>
 </div>
