@@ -170,14 +170,9 @@ class webgl_camera {
     let ray = vec3.create();
     vec3.sub(ray, position_world_far, position_world_near);
 
-    // Normalise to get a unit ray
-    let ray_unit = vec3.create();
-    vec3.normalize(ray_unit, ray);
-
     // Now cast a ray from the camera position to z=0
-    if (ray_unit[2] !== 0) {
-      let ray = vec3.create();
-      vec3.scale(ray, ray_unit, -this.__camera_position[2] / ray_unit[2]);
+    if (ray[2] !== 0) {
+      vec3.scale(ray, ray, -this.__camera_position[2] / ray[2]);
 
       let plane_intersection = vec3.create();
       vec3.add(plane_intersection, this.__camera_position, ray);
