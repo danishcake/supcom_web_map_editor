@@ -4,10 +4,9 @@
  * in a similar fashion to that within SupCom
  */
 class webgl_camera {
-  constructor(gl, scene_size, render_target_size) {
+  constructor(gl, scene_size) {
     this.__gl = gl;
     this.__scene_size = scene_size;
-    this.__render_target_size = render_target_size;
     this.__long_edge = Math.max(this.__scene_size[0], this.__scene_size[1]);
     this.__short_edge = Math.min(this.__scene_size[0], this.__scene_size[1]);
     this.__fov = 90;
@@ -111,11 +110,6 @@ class webgl_camera {
   }
 
 
-  set_render_target_size(render_target_size) {
-    this.__render_target_size = render_target_size;
-  }
-
-
   /**
    * Sets the centre of the zoom process
    */
@@ -158,12 +152,14 @@ class webgl_camera {
     mat4.mul(inverted_mvp, this.__perspective, this.__model_view);
     mat4.invert(inverted_mvp, inverted_mvp);
 
-    // Express screen position in normalised screen space coordinates, on a frustrum 1 unit from camera position
-    const position_nssc_near = vec4.fromValues( (position_screen[0] - this.__render_target_size[0] / 2) / (this.__render_target_size[0] / 2),
-                                               -(position_screen[1] - this.__render_target_size[1] / 2) / (this.__render_target_size[1] / 2),
+    // Express screen position in normalised screen space coordinates
+    const half_width = this.__gl.canvas.clientWidth / 2;
+    const half_height = this.__gl.canvas.clientHeight / 2;
+    const position_nssc_near = vec4.fromValues( (position_screen[0] - half_width) / half_width,
+                                               -(position_screen[1] - half_height) / half_height,
                                                 0.0001, 1);
-    const position_nssc_far  = vec4.fromValues( (position_screen[0] - this.__render_target_size[0] / 2) / (this.__render_target_size[0] / 2),
-                                               -(position_screen[1] - this.__render_target_size[1] / 2) / (this.__render_target_size[1] / 2),
+    const position_nssc_far  = vec4.fromValues( (position_screen[0] - half_width) / half_width,
+                                               -(position_screen[1] - half_height) / half_height,
                                                 8192, 1);
 
     // Calculate a ray towards the clicked position

@@ -19,8 +19,6 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     }
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-
-    scope.camera.set_render_target_size([gl.canvas.width, gl.canvas.height]);
     scope.camera.tick();
 
 
