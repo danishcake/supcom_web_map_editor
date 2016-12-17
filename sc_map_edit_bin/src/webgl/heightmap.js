@@ -95,26 +95,62 @@ class webgl_heightmap {
 
 
   /**
+   * Incremental update to the heightmap.
+   * The regions of the heightmap that have changed are uploaded
+   * The edit heightmap dirty region is cleared at the end of this process
+   */
+  update() {
+    const gl = this.__gl;
+    const dirty_region = this.__heightmap.dirty_region;
+    this.__heightmap.update_range_stats();
+
+    if (dirty_region) {
+      gl.bindTexture(gl.TEXTURE_2D, this.__height_texture);
+
+
+      // If I had WebGL 2.0 I could use
+      // gl.pixelStorei(gl.UNPACK_ROW_LENGTH, ...
+      // gl.pixelStorei(gl.UNPACK_SKIP_PIXELS, ...
+      // gl.pixelStorei(gl.UNPACK_SKIP_ROWS, ...
+      // gl.texSubImage2D(...
+
+      // As I'm using WebGL 1.0 I'm going to have to copy into a packed array first
+      const contiguous_dirty = new Float32Array(dirty_region.width * dirty_region.height);
+      for (let y = 0; y < dirty_region.height; y++) {
+        const iy = dirty_region.top + y;
+        const dirty_line = this.__heightmap.working_heightmap.slice(this.__heightmap.width * iy + dirty_region.left,
+                                                                    this.__heightmap.width * iy + dirty_region.right + 1);
+        contiguous_dirty.set(dirty_line, y * dirty_region.width);
+      }
+
+      gl.texSubImage2D(gl.TEXTURE_2D,
+                       0,
+                       dirty_region.left,
+                       dirty_region.top,
+                       dirty_region.width,
+                       dirty_region.height,
+                       gl.ALPHA,
+                       gl.FLOAT,
+                       contiguous_dirty);
+
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
+    this.__heightmap.reset_dirty_region();
+  }
+
+
+  /**
    * Checks the effect uniform/attribute set, binds appropriately and
    * draws the heightmap
    */
   draw(effect, camera) {
     effect.start();
 
-    this.__update_height_texture();
     this.__bind_effect(effect, camera);
     this.__draw_mesh();
 
     effect.stop();
-  }
-
-
-  /**
-   * Updates the GPU texture representation of the heightmap
-   * by using texSubImage2D on the dirty region
-   */
-  __update_height_texture() {
-    // TODO: Implement once drawing works again
   }
 
 

@@ -20,6 +20,7 @@ export class sc_edit_heightmap extends sc_edit_view_base {
     this.__source_heightmap = heightmap;
     this.__import_heightmap();
     this.mark_dirty_region(new sc_rect(0, 0, this.width, this.height));
+    this.update_range_stats();
   }
 
 
@@ -35,18 +36,7 @@ export class sc_edit_heightmap extends sc_edit_view_base {
       this.__scanline_range.push({min: 65535, max: 0})
       for (let x = 0; x < this.width; x++) {
         this.set_pixel([x, y], this.__source_heightmap.data.readUint16((y * this.width + x) * 2));
-        this.__scanline_range[y].min = Math.min(this.__scanline_range[y].min, this.get_pixel([x, y]));
-        this.__scanline_range[y].max = Math.max(this.__scanline_range[y].max, this.get_pixel([x, y]));
       }
-    }
-
-    // Calculate the range of data
-    this.__minimum = _.min(this.__scanline_range, function(item) { return item.min; }).min;
-    this.__maximum = _.min(this.__scanline_range, function(item) { return item.max; }).max;
-    // Ensure these two don't match
-    if (this.__maximum === this.__minimum) {
-      this.__minimum--;
-      this.__maximum++;
     }
   }
 
@@ -64,6 +54,32 @@ export class sc_edit_heightmap extends sc_edit_view_base {
    */
   mark_dirty_region(rect) {
     this.__dirty_region = (this.__dirty_region || rect).expand(rect);
+  }
+
+
+  /**
+   * Updates the high/low stats.
+   * Fairly heavyweight operation, but operates only on the dirty region
+   */
+  update_range_stats() {
+    // Calculate the min/max values of the dirty rows
+    if (this.__dirty_region) {
+      for (let y = this.__dirty_region.top; y <= this.__dirty_region.bottom; y++) {
+        const scanline = this.__working_heightmap.slice(y * this.width, (y + 1) * this.width);
+        this.__scanline_range[y].min = _.min(scanline);
+        this.__scanline_range[y].max = _.max(scanline);
+      }
+
+      // Calculate the range of data
+      this.__minimum = _.min(this.__scanline_range, function(item) { return item.min; }).min;
+      this.__maximum = _.max(this.__scanline_range, function(item) { return item.max; }).max;
+
+      // Ensure these two don't match
+      if (this.__maximum === this.__minimum) {
+        this.__minimum--;
+        this.__maximum++;
+      }
+    }
   }
 
 

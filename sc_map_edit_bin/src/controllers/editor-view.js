@@ -20,7 +20,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
 
     // LMB held during move, start/apply a tool step
     if ((evt.buttons & 1) && editor_state.tool !== null) {
-      editor_state.tool.apply(editor_state.edit_heightmap, [world_position[0], world_position[1]]);
+      const grid_position = [Math.round(world_position[0]), Math.round(world_position[1])];
+      editor_state.tool.apply(editor_state.edit_heightmap, grid_position);
     }
   };
 

@@ -33,7 +33,7 @@ class sc_edit_tool_height_change extends sc_edit_tool_base {
 
         const r = Math.sqrt(x * x + y * y);
         if (r < this.__inner_radius) {
-          this.__patch.set_pixel([ox, oy], this.__strength * this.__raise);
+          this.__patch.set_pixel([ox, oy], this.__strength);
         } else if (r < this.__outer_radius) {
           let falloff_strength = Math.floor(this.__strength * (this.__outer_radius - r) / (this.__outer_radius - this.__inner_radius));
           this.__patch.set_pixel([ox, oy], falloff_strength);

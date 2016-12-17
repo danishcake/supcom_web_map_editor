@@ -25,6 +25,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);      // Clear the color and depth buffers
 
     // Draw heightmap
+    scope.scene.heightmap.update();
     scope.scene.heightmap.draw(scope.terrainShader, scope.camera)
 
     // Trigger next redraw in approximately 16ms (for 60Hz monitors)
