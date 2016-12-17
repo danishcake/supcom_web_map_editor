@@ -9,7 +9,7 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
       texture_index: 0,
       type: 'add'
     },
-    size: 20,
+    size: 10,
     strength: 10
   };
 
