@@ -1,4 +1,5 @@
 <div id="editor-menu">
+  <!-- Tool category -->
   <div class="btn-group-vertical">
     <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'select'" uib-tooltip="Selection tool" tooltip-placement="right"><span class="glyphicon glyphicon-move"></span></label>
     <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'heightmap'" uib-tooltip="Heightmap tools" tooltip-placement="right"><span class="glyphicon glyphicon-resize-vertical"></span></label>
@@ -23,5 +24,6 @@
   <div class="btn-group-vertical" ng-show="tool.category === 'heightmap'">
     <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'raise'" uib-tooltip="Raise terrain" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-up"></span></label>
     <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'lower'" uib-tooltip="Lower terrain" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-down"></span></label>
+    <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'flatten'" uib-tooltip="Flatten terrain" tooltip-placement="right"><span class="glyphicon glyphicon-object-align-horizontal"></span></label>
   </div>
 </div>

@@ -31,7 +31,7 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
    */
   $scope.on_mouseup = function(evt) {
     // LMB released, end tool application
-    if (evt.buttons & 1 && editor_state.tool !== null) {
+    if (evt.which == 1 && editor_state.tool !== null) {
       editor_state.tool.end();
     }
   };

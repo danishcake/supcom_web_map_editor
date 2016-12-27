@@ -4,7 +4,7 @@ import {sc_edit_view_base} from "./sc_edit_view"
  * A region of pixels - pretty much the simplest possible view with some actual
  * backing storage
  */
-export class sc_edit_patch extends sc_edit_view_base{
+export class sc_edit_patch extends sc_edit_view_base {
   /**
    * Creates an uninitialised patch
    */

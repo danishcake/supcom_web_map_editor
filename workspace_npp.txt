@@ -47,12 +47,14 @@
                 <Folder name="tools">
                     <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool.js" />
                     <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_raise.js" />
+                    <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_flatten.js" />
                 </Folder>
                 <Folder name="views">
                     <File name="sc_map_io_lib\src\lib\views\sc_edit_view.js" />
                     <File name="sc_map_io_lib\src\lib\views\sc_edit_view_symmetry.js" />
                     <File name="sc_map_io_lib\src\lib\views\sc_edit_patch.js" />
                     <File name="sc_map_io_lib\src\lib\views\sc_edit_view_methods.js" />
+                    <File name="sc_map_io_lib\src\lib\views\sc_edit_view_snapshot.js" />
                 </Folder>
                 <File name="sc_map_io_lib\src\lib\sc.js" />
                 <File name="sc_map_io_lib\src\lib\sc_bitfield.js" />
@@ -87,6 +89,9 @@
                 <File name="sc_map_io_lib\src\test\sc_map.js" />
                 <File name="sc_map_io_lib\src\test\sc_rect.js" />
                 <File name="sc_map_io_lib\src\test\sc_script.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_view_snapshot.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_view_methods.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_flatten.js" />
             </Folder>
         </Folder>
     </Project>
