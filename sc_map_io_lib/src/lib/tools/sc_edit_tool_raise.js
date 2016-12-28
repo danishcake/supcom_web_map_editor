@@ -23,23 +23,7 @@ class sc_edit_tool_height_change extends sc_edit_tool_base {
   __prepare_impl(edit_heightmap, position) {
     // Create the patch that will be applied periodically
     this.__patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1]);
-
-    // Solid inner region with linear falloff to zero
-    // Outer region is zero initialised
-    for (let y = -this.__outer_radius; y <= this.__outer_radius; y++) {
-      let oy = this.__outer_radius + y;
-      for (let x = -this.__outer_radius; x <= this.__outer_radius; x++) {
-        let ox = this.__outer_radius + x;
-
-        const r = Math.sqrt(x * x + y * y);
-        if (r < this.__inner_radius) {
-          this.__patch.set_pixel([ox, oy], this.__strength);
-        } else if (r < this.__outer_radius) {
-          let falloff_strength = Math.floor(this.__strength * (this.__outer_radius - r) / (this.__outer_radius - this.__inner_radius));
-          this.__patch.set_pixel([ox, oy], falloff_strength);
-        }
-      }
-    }
+    sc_edit_view_methods.radial_fill(this.__patch, this.__strength, this.__inner_radius, 0, this.__outer_radius);
   }
 
 

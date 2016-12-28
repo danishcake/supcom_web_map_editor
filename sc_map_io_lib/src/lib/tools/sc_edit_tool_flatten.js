@@ -6,7 +6,6 @@ import {sc_edit_view_methods} from "../views/sc_edit_view_methods"
 /**
  * Terrain flattening tool
  */
-
 export class sc_edit_tool_flatten extends sc_edit_tool_base {
   /**
    * Height flattening tool
@@ -23,27 +22,13 @@ export class sc_edit_tool_flatten extends sc_edit_tool_base {
     // Create the patch that will be applied periodically
     this.__patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1]);
     sc_edit_view_methods.fill(this.__patch, edit_heightmap.get_pixel(position));
+
     // Create the blending weight patch that will be used to lerp betweeen
     this.__blending_patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1]);
+    sc_edit_view_methods.radial_fill(this.__blending_patch, 1, this.__inner_radius, 0, this.__outer_radius);
+
     // Create a cache of the original heightmap
     this.__snapshot = new sc_edit_view_snapshot(edit_heightmap);
-
-    // Solid inner region with linear falloff to zero
-    // Outer region is zero initialised
-    for (let y = -this.__outer_radius; y <= this.__outer_radius; y++) {
-      let oy = this.__outer_radius + y;
-      for (let x = -this.__outer_radius; x <= this.__outer_radius; x++) {
-        let ox = this.__outer_radius + x;
-
-        const r = Math.sqrt(x * x + y * y);
-        if (r < this.__inner_radius) {
-          this.__blending_patch.set_pixel([ox, oy], 1);
-        } else if (r < this.__outer_radius) {
-          let falloff_factor = (this.__outer_radius - r) / (this.__outer_radius - this.__inner_radius);
-          this.__blending_patch.set_pixel([ox, oy], falloff_factor);
-        }
-      }
-    }
   }
 
 

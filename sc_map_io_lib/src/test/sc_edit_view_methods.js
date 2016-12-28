@@ -128,4 +128,61 @@ describe('sc_edit_view_methods', function() {
       assert.equal(50, this.patch_dest.get_pixel([24, 24]));
     });
   });
+
+
+  describe('radial_fill', function() {
+    before(function() {
+      this.patch = new sc_edit_patch([33, 33]);
+      this.inner_radius = 8;
+      this.outer_radius = 16;
+      this.inner_value = 80;
+      this.outer_value = 40;
+      sc_edit_view_methods.radial_fill(this.patch, this.inner_value, this.inner_radius, this.outer_value, this.outer_radius);
+    });
+
+    it('fills the centre radius with centre_value', function() {
+      for (let y = -this.outer_radius; y <= this.outer_radius; y++) {
+        const iy = y + this.outer_radius;
+        for (let x = -this.outer_radius; x <= this.outer_radius; x++) {
+          const ix = x + this.outer_radius;
+          const r = Math.sqrt(x * x + y * y);
+
+          if (r < this.inner_radius) {
+            assert.equal(this.inner_value, this.patch.get_pixel([ix, iy]));
+          }
+        }
+      }
+    });
+
+    it('falls off linearly towards outer edge', function() {
+      for (let y = -this.outer_radius; y <= this.outer_radius; y++) {
+        const iy = y + this.outer_radius;
+        for (let x = -this.outer_radius; x <= this.outer_radius; x++) {
+          const ix = x + this.outer_radius;
+          const r = Math.sqrt(x * x + y * y);
+
+          if (r >= this.inner_radius && r < this.outer_radius) {
+            const expected_value = this.inner_value +
+                                   (this.outer_value - this.inner_value) *
+                                   ((r - this.inner_radius) / (this.outer_radius - this.inner_radius));
+            assert.closeTo(expected_value, this.patch.get_pixel([ix, iy]), 1);
+          }
+        }
+      }
+    });
+
+    it('fills outer ring with outer_value', function() {
+      for (let y = -this.outer_radius; y <= this.outer_radius; y++) {
+        const iy = y + this.outer_radius;
+        for (let x = -this.outer_radius; x <= this.outer_radius; x++) {
+          const ix = x + this.outer_radius;
+          const r = Math.sqrt(x * x + y * y);
+
+          if (r >= this.outer_radius) {
+            assert.equal(this.outer_value, this.patch.get_pixel([ix, iy]));
+          }
+        }
+      }
+    });
+  });
 });

@@ -149,10 +149,41 @@ let ratcheted_weighted_blend = function(dest, offset, src1, src2, weights) {
           candidate_delta > 0 && candidate_delta < current_delta) {
         dest.set_pixel([ox, oy], candidate);
       }
-
     }
   }
 };
+
+/**
+ * Fills the inner radius with inner_value, then falls off linearly to outer_value
+ * at outer_radius and beyond
+ * @param {sc_edit_view_base} dest Destination view
+ * @param {number} inner_value The value to use within inner_radius
+ * @param {number} inner_radius The inner radius
+ * @param {number} outer_value The value to user outside the outer_radius
+ * @param {number} outer_radius The outer radius
+ */
+let radial_fill = function(dest, inner_value, inner_radius, outer_value, outer_radius) {
+  // A patch 33 pixels across has centre bin at 16
+  const cx = (dest.width - 1) / 2;
+  const cy = (dest.height - 1) / 2;
+
+  for (let oy = 0; oy < dest.height; oy++) {
+    for (let ox = 0; ox < dest.width; ox++) {
+      const r = Math.sqrt((ox - cx) * (ox - cx) + (oy - cy) * (oy - cy));
+      if (r < inner_radius) {
+        dest.set_pixel([ox, oy], inner_value);
+      } else if (r < outer_radius) {
+        const interpolated_value = inner_value +  // 1
+                                   (outer_value - inner_value) * // -1
+                                   ((r - inner_radius) / (outer_radius - inner_radius)); // 1 at outer_radius, 0 at inner_radius
+        dest.set_pixel([ox, oy], interpolated_value);
+      } else {
+        dest.set_pixel([ox, oy], outer_value);
+      }
+    }
+  }
+};
+
 
 const sc_edit_view_methods = {
   fill:                     fill,
@@ -161,7 +192,8 @@ const sc_edit_view_methods = {
   copy:                     copy,
   set:                      set,
   weighted_blend:           weighted_blend,
-  ratcheted_weighted_blend: ratcheted_weighted_blend
+  ratcheted_weighted_blend: ratcheted_weighted_blend,
+  radial_fill:              radial_fill
 };
 
 export { sc_edit_view_methods };
