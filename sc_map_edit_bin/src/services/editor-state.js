@@ -37,6 +37,10 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
             service.tool = new sc_map_io_lib.sc.edit.tool.flatten(outer, inner, strength);
             break;
 
+          case 'smooth':
+            service.tool = new sc_map_io_lib.sc.edit.tool.smooth(outer, inner, strength);
+            break;
+
           default:
             service.tool = null;
             break;
