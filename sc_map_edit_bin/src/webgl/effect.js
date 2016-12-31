@@ -32,6 +32,40 @@ class webgl_effect {
     this.__enumerate_uniforms();
   }
 
+  /**
+   * Extracts the text from a DOM element, concatenating adjacent siblings
+   */
+  static text_from_element(element_id) {
+     let parent_element = document.getElementById(element_id);
+      if (!parent_element) {
+        throw new Error(`Unable to find element '${element_id}'`);
+     }
+
+     let child_element = parent_element.firstChild;
+     let text = "";
+
+     while (child_element)
+     {
+        if (child_element.nodeType == child_element.TEXT_NODE)
+        {
+           text += child_element.textContent;
+        }
+        child_element = child_element.nextSibling;
+     }
+
+     return text;
+  }
+
+  /**
+   * Helper function to construct a webgl_effect with sources extracted from
+   * the DOM
+   */
+  static create_from_dom(gl, vs_id, fs_id) {
+    const vs_src = webgl_effect.text_from_element(vs_id);
+    const fs_src = webgl_effect.text_from_element(fs_id);
+    return new webgl_effect(gl, vs_src, fs_src);
+  }
+
 
   /**
    * Compiles and links the vertex and fragment shaders
