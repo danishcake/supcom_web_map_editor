@@ -9,7 +9,8 @@
  * TODO: Add readFloat32Array helper function
  */
 import check from "./sc_check";
-import {sc_dds} from "./sc_dds";
+import {sc_dds, sc_dds_pixelformat} from "./sc_dds";
+import {_} from "underscore";
 const ByteBuffer = require('bytebuffer');
 
 
@@ -79,7 +80,20 @@ class sc_map_header {
     this.__width = width;
     this.__height = height;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const output = new ByteBuffer(30, ByteBuffer.LITTLE_ENDIAN);
+    output.writeInt32(0x1a70614d);                  // Magic
+    output.writeInt32(2);                           // Major version
+    output.writeInt32(2);                           // Unknown 1
+    output.writeInt32(0xEDFEEFBE);                  // Unknown 2 - Endianness check?
+    output.writeFloat32(this.__width);
+    output.writeFloat32(this.__height);
+    output.writeInt32(0);                           // Unknown 3
+    output.writeInt16(0);                           // Unknown 4
+
+    return output.buffer;
+  }
 
   create(map_args) {
     this.__width = hm_sz(map_args.size);
@@ -102,23 +116,31 @@ class sc_map_preview_image {
     // Sanity check the preview image length
     check.between(0, 256*256*4+128, preview_image_length, "Invalid preview image length");
 
-    let preview_image_data = new sc_dds();
     let starting_remaining = input.remaining();
-    preview_image_data.load(input);
+    let preview_image_data = sc_dds.load(input);
 
     // Sanity check correct number of bytes read
     let bytes_read = starting_remaining - input.remaining();
     check.equal(bytes_read, preview_image_length, `Wrong number of bytes read extracting prerview image (req ${preview_image_length} found ${bytes_read}`);
 
     // Minor version is included in this section for lack of a better place to put it
-    // TODO: Restore this to 56 when I find some good test data
     let minor_version = input.readInt32();
     check.equal(56, minor_version, "Incorrect minor version in header");
 
     // Record fields
     this.__data = preview_image_data.data;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const output = new ByteBuffer(4 + 256 * 256 * 4 + 128 + 4, ByteBuffer.LITTLE_ENDIAN);
+    output.writeInt32(256 * 256 * 4 + 128);                                   // Length of DDS texture
+
+    sc_dds.save(output, this.data, 256, 256, sc_dds_pixelformat.RawARGB);     // Preview image (Uncompressed DDS)
+
+    output.writeInt32(56);                                                    // Minor version
+
+    return output.buffer;
+  }
 
   create(map_args) {
     // Blank dds, excluding header
@@ -146,7 +168,7 @@ class sc_map_heightmap {
   load(input) {
     let width = input.readInt32();
     let height = input.readInt32();
-    let scale = input.readFloat32();     // Vertical scale (typicaly 1/128)
+    let scale = input.readFloat32();     // Vertical scale (typically 1/128)
 
     // Sanity checks
     check.one_of([hm_sz(0), hm_sz(1), hm_sz(2), hm_sz(3), hm_sz(4)], width, "Invalid heightmap width");
@@ -160,7 +182,7 @@ class sc_map_heightmap {
     this.__scale = scale;
     this.__data = data;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+  save() {} // TODO: Add serialise to ByteBuffer
 
   create(map_args) {
     this.__width = hm_sz(map_args.size);
@@ -863,13 +885,12 @@ class sc_map_normalmap {
     let data_length = input.readInt32();
 
     // Sanity checks
-    check.one_of([256, 512, 1024, 2048, 4096], width, "Suspcious normal map width"); // TODO: Check it should be 128-2048
-    check.one_of([256, 512, 1024, 2048, 4096], height, "Suspcious normal map width");
+    check.one_of([256, 512, 1024, 2048, 4096], width, "Suspicious normal map width"); // TODO: Check it should be 128-2048
+    check.one_of([256, 512, 1024, 2048, 4096], height, "Suspicious normal map width");
     check.equal(1, count, "Suspicious normal map count");
     check.equal(width * height * 4 / 4 + 128, data_length, "Suspicious normal map length"); // DXT5 achieves 4:1 compression, plus some header
 
-    let normal_map = new sc_dds();
-    normal_map.load(input);
+    let normal_map = sc_dds.load(input);
 
     // Record fields
     this.__width = width;
@@ -915,9 +936,8 @@ class sc_map_texturemap {
       // Sanity check texture map length
       check.one_of([dds_sz(tm_sz(0)), dds_sz(tm_sz(1)), dds_sz(tm_sz(2)), dds_sz(tm_sz(3)), dds_sz(tm_sz(4))], chan_length, "Suspicious texture map length");
 
-      let chan_dds = new sc_dds();
       let starting_remaining = input.remaining();
-      chan_dds.load(input);
+      let chan_dds = sc_dds.load(input);
       let bytes_read = starting_remaining - input.remaining();
       // Sanity check correct number of bytes read
       check.equal(bytes_read, chan_length, `Wrong number of bytes read extracting texture map ${chan} (req ${chan_length} found ${bytes_read}`);
@@ -975,9 +995,8 @@ class sc_map_watermap {
     // TBD: Check bounds are correct
     check.equal(dds_sz2(this.__heightmap.width / 2, this.__heightmap.height / 2), watermap_length, "Suspicious water map length")
 
-    let watermap_dds = new sc_dds();
     let starting_remaining = input.remaining();
-    watermap_dds.load(input);
+    let watermap_dds = sc_dds.load(input);
     let bytes_read = starting_remaining - input.remaining();
     // Sanity check correct number of bytes read
     check.equal(bytes_read, watermap_length, `Wrong number of bytes read extracting watermap (req ${watermap_length} found ${bytes_read}`);
@@ -1138,19 +1157,33 @@ export class sc_map {
     this.props.load(input);
   }
 
-  save(output) {
-    this.header.save(output);
-    this.preview_image.save(output);
-    this.heightmap.save(output);
-    this.textures.save(output);
-    this.lighting.save(output);
-    this.water.save(output);
-    this.layers.save(output);
-    this.decals.save(output);
-    this.normalmap.save(output);
-    this.texturemap.save(output);
-    this.watermap.save(output);
-    this.props.save(output);
+  save() {
+    const buffers = [
+      this.header.save(),
+      this.preview_image.save(),
+      //this.heightmap.save(),
+      //this.textures.save(),
+      //this.lighting.save(),
+      //this.water.save(),
+      //this.layers.save(),
+      //this.decals.save(),
+      //this.normalmap.save(),
+      //this.texturemap.save(),
+      //this.watermap.save(),
+      //this.props.save()
+    ];
+
+    // Concatenate all of the above to get the output
+    const output_length = _.reduce(buffers, (sum, term) => { return sum + term.length; }, 0);
+    const output = new Uint8Array(output_length);
+
+    let cumulative_length = 0;
+    for (const buffer of buffers) {
+      output.set(buffer, cumulative_length);
+      cumulative_length += buffer.length;
+    }
+
+    return output;
   }
 
   /**

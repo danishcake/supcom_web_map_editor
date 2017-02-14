@@ -560,7 +560,76 @@ describe('sc_map', function() {
     it('should create correct metadata', function() {
 
     });
+  });
 
+  describe('saving maps', function() {
+    before('create a map, save it and reload it', function() {
+      this.src_map = new sc.map();
+      this.src_map.create({
+        name: 'x',
+        author: 'x',
+        description: 'x',
+        size: 0 // 5x5
+      });
 
+      const roundtrip_buffer = this.src_map.save();
+
+      this.dest_map = new sc.map();
+      this.dest_map.load(ByteBuffer.wrap(roundtrip_buffer, ByteBuffer.LITTLE_ENDIAN));
+    });
+
+    it('should write header', function() {
+      assert.equal(256, this.dest_map.header.width);
+      assert.equal(256, this.dest_map.header.height);
+    });
+
+    it('should write preview image', function() {
+      assert.deepEqual(this.dest_map.preview_image.data, this.src_map.preview_image.data);
+    });
+
+    it('should write heightmap', function() {
+      assert.equal(this.dest_map.heightmap.width, this.src_map.heightmap.width);
+      assert.equal(this.dest_map.heightmap.height, this.src_map.heightmap.height);
+      assert.closeTo(this.dest_map.heightmap.scale, this.src_map.heightmap.scale, 1/409600);
+      assert.deepEqual(this.dest_map.heightmap.data, this.src_map.heightmap.data);
+    });
+
+    it('should write textures', function() {
+    });
+
+    it('should write lighting', function() {
+    });
+
+    it('should write water', function() {
+    });
+
+    it('should write layers', function() {
+    });
+
+    it('should write decals', function() {
+    });
+
+    it('should write normal maps', function() {
+    });
+
+    it('should write texture maps', function() {
+    });
+
+    it('should write normal maps', function() {
+    });
+
+    it('should write props', function() {
+    });
+  });
+
+  describe('zip loading', function() {
+    it('should load scripts and scmap from zipfile', function() {
+    });
+
+    it('should load scenario first, and use that to determine other filenames', function() {
+    });
+  });
+
+  describe('zip saving', function() {
   });
 });
