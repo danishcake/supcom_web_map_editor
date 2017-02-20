@@ -20,7 +20,7 @@ let check = {
 
   one_of: function(values, found, message) {
     if (!_.contains(values, found)) {
-      let values_str = _.reduce(values, (memo, it) => { memo = `${memo}, ${it}`; });
+      let values_str = _.reduce(values, (memo, it) => { return `${memo}, ${it}`; });
       throw new Error(`${message} (${found} not in ${values_str})`)
     }
   },
