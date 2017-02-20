@@ -273,7 +273,23 @@ class sc_map_textures {
     this.__sky_cubemap_texture_path = sky_cubemap_texture_path;
     this.__environment_cubemaps = environment_cubemaps;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeByte(0);
+    output.writeCString(this.__terrain_shader);
+    output.writeCString(this.__background_texture_path);
+    output.writeCString(this.__sky_cubemap_texture_path);
+
+    output.writeInt32(this.__environment_cubemaps.length);
+    for (let i = 0; i < this.__environment_cubemaps.length; i++) {
+      output.writeCString(this.__environment_cubemaps[i].name);
+      output.writeCString(this.__environment_cubemaps[i].file);
+    }
+
+    return output.buffer;
+  }
 
   create(map_args) {
     this.__terrain_shader = "TTerrain";
@@ -1176,7 +1192,7 @@ export class sc_map {
       this.header.save(),
       this.preview_image.save(),
       this.heightmap.save(),
-      //this.textures.save(),
+      this.textures.save(),
       //this.lighting.save(),
       //this.water.save(),
       //this.layers.save(),
