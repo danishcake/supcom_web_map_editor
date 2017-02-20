@@ -121,7 +121,7 @@ class sc_map_preview_image {
 
     // Sanity check correct number of bytes read
     let bytes_read = starting_remaining - input.remaining();
-    check.equal(bytes_read, preview_image_length, `Wrong number of bytes read extracting prerview image (req ${preview_image_length} found ${bytes_read}`);
+    check.equal(bytes_read, preview_image_length, `Wrong number of bytes read extracting preview image (req ${preview_image_length} found ${bytes_read}`);
 
     // Minor version is included in this section for lack of a better place to put it
     let minor_version = input.readInt32();
@@ -182,7 +182,21 @@ class sc_map_heightmap {
     this.__scale = scale;
     this.__data = data;
   }
-  save() {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const hm_count = (this.__width + 1) * (this.__height + 1);
+
+    // 2 ints, 1 float and hm_count shorts
+    const output = new ByteBuffer(12 + hm_count * 2, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(this.__width);
+    output.writeInt32(this.__height);
+    output.writeFloat32(this.__scale);
+
+    output.append(this.__data);
+
+    return output.buffer;
+  }
 
   create(map_args) {
     this.__width = hm_sz(map_args.size);
@@ -1161,7 +1175,7 @@ export class sc_map {
     const buffers = [
       this.header.save(),
       this.preview_image.save(),
-      //this.heightmap.save(),
+      this.heightmap.save(),
       //this.textures.save(),
       //this.lighting.save(),
       //this.water.save(),
