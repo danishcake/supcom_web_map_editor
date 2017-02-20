@@ -595,6 +595,17 @@ describe('sc_map', function() {
     });
 
     it('should write textures', function() {
+      assert.equal(this.dest_map.textures.terrain_shader, this.src_map.textures.terrain_shader);
+      assert.equal(this.dest_map.textures.background_texture_path, this.src_map.textures.background_texture_path);
+      assert.equal(this.dest_map.textures.sky_cubemap_texture_path, this.src_map.textures.sky_cubemap_texture_path);
+      assert.equal(this.dest_map.textures.environment_cubemaps.length, this.src_map.textures.environment_cubemaps.length);
+
+      for (let i = 0; i < this.dest_map.textures.environment_cubemaps.length; i++) {
+        assert.equal(this.dest_map.textures.environment_cubemaps[i].name,
+                     this.src_map.textures.environment_cubemaps[i].name);
+        assert.equal(this.dest_map.textures.environment_cubemaps[i].file,
+                     this.src_map.textures.environment_cubemaps[i].file);
+      }
     });
 
     it('should write lighting', function() {
