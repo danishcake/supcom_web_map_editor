@@ -609,6 +609,29 @@ describe('sc_map', function() {
     });
 
     it('should write lighting', function() {
+      assert.equal(this.dest_map.lighting.lighting_multiplier, this.src_map.lighting_multiplier);
+      assert.equal(this.dest_map.lighting.lighting_sun_direction[0], this.src_map.lighting.lighting_sun_direction[0]);
+      assert.equal(this.dest_map.lighting.lighting_sun_direction[1], this.src_map.lighting.lighting_sun_direction[1]);
+      assert.equal(this.dest_map.lighting.lighting_sun_direction[2], this.src_map.lighting.lighting_sun_direction[2]);
+      assert.equal(this.dest_map.lighting.lighting_sun_ambience[0],  this.src_map.lighting.lighting_sun_ambience[0]);
+      assert.equal(this.dest_map.lighting.lighting_sun_ambience[1],  this.src_map.lighting.lighting_sun_ambience[1]);
+      assert.equal(this.dest_map.lighting.lighting_sun_ambience[2],  this.src_map.lighting.lighting_sun_ambience[2]);
+      assert.equal(this.dest_map.lighting.lighting_sun_colour[0],    this.src_map.lighting.lighting_sun_colour[0]);
+      assert.equal(this.dest_map.lighting.lighting_sun_colour[1],    this.src_map.lighting.lighting_sun_colour[1]);
+      assert.equal(this.dest_map.lighting.lighting_sun_colour[2],    this.src_map.lighting.lighting_sun_colour[2]);
+      assert.equal(this.dest_map.lighting.shadow_fill_colour[0],     this.src_map.lighting.shadow_fill_colour[0]);
+      assert.equal(this.dest_map.lighting.shadow_fill_colour[1],     this.src_map.lighting.shadow_fill_colour[1]);
+      assert.equal(this.dest_map.lighting.shadow_fill_colour[2],     this.src_map.lighting.shadow_fill_colour[2]);
+      assert.equal(this.dest_map.lighting.specular_colour[0],        this.src_map.lighting.specular_colour[0]);
+      assert.equal(this.dest_map.lighting.specular_colour[1],        this.src_map.lighting.specular_colour[1]);
+      assert.equal(this.dest_map.lighting.specular_colour[2],        this.src_map.lighting.specular_colour[2]);
+      assert.equal(this.dest_map.lighting.specular_colour[3],        this.src_map.lighting.specular_colour[3]);
+      assert.equal(this.dest_map.lighting.bloom,                     this.src_map.lighting.bloom);
+      assert.equal(this.dest_map.lighting.fog_colour[0],             this.src_map.lighting.fog_colour[0]);
+      assert.equal(this.dest_map.lighting.fog_colour[1],             this.src_map.lighting.fog_colour[1]);
+      assert.equal(this.dest_map.lighting.fog_colour[2],             this.src_map.lighting.fog_colour[2]);
+      assert.equal(this.dest_map.lighting.fog_start,                 this.src_map.lighting.fog_start);
+      assert.equal(this.dest_map.lighting.fog_end,                   this.src_map.lighting.fog_end);
     });
 
     it('should write water', function() {

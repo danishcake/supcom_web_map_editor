@@ -367,7 +367,36 @@ class sc_map_lighting {
     this.__fog_start = fog_start;
     this.__fog_end = fog_end;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const output = new ByteBuffer(23, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeFloat32(this.__lighting_multiplier);
+    output.writeFloat32(this.__lighting_sun_direction[0]);
+    output.writeFloat32(this.__lighting_sun_direction[1]);
+    output.writeFloat32(this.__lighting_sun_direction[2]);
+    output.writeFloat32(this.__lighting_sun_ambience[0]);
+    output.writeFloat32(this.__lighting_sun_ambience[1]);
+    output.writeFloat32(this.__lighting_sun_ambience[2]);
+    output.writeFloat32(this.__lighting_sun_colour[0]);
+    output.writeFloat32(this.__lighting_sun_colour[1]);
+    output.writeFloat32(this.__lighting_sun_colour[2]);
+    output.writeFloat32(this.__shadow_fill_colour[0]);
+    output.writeFloat32(this.__shadow_fill_colour[1]);
+    output.writeFloat32(this.__shadow_fill_colour[2]);
+    output.writeFloat32(this.__specular_colour[0]);
+    output.writeFloat32(this.__specular_colour[1]);
+    output.writeFloat32(this.__specular_colour[2]);
+    output.writeFloat32(this.__specular_colour[3]);
+    output.writeFloat32(this.__bloom);
+    output.writeFloat32(this.__fog_colour[0]);
+    output.writeFloat32(this.__fog_colour[1]);
+    output.writeFloat32(this.__fog_colour[2]);
+    output.writeFloat32(this.__fog_start);
+    output.writeFloat32(this.__fog_end);
+
+    return output.buffer;
+  }
 
   create(map_args) {
     this.__lighting_multiplier = 1.5;
@@ -1193,7 +1222,7 @@ export class sc_map {
       this.preview_image.save(),
       this.heightmap.save(),
       this.textures.save(),
-      //this.lighting.save(),
+      this.lighting.save(),
       //this.water.save(),
       //this.layers.save(),
       //this.decals.save(),
