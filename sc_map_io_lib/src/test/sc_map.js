@@ -723,15 +723,26 @@ describe('sc_map', function() {
     });
 
     it('should write decals', function() {
+      // Not really testing very well here, but I don't have an input with decals
+      assert.equal(this.dest_map.decals.decals.length, this.src_map.decals.decals.length);
+      assert.equal(this.dest_map.decals.decal_groups.length, this.src_map.decals.decal_groups.length);
     });
 
     it('should write normal maps', function() {
+      assert.equal(this.dest_map.normalmap.data[0], this.src_map.normalmap.data[0]);
+      assert.equal(this.dest_map.normalmap.data[1], this.src_map.normalmap.data[1]);
+      assert.equal(this.dest_map.normalmap.data[2], this.src_map.normalmap.data[2]);
+      assert.equal(this.dest_map.normalmap.data[3], this.src_map.normalmap.data[3]);
+
+      assert.equal(this.dest_map.normalmap.width, this.src_map.normalmap.width);
+      assert.equal(this.dest_map.normalmap.height, this.src_map.normalmap.height);
+      assert.equal(this.dest_map.normalmap.data.capacity(), this.src_map.normalmap.data.capacity());
     });
 
     it('should write texture maps', function() {
     });
 
-    it('should write normal maps', function() {
+    it('should write water maps', function() {
     });
 
     it('should write props', function() {

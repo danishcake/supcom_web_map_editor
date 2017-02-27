@@ -847,7 +847,7 @@ class sc_map_layers {
     }
 
     for (let i = 0; i < 9; i++) {
-    output.append(this.__normal_data[i].save().flip().compact());
+      output.append(this.__normal_data[i].save().flip().compact());
     }
 
     return output;
@@ -939,7 +939,30 @@ class sc_map_decal {
     this.__near_cutoff_lod = near_cutoff_lod;
     this.__owner_army = owner_army;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(this.__id);
+    output.writeInt32(this.__decal_type);
+    output.writeInt32(this.__texture_count);
+    output.writeCString(this.__texture_file);
+    output.writeFloat32(this.__scale[0]);
+    output.writeFloat32(this.__scale[1]);
+    output.writeFloat32(this.__scale[2]);
+    output.writeFloat32(this.__position[0]);
+    output.writeFloat32(this.__position[1]);
+    output.writeFloat32(this.__position[2]);
+    output.writeFloat32(this.__rotation[0]);
+    output.writeFloat32(this.__rotation[1]);
+    output.writeFloat32(this.__rotation[2]);
+
+    output.writeFloat32(this.__cutoff_lod);
+    output.writeFloat32(this.__near_cutoff_lod);
+    output.writeInt32(this.__owner_army);
+
+    return output;
+  }
 
   create(map_args) {
 
@@ -969,8 +992,25 @@ class sc_map_decal_group {
       let item = input.readInt32();
       data.push(item);
     }
+
+    this.__id = id;
+    this.__name = name;
+    this.__data = data;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(this.__id);
+    output.writeCString(this.__name);
+    output.writeInt32(this.__data.length);
+
+    for (let i = 0; i < this.__data.length; i++) {
+      output.writeInt32(this.__data[i]);
+    }
+
+    return output;
+  }
 
   create(map_args) {
 
@@ -1016,7 +1056,27 @@ class sc_map_decals {
     this.__decals = decals;
     this.__decal_groups = decal_groups;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    // Write 8 unknown bytes
+    for (let i = 0; i < 8; i++) {
+      output.writeByte(0);
+    }
+
+    output.writeInt32(this.__decals.length);
+    for (let i = 0; i < this.__decals.length; i++) {
+      output.append(this.__decals[i].save().flip().compact());
+    }
+
+    output.writeInt32(this.__decal_groups.length);
+    for (let i = 0; i < this.__decal_groups.length; i++) {
+      output.append(this.__decal_groups[i].save().flip().compact());
+    }
+
+    return output;
+  }
 
   create(map_args) {
 
@@ -1057,7 +1117,18 @@ class sc_map_normalmap {
     this.__height = height;
     this.__data = normal_map.data;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(this.__width);
+    output.writeInt32(this.__height);
+    output.writeInt32(1); // Normal map count
+    output.writeInt32(width * height  * 4 / 4 + 128);
+    sc_dds.save(output, this.__data, this.__width, this.__height, sc_dds_pixelformat.DXT5);
+
+    return output;
+  }
 
   create(map_args) {
     this.__width = nm_sz(map_args.size);
@@ -1326,8 +1397,8 @@ export class sc_map {
       this.lighting.save(),
       this.water.save(),
       this.layers.save(),
-      //this.decals.save(),
-      //this.normalmap.save(),
+      this.decals.save(),
+      this.normalmap.save(),
       //this.texturemap.save(),
       //this.watermap.save(),
       //this.props.save()
