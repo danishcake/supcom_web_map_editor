@@ -635,6 +635,43 @@ describe('sc_map', function() {
     });
 
     it('should write water', function() {
+      assert.equal(this.dest_map.water.has_water,                             this.src_map.water.has_water);
+      assert.equal(this.dest_map.water.elevation,                             this.src_map.water.elevation);
+      assert.equal(this.dest_map.water.elevation_deep,                        this.src_map.water.elevation_deep);
+      assert.equal(this.dest_map.water.elevation_abyss,                       this.src_map.water.elevation_abyss);
+      assert.equal(this.dest_map.water.surface_colour[0],                     this.src_map.water.surface_colour[0]);
+      assert.equal(this.dest_map.water.surface_colour[1],                     this.src_map.water.surface_colour[1]);
+      assert.equal(this.dest_map.water.surface_colour[2],                     this.src_map.water.surface_colour[2]);
+      assert.equal(this.dest_map.water.colour_lerp[0],                        this.src_map.water.colour_lerp[0]);
+      assert.equal(this.dest_map.water.colour_lerp[1],                        this.src_map.water.colour_lerp[1]);
+      assert.equal(this.dest_map.water.refraction_scale,                      this.src_map.water.refraction_scale);
+      assert.equal(this.dest_map.water.fresnel_bias,                          this.src_map.water.fresnel_bias);
+      assert.equal(this.dest_map.water.fresnel_power,                         this.src_map.water.fresnel_power);
+      assert.equal(this.dest_map.water.unit_reflection,                       this.src_map.water.unit_reflection);
+      assert.equal(this.dest_map.water.sky_reflection,                        this.src_map.water.sky_reflection);
+      assert.equal(this.dest_map.water.water_sun_shininess,                   this.src_map.water.water_sun_shininess);
+      assert.equal(this.dest_map.water.water_sun_strength,                    this.src_map.water.water_sun_strength);
+      assert.equal(this.dest_map.water.water_sun_direction[0],                this.src_map.water.water_sun_direction[0]);
+      assert.equal(this.dest_map.water.water_sun_direction[1],                this.src_map.water.water_sun_direction[1]);
+      assert.equal(this.dest_map.water.water_sun_direction[2],                this.src_map.water.water_sun_direction[2]);
+      assert.equal(this.dest_map.water.water_sun_colour[0],                   this.src_map.water.water_sun_colour[0]);
+      assert.equal(this.dest_map.water.water_sun_colour[1],                   this.src_map.water.water_sun_colour[1]);
+      assert.equal(this.dest_map.water.water_sun_colour[2],                   this.src_map.water.water_sun_colour[2]);
+      assert.equal(this.dest_map.water.water_sun_reflection,                  this.src_map.water.water_sun_reflection);
+      assert.equal(this.dest_map.water.water_sun_glow,                        this.src_map.water.water_sun_glow);
+      assert.equal(this.dest_map.water.water_cubemap_file,                    this.src_map.water.water_cubemap_file);
+      assert.equal(this.dest_map.water.water_ramp_file,                       this.src_map.water.water_ramp_file);
+      assert.equal(this.dest_map.water.normal_repeat[0],                      this.src_map.water.normal_repeat[0]);
+      assert.equal(this.dest_map.water.normal_repeat[1],                      this.src_map.water.normal_repeat[0]);
+      assert.equal(this.dest_map.water.normal_repeat[2],                      this.src_map.water.normal_repeat[0]);
+      assert.equal(this.dest_map.water.normal_repeat[3],                      this.src_map.water.normal_repeat[0]);
+      assert.equal(this.dest_map.water.water_textures[0].normal_movement[0],  this.src_map.water.water_textures[0].normal_movement[0]);
+      assert.equal(this.dest_map.water.water_textures[0].normal_movement[1],  this.src_map.water.water_textures[0].normal_movement[1]);
+      assert.equal(this.dest_map.water.water_textures[0].texture_file,        this.src_map.water.water_textures[0].texture_file);
+      assert.equal(this.dest_map.water.water_textures[1].texture_file,        this.src_map.water.water_textures[1].texture_file);
+      assert.equal(this.dest_map.water.water_textures[2].texture_file,        this.src_map.water.water_textures[2].texture_file);
+      assert.equal(this.dest_map.water.water_textures[3].texture_file,        this.src_map.water.water_textures[3].texture_file);
+      assert.equal(this.dest_map.water.wave_generators.length,                this.src_map.water.wave_generators.length);
     });
 
     it('should write layers', function() {

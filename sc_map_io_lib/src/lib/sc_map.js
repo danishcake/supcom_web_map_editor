@@ -92,7 +92,7 @@ class sc_map_header {
     output.writeInt32(0);                           // Unknown 3
     output.writeInt16(0);                           // Unknown 4
 
-    return output.buffer;
+    return output;
   }
 
   create(map_args) {
@@ -139,7 +139,7 @@ class sc_map_preview_image {
 
     output.writeInt32(56);                                                    // Minor version
 
-    return output.buffer;
+    return output;
   }
 
   create(map_args) {
@@ -195,7 +195,7 @@ class sc_map_heightmap {
 
     output.append(this.__data);
 
-    return output.buffer;
+    return output;
   }
 
   create(map_args) {
@@ -288,7 +288,7 @@ class sc_map_textures {
       output.writeCString(this.__environment_cubemaps[i].file);
     }
 
-    return output.buffer;
+    return output;
   }
 
   create(map_args) {
@@ -369,7 +369,7 @@ class sc_map_lighting {
   }
 
   save() {
-    const output = new ByteBuffer(23, ByteBuffer.LITTLE_ENDIAN);
+    const output = new ByteBuffer(23 * 4, ByteBuffer.LITTLE_ENDIAN);
 
     output.writeFloat32(this.__lighting_multiplier);
     output.writeFloat32(this.__lighting_sun_direction[0]);
@@ -395,7 +395,7 @@ class sc_map_lighting {
     output.writeFloat32(this.__fog_start);
     output.writeFloat32(this.__fog_end);
 
-    return output.buffer;
+    return output;
   }
 
   create(map_args) {
@@ -420,7 +420,7 @@ class sc_map_lighting {
     this.__fog_colour[0] = 0.8;
     this.__fog_colour[1] = 1;
     this.__fog_colour[2] = 0.8;
-    this.__fog_start= 1000;
+    this.__fog_start = 1000;
     this.__fog_end = 1000;
   }
 }
@@ -444,7 +444,16 @@ class sc_map_water_texture {
     // Sanity checks
     check.between(1, 512, this.__texture_file.length, "Suspicious water texture filename length");
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeFloat32(this.__normal_movement[0]);
+    output.writeFloat32(this.__normal_movement[1]);
+    output.writeCString(this.__texture_file);
+
+    return output;
+  }
 }
 
 /**
@@ -512,7 +521,31 @@ class sc_map_wave_generator {
     check.between(1, 512, this.__ramp_file.length, "Suspicious ramp filename length");
   }
 
-  save(output) {}
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeCString(this.__texture_file);
+    output.writeCString(this.__ramp_file);
+    output.writeFloat32(this.__position[0]);
+    output.writeFloat32(this.__position[1]);
+    output.writeFloat32(this.__position[2]);
+    output.writeFloat32(this.__rotation);
+    output.writeFloat32(this.__velocity[0]);
+    output.writeFloat32(this.__velocity[1]);
+    output.writeFloat32(this.__velocity[2]);
+    output.writeFloat32(this.__lifetime_first);
+    output.writeFloat32(this.__lifetime_last);
+    output.writeFloat32(this.__period_first);
+    output.writeFloat32(this.__period_last);
+    output.writeFloat32(this.__scale_first);
+    output.writeFloat32(this.__scale_last);
+    output.writeFloat32(this.__frame_count); // TODO: This cannot really be a float can it?
+    output.writeFloat32(this.__frame_rate_first);
+    output.writeFloat32(this.__frame_rate_second);
+    output.writeFloat32(this.__strip_count);
+
+    return output;
+  }
 }
 
 /**
@@ -573,7 +606,8 @@ class sc_map_water {
     let elevation_deep = input.readFloat32();
     let elevation_abyss = input.readFloat32();
     let surface_colour = [input.readFloat32(),
-                          input.readFloat32(), input.readFloat32()];
+                          input.readFloat32(),
+                          input.readFloat32()];
     let colour_lerp = [input.readFloat32(),
                        input.readFloat32()];
     let refraction_scale = input.readFloat32();
@@ -641,7 +675,52 @@ class sc_map_water {
     this.__water_textures = water_textures;
     this.__wave_generators = wave_generators;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeByte(this.__has_water ? 1 : 0);
+    output.writeFloat32(this.__elevation);
+    output.writeFloat32(this.__elevation_deep);
+    output.writeFloat32(this.__elevation_abyss);
+    output.writeFloat32(this.__surface_colour[0]);
+    output.writeFloat32(this.__surface_colour[1]);
+    output.writeFloat32(this.__surface_colour[2]);
+    output.writeFloat32(this.__colour_lerp[0]);
+    output.writeFloat32(this.__colour_lerp[1]);
+    output.writeFloat32(this.__refraction_scale);
+    output.writeFloat32(this.__fresnel_bias);
+    output.writeFloat32(this.__fresnel_power);
+    output.writeFloat32(this.__unit_reflection);
+    output.writeFloat32(this.__sky_reflection);
+    output.writeFloat32(this.__water_sun_shininess);
+    output.writeFloat32(this.__water_sun_strength);
+    output.writeFloat32(this.__water_sun_direction[0]);
+    output.writeFloat32(this.__water_sun_direction[1]);
+    output.writeFloat32(this.__water_sun_direction[2]);
+    output.writeFloat32(this.__water_sun_colour[0]);
+    output.writeFloat32(this.__water_sun_colour[1]);
+    output.writeFloat32(this.__water_sun_colour[2]);
+    output.writeFloat32(this.__water_sun_reflection);
+    output.writeFloat32(this.__water_sun_glow);
+    output.writeCString(this.__water_cubemap_file);
+    output.writeCString(this.__water_ramp_file);
+    output.writeFloat32(this.__normal_repeat[0]);
+    output.writeFloat32(this.__normal_repeat[1]);
+    output.writeFloat32(this.__normal_repeat[2]);
+    output.writeFloat32(this.__normal_repeat[3]);
+
+    for (let i = 0; i < this.__water_textures.length; i++) {
+      output.append(this.__water_textures[i].save().flip().compact());
+    }
+
+    output.writeInt32(this.__wave_generators.length);
+    for (let i = 0; i < this.__wave_generators.length; i++) {
+      output.append(this.__wave_generators[i].save().flip().compact());
+    }
+
+    return output;
+  }
 
   create(map_args) {
     this.__has_water = true;
@@ -1223,7 +1302,7 @@ export class sc_map {
       this.heightmap.save(),
       this.textures.save(),
       this.lighting.save(),
-      //this.water.save(),
+      this.water.save(),
       //this.layers.save(),
       //this.decals.save(),
       //this.normalmap.save(),
@@ -1236,13 +1315,16 @@ export class sc_map {
     const output_length = _.reduce(buffers, (sum, term) => { return sum + term.length; }, 0);
     const output = new Uint8Array(output_length);
 
-    let cumulative_length = 0;
+    const output = new ByteBuffer();
     for (const buffer of buffers) {
-      output.set(buffer, cumulative_length);
-      cumulative_length += buffer.length;
+      // Compact: Resizes backing buffer to limit-offset. No good, I want 0-offset
+      // flip: Sets limit to offset and offset to zero. This helps as I can then compact
+
+      output.append(buffer.flip().compact());
     }
 
-    return output;
+    // TBD: This will be a Buffer under node, which may not be quite what I want
+    return output.flip().compact().buffer;
   }
 
   /**
