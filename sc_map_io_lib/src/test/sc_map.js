@@ -675,6 +675,51 @@ describe('sc_map', function() {
     });
 
     it('should write layers', function() {
+      assert.equal(this.dest_map.layers.albedo_data.length, this.src_map.layers.albedo_data.length);
+      assert.equal(this.dest_map.layers.normal_data.length, this.src_map.layers.normal_data.length);
+
+      assert.equal(this.dest_map.layers.albedo_data[0].texture_file, this.src_map.layers.albedo_data[0].texture_file);
+      assert.equal(this.dest_map.layers.albedo_data[1].texture_file, this.src_map.layers.albedo_data[1].texture_file);
+      assert.equal(this.dest_map.layers.albedo_data[2].texture_file, this.src_map.layers.albedo_data[2].texture_file);
+      assert.equal(this.dest_map.layers.albedo_data[3].texture_file, this.src_map.layers.albedo_data[3].texture_file);
+      assert.equal(this.dest_map.layers.albedo_data[4].texture_file, this.src_map.layers.albedo_data[4].texture_file);
+      assert.equal(this.dest_map.layers.albedo_data[5].texture_file, this.src_map.layers.albedo_data[5].texture_file);
+      assert.equal(this.dest_map.layers.albedo_data[6].texture_file, this.src_map.layers.albedo_data[6].texture_file);
+      assert.equal(this.dest_map.layers.albedo_data[7].texture_file, this.src_map.layers.albedo_data[7].texture_file);
+      assert.equal(this.dest_map.layers.albedo_data[8].texture_file, this.src_map.layers.albedo_data[8].texture_file);
+      assert.equal(this.dest_map.layers.albedo_data[9].texture_file, this.src_map.layers.albedo_data[9].texture_file);
+
+      assert.equal(this.dest_map.layers.albedo_data[0].texture_scale, this.src_map.layers.albedo_data[0].texture_scale);
+      assert.equal(this.dest_map.layers.albedo_data[1].texture_scale, this.src_map.layers.albedo_data[1].texture_scale);
+      assert.equal(this.dest_map.layers.albedo_data[2].texture_scale, this.src_map.layers.albedo_data[2].texture_scale);
+      assert.equal(this.dest_map.layers.albedo_data[3].texture_scale, this.src_map.layers.albedo_data[3].texture_scale);
+      assert.equal(this.dest_map.layers.albedo_data[4].texture_scale, this.src_map.layers.albedo_data[4].texture_scale);
+      assert.equal(this.dest_map.layers.albedo_data[5].texture_scale, this.src_map.layers.albedo_data[5].texture_scale);
+      assert.equal(this.dest_map.layers.albedo_data[6].texture_scale, this.src_map.layers.albedo_data[6].texture_scale);
+      assert.equal(this.dest_map.layers.albedo_data[7].texture_scale, this.src_map.layers.albedo_data[7].texture_scale);
+      assert.equal(this.dest_map.layers.albedo_data[8].texture_scale, this.src_map.layers.albedo_data[8].texture_scale);
+      assert.equal(this.dest_map.layers.albedo_data[9].texture_scale, this.src_map.layers.albedo_data[9].texture_scale);
+
+
+      assert.equal(this.dest_map.layers.normal_data[0].texture_file, this.src_map.layers.normal_data[0].texture_file);
+      assert.equal(this.dest_map.layers.normal_data[1].texture_file, this.src_map.layers.normal_data[1].texture_file);
+      assert.equal(this.dest_map.layers.normal_data[2].texture_file, this.src_map.layers.normal_data[2].texture_file);
+      assert.equal(this.dest_map.layers.normal_data[3].texture_file, this.src_map.layers.normal_data[3].texture_file);
+      assert.equal(this.dest_map.layers.normal_data[4].texture_file, this.src_map.layers.normal_data[4].texture_file);
+      assert.equal(this.dest_map.layers.normal_data[5].texture_file, this.src_map.layers.normal_data[5].texture_file);
+      assert.equal(this.dest_map.layers.normal_data[6].texture_file, this.src_map.layers.normal_data[6].texture_file);
+      assert.equal(this.dest_map.layers.normal_data[7].texture_file, this.src_map.layers.normal_data[7].texture_file);
+      assert.equal(this.dest_map.layers.normal_data[8].texture_file, this.src_map.layers.normal_data[8].texture_file);
+
+      assert.equal(this.dest_map.layers.normal_data[0].texture_scale, this.src_map.layers.normal_data[0].texture_scale);
+      assert.equal(this.dest_map.layers.normal_data[1].texture_scale, this.src_map.layers.normal_data[1].texture_scale);
+      assert.equal(this.dest_map.layers.normal_data[2].texture_scale, this.src_map.layers.normal_data[2].texture_scale);
+      assert.equal(this.dest_map.layers.normal_data[3].texture_scale, this.src_map.layers.normal_data[3].texture_scale);
+      assert.equal(this.dest_map.layers.normal_data[4].texture_scale, this.src_map.layers.normal_data[4].texture_scale);
+      assert.equal(this.dest_map.layers.normal_data[5].texture_scale, this.src_map.layers.normal_data[5].texture_scale);
+      assert.equal(this.dest_map.layers.normal_data[6].texture_scale, this.src_map.layers.normal_data[6].texture_scale);
+      assert.equal(this.dest_map.layers.normal_data[7].texture_scale, this.src_map.layers.normal_data[7].texture_scale);
+      assert.equal(this.dest_map.layers.normal_data[8].texture_scale, this.src_map.layers.normal_data[8].texture_scale);
     });
 
     it('should write decals', function() {

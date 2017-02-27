@@ -787,10 +787,14 @@ class sc_map_layer {
     this.__texture_file = texture_file;
     this.__texture_scale = texture_scale;
   }
-  save(output) {}
 
-  create(map_args) {
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
 
+    output.writeCString(this.__texture_file);
+    output.writeFloat32(this.__texture_scale);
+
+    return output;
   }
 }
 
@@ -829,7 +833,25 @@ class sc_map_layers {
     this.__albedo_data = albedo_data;
     this.__normal_data = normal_data;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    // Write 24 mystery bytes
+    for (let i = 0; i < 24; i++) {
+      output.writeByte(0);
+    }
+
+    for (let i = 0; i < 10; i++) {
+      output.append(this.__albedo_data[i].save().flip().compact());
+    }
+
+    for (let i = 0; i < 9; i++) {
+    output.append(this.__normal_data[i].save().flip().compact());
+    }
+
+    return output;
+  }
 
   create(map_args) {
     // TODO: Fully specify layers. What do blank layers even mean? No albedo/normals applied?
@@ -1303,7 +1325,7 @@ export class sc_map {
       this.textures.save(),
       this.lighting.save(),
       this.water.save(),
-      //this.layers.save(),
+      this.layers.save(),
       //this.decals.save(),
       //this.normalmap.save(),
       //this.texturemap.save(),
