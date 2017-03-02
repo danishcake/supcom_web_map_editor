@@ -1155,10 +1155,14 @@ class sc_map_texturemap {
   constructor() {
     this.__chan0_3 = undefined;
     this.__chan4_7 = undefined;
+    this.__width = undefined;
+    this.__height = undefined;
   }
 
   get chan0_3() { return this.__chan0_3; }
   get chan4_7() { return this.__chan4_7; }
+  get width() { return this.__width; }
+  get height() { return this.__height; }
 
   load(input) {
     let chan_data = [undefined, undefined];
@@ -1180,11 +1184,24 @@ class sc_map_texturemap {
     this.__chan0_3 = chan_data[0];
     this.__chan4_7 = chan_data[1];
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(dds_sz2(this.__width, this.__height));
+    sc_dds.save(output, this.__chan0_3, this.__width, this.__height, sc_dds_pixelformat.RawARGB);
+
+    output.writeInt32(dds_sz2(this.__width, this.__height));
+    sc_dds.save(output, this.__chan4_7, this.__width, this.__height, sc_dds_pixelformat.RawARGB);
+
+    return output;
+  }
 
   create(map_args) {
     this.__chan0_3 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4);
     this.__chan4_7 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4);
+    this.__width = tm_sz(map_args.size);
+    this.__height = tm_sz(map_args.size);
   }
 }
 
@@ -1399,7 +1416,7 @@ export class sc_map {
       this.layers.save(),
       this.decals.save(),
       this.normalmap.save(),
-      //this.texturemap.save(),
+      this.texturemap.save(),
       //this.watermap.save(),
       //this.props.save()
     ];

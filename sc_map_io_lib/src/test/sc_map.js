@@ -740,6 +740,17 @@ describe('sc_map', function() {
     });
 
     it('should write texture maps', function() {
+      asssert.equal(this.dest_map.texturemap.chan0_3.data.capacity(), this.src_map.texturemap.chan0_3.data.capacity());
+      asssert.equal(this.dest_map.texturemap.chan0_3.data[0], this.src_map.texturemap.chan0_3.data[0]);
+      asssert.equal(this.dest_map.texturemap.chan0_3.data[1], this.src_map.texturemap.chan0_3.data[1]);
+      asssert.equal(this.dest_map.texturemap.chan0_3.data[2], this.src_map.texturemap.chan0_3.data[2]);
+      asssert.equal(this.dest_map.texturemap.chan0_3.data[3], this.src_map.texturemap.chan0_3.data[3]);
+
+      asssert.equal(this.dest_map.texturemap.chan4_7.data.capacity(), this.src_map.texturemap.chan4_7.data.capacity());
+      asssert.equal(this.dest_map.texturemap.chan4_7.data[0], this.src_map.texturemap.chan4_7.data[0]);
+      asssert.equal(this.dest_map.texturemap.chan4_7.data[1], this.src_map.texturemap.chan4_7.data[1]);
+      asssert.equal(this.dest_map.texturemap.chan4_7.data[2], this.src_map.texturemap.chan4_7.data[2]);
+      asssert.equal(this.dest_map.texturemap.chan4_7.data[3], this.src_map.texturemap.chan4_7.data[3]);
     });
 
     it('should write water maps', function() {
