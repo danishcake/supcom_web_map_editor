@@ -199,6 +199,11 @@ class sc_dds_pixel_rgb {
            (this.b - rhs.b) * (this.b - rhs.b);
   }
 
+  luminance() {
+    // Why is g scaled by 2? Because http://www.gamedev.no/projects/MegatextureCompression/324337_324337.pdf suggests so!
+    return this.r + this.g * 2 + this.b;
+  }
+
   static from_packed_rgb565(rgb_565) {
     // TODO: Check DXT5 ARGB bit order - what byte is b stored in?
 
@@ -289,6 +294,69 @@ export const sc_dds_pixelformat = {
   },
 
   DXT5: {
+    /**
+     * DXT5 compression uses a straight line through colour space, with the colours at 0%, 33%, 66% and 100%
+     * These algorithms suggest colour pairs for a given block
+     */
+
+    rgb_colourpair_generators: {
+      // Too heavy :( - 120 comparisons
+      //maximal_colour_distance: function(rgb_block) {
+      //  return {c0: 0, c1: 0}
+      //},
+
+      /**
+       * Returns the pair of colours maximally separated by intensity
+       */
+      maximal_intensity_distance: function(rgb_block) {
+        const pixel_luminances = _.map(rgb_block, (rgb_pixel, index) => {
+          return {index: index, luminance: rgb_pixel.luminance()};
+        });
+
+        const min_luminance = _.min(pixel_luminances, (pixel) => {
+          return pixel.luminance;
+        });
+        const max_luminance = _.min(pixel_luminances, (pixel) => {
+          return pixel.luminance;
+        });
+
+        return [{ c0: rgb_block[min_luminance.index],
+                  c1: rgb_block[max_luminance.index] }];
+      },
+
+      /**
+       * Returns a pair of colours containing the bounding rgb cube
+       */
+      rgb_extents: function(rgb_block) {
+        // Find bounding rgb values
+        let max_r = 0;
+        let max_g = 0;
+        let max_b = 0;
+        let min_r = 255;
+        let min_g = 255;
+        let min_b = 255;
+
+        for (let i = 0; i < 16; i++) {
+          if (rgb_block[i].r > max_r) max_r = rgb_block[i].r;
+          if (rgb_block[i].g > max_g) max_g = rgb_block[i].g;
+          if (rgb_block[i].b > max_b) max_b = rgb_block[i].b;
+          if (rgb_block[i].r < min_r) min_r = rgb_block[i].r;
+          if (rgb_block[i].g < min_g) min_g = rgb_block[i].g;
+          if (rgb_block[i].b < min_b) min_b = rgb_block[i].b;
+        }
+
+        // Return both the bounding box and the bounding box inset by 1/16th as suggested by
+        // http://www.gamedev.no/projects/MegatextureCompression/324337_324337.pdf
+        const offset_r = (max_r - min_r) / 16;
+        const offset_g = (max_g - min_g) / 16;
+        const offset_b = (max_b - min_b) / 16;
+        return [{ c0: new sc_dds_pixel_rgb(min_r, min_g, min_b),
+                  c1: new sc_dds_pixel_rgb(max_r, max_g, max_b) },
+                { c0: new sc_dds_pixel_rgb(min_r + offset_r, min_g + offset_g, min_b + offset_b),
+                  c1: new sc_dds_pixel_rgb(max_r - offset_r, max_g - offset_g, max_b - offset_b) }];
+      }
+    },
+
     /**
      * Loads a compressed DXT5 texture.
      * @param {ByteBuffer} input Input texture data. Must be width * height remaining (eg header already read)
@@ -399,7 +467,7 @@ export const sc_dds_pixelformat = {
       const extract_blocks = function(data, x, y, width, height) {
         const result = {
           alpha_pixel_block: new ByteBuffer(16),
-          rgb_pixel_block: new ByteBuffer(16)
+          rgb_pixel_block: []
         };
 
         // 1. Extract the alpha/rgb values into a contiguous block of memory
@@ -420,7 +488,7 @@ export const sc_dds_pixelformat = {
                                              data.readUint8(input_index + 3));
 
             result.alpha_pixel_block.writeUint8(a, output_index);
-            result.rgb_pixel_block.writeUint16(rgb.packed_rgb565, output_index * 2);
+            result.rgb_pixel_block.push(rgb);
           }
         }
 
@@ -478,58 +546,53 @@ export const sc_dds_pixelformat = {
        *                   lookup table
        */
       const calculate_rgb_block = function(rgb_pixel_block) {
-        // Find the pair of colours that minimising the sum of errors^2 (120 options)
-        // TODO: Check other distributions of colour match
+        let colourpairs = [];
+        for (let colourpair_generator_name in sc_dds_pixelformat.DXT5.rgb_colourpair_generators) {
+          let colourpair_generator = sc_dds_pixelformat.DXT5.rgb_colourpair_generators[colourpair_generator_name];
+          colourpairs = colourpairs.concat(colourpair_generator(rgb_pixel_block));
+        }
+
+        // Determine which colourpair is optimal
         const error_metrics = [];
         let i = 0;
-        for (let i0 = 0; i0 < 15; i0++)
-        {
-          for (let i1 = i0 + 1; i1 < 16; i1++)
-          {
-            // Pick two colours and ensure that c0 > c1
-            error_metrics.push({});
-            error_metrics[i].c0 = sc_dds_pixel_rgb.from_packed_rgb565(Math.max(rgb_pixel_block.readUint16(i0 * 2),
-                                                                               rgb_pixel_block.readUint16(i1 * 2)));
-            error_metrics[i].c1 = sc_dds_pixel_rgb.from_packed_rgb565(Math.min(rgb_pixel_block.readUint16(i0 * 2),
-                                                                               rgb_pixel_block.readUint16(i1 * 2)));
+        for (let i = 0; i < colourpairs.length; i++) {
 
-            // Derive additional colours
-            const c0 = error_metrics[i].c0;
-            const c1 = error_metrics[i].c1;
-            const c2 = sc_dds_pixel_rgb.lerp(c0, c1, 0.3333333);
-            const c3 = sc_dds_pixel_rgb.lerp(c0, c1, 0.6666666);
+          // Derive additional colours
+          const c0 = colourpairs[i].c0;
+          const c1 = colourpairs[i].c1;
+          const c2 = sc_dds_pixel_rgb.lerp(c0, c1, 0.3333333);
+          const c3 = sc_dds_pixel_rgb.lerp(c0, c1, 0.6666666);
 
-            error_metrics[i].metric = 0;
-            error_metrics[i].indices = [];
+          error_metrics.push({
+            c0: c0,
+            c1: c1,
+            metric: 0,
+            indices: []
+          });
 
-            // Now assign each pixel it's closest colour match
-            // and increase the error metric for this palette for that pixel
-            for (let j = 0; j < 16; j++)
-            {
-              const cj = sc_dds_pixel_rgb.from_packed_rgb565(rgb_pixel_block.readUint16(j * 2));
-              const metric_choice = [
-                cj.distance_sq(c0),
-                cj.distance_sq(c1),
-                cj.distance_sq(c2),
-                cj.distance_sq(c3)
-              ];
+          // Now assign each pixel it's closest colour match
+          // and increase the error metric for this palette for that pixel
+          for (let j = 0; j < 16; j++) {
+            const metric_choice = [
+              c0.distance_sq(rgb_pixel_block[j]),
+              c1.distance_sq(rgb_pixel_block[j]),
+              c2.distance_sq(rgb_pixel_block[j]),
+              c3.distance_sq(rgb_pixel_block[j])
+            ];
 
-              // Find index of the closest colour in the interpolation table by sum of square of elements
-              const best_match_index = _.chain(metric_choice)
-              .map(function(error_metric, index) {
-                return {
-                  index: index,
-                  value: error_metric
-                };
-              }).min(function(item) {
-                return item.value;
-              }).value().index;
+            // Find index of the closest colour in the interpolation table by sum of square of elements
+            const best_match_index = _.chain(metric_choice)
+            .map(function(error_metric, index) {
+              return {
+                index: index,
+                value: error_metric
+              };
+            }).min(function(item) {
+              return item.value;
+            }).value().index;
 
-              error_metrics[i].indices.push(best_match_index);
-              error_metrics[i].metric += metric_choice[error_metrics[i].indices[j]];
-            }
-
-            i++;
+            error_metrics[i].indices.push(best_match_index);
+            error_metrics[i].metric += metric_choice[error_metrics[i].indices[j]];
           }
         }
 
