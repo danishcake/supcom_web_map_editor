@@ -19,8 +19,10 @@ const ByteBuffer = require('bytebuffer');
  * These are square, with a fixed size header
  * Used by the texturemap and water maps
  */
-const dds_sz2 = function(x, y) { return x * y + 128; };
-const dds_sz = function(d) { return dds_sz2(d, d); };
+const dds_dxt5_sz2 = function(x, y) { return x * y + 128; };
+const dds_dxt5_sz = function(d) { return dds_dxt5_sz2(d, d); };
+const dds_raw_sz2 = function(x, y) { return 4 * x * y + 128; };
+const dds_raw_sz = function(d) { return dds_raw_sz2(d, d); };
 
 /* Used to determine height map size from a zero based size enum */
 const hm_sz = function(idx) {
@@ -145,7 +147,7 @@ class sc_map_preview_image {
   create(map_args) {
     // Blank dds, excluding header
     // TBD: Change this to store the DDS header and ARGB data (as is available post load?)
-    this.__data = new ByteBuffer(256 * 256 * 4);
+    this.__data = new ByteBuffer(256 * 256 * 4, ByteBuffer.LITTLE_ENDIAN);
   }
 }
 
@@ -203,7 +205,7 @@ class sc_map_heightmap {
     this.__height = hm_sz(map_args.size);
     this.__scale = 1 / 128;
     const hm_count = (this.__width + 1) * (this.__height + 1);
-    this.__data = new ByteBuffer(hm_count * 2);
+    this.__data = new ByteBuffer(hm_count * 2, ByteBuffer.LITTLE_ENDIAN);
 
     const hm_default = map_args.default_height || 32 * 1024;
     // Fill with some default height
@@ -1124,7 +1126,7 @@ class sc_map_normalmap {
     output.writeInt32(this.__width);
     output.writeInt32(this.__height);
     output.writeInt32(1); // Normal map count
-    output.writeInt32(width * height  * 4 / 4 + 128);
+    output.writeInt32(this.__width * this.__height  * 4 / 4 + 128);
     sc_dds.save(output, this.__data, this.__width, this.__height, sc_dds_pixelformat.DXT5);
 
     return output;
@@ -1133,7 +1135,7 @@ class sc_map_normalmap {
   create(map_args) {
     this.__width = nm_sz(map_args.size);
     this.__height = nm_sz(map_args.size);
-    this.__data = new ByteBuffer(this.__width * this.__height * 4);
+    this.__data = new ByteBuffer(this.__width * this.__height * 4, ByteBuffer.LITTLE_ENDIAN);
 
     // Fill normalmap with 'pointing up' vector.
     // TODO: Check this is up!
@@ -1169,7 +1171,7 @@ class sc_map_texturemap {
     for (let chan = 0; chan < 2; chan++) {
       let chan_length = input.readInt32();
       // Sanity check texture map length
-      check.one_of([dds_sz(tm_sz(0)), dds_sz(tm_sz(1)), dds_sz(tm_sz(2)), dds_sz(tm_sz(3)), dds_sz(tm_sz(4))], chan_length, "Suspicious texture map length");
+      check.one_of([dds_raw_sz(tm_sz(0)), dds_raw_sz(tm_sz(1)), dds_raw_sz(tm_sz(2)), dds_raw_sz(tm_sz(3)), dds_raw_sz(tm_sz(4))], chan_length, "Suspicious texture map length");
 
       let starting_remaining = input.remaining();
       let chan_dds = sc_dds.load(input);
@@ -1188,18 +1190,18 @@ class sc_map_texturemap {
   save() {
     const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
 
-    output.writeInt32(dds_sz2(this.__width, this.__height));
+    output.writeInt32(dds_raw_sz(this.__width, this.__height));
     sc_dds.save(output, this.__chan0_3, this.__width, this.__height, sc_dds_pixelformat.RawARGB);
 
-    output.writeInt32(dds_sz2(this.__width, this.__height));
+    output.writeInt32(dds_raw_sz(this.__width, this.__height));
     sc_dds.save(output, this.__chan4_7, this.__width, this.__height, sc_dds_pixelformat.RawARGB);
 
     return output;
   }
 
   create(map_args) {
-    this.__chan0_3 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4);
-    this.__chan4_7 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4);
+    this.__chan0_3 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4, ByteBuffer.LITTLE_ENDIAN);
+    this.__chan4_7 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4, ByteBuffer.LITTLE_ENDIAN);
     this.__width = tm_sz(map_args.size);
     this.__height = tm_sz(map_args.size);
   }
@@ -1241,7 +1243,7 @@ class sc_map_watermap {
 
     // Sanity check water map length
     // TBD: Check bounds are correct
-    check.equal(dds_sz2(this.__heightmap.width / 2, this.__heightmap.height / 2), watermap_length, "Suspicious water map length")
+    check.equal(dds_dxt5_sz2(this.__heightmap.width / 2, this.__heightmap.height / 2), watermap_length, "Suspicious water map length")
 
     let starting_remaining = input.remaining();
     let watermap_dds = sc_dds.load(input);
@@ -1267,14 +1269,32 @@ class sc_map_watermap {
     this.__depth_bias_data = depth_bias_data;
     this.__terrain_type_data = terrain_type_data;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    // Write 4 unknown bytes
+    for (let i = 0; i < 4; i++) {
+      output.writeByte(0);
+    }
+
+    output.writeInt32(dds_dxt5_sz2(this.__heightmap.width / 2, this.__heightmap.height / 2));
+    sc_dds.save(output, this.__watermap_data, this.__heightmap.width / 2, this.__heightmap.height / 2, sc_dds_pixelformat.DXT5);
+
+    output.append(this.__foam_mask_data);
+    output.append(this.__flatness_data);
+    output.append(this.__depth_bias_data);
+    output.append(this.__terrain_type_data);
+
+    return output;
+  }
 
   create(map_args) {
-    this.__watermap_data = new ByteBuffer(wmwm_sz(map_args.size) * wmwm_sz(map_args.size) * 4); // 32bpp
-    this.__foam_mask_data = new ByteBuffer(wmfm_sz(map_args.size) * wmfm_sz(map_args.size)); // 8bpp
-    this.__flatness_data = new ByteBuffer(wmfl_sz(map_args.size) * wmfl_sz(map_args.size)); // 8bpp
-    this.__depth_bias_data = new ByteBuffer(wmdb_sz(map_args.size) * wmdb_sz(map_args.size)); // 8bpp
-    this.__terrain_type_data = new ByteBuffer(wmtt_sz(map_args.size) * wmtt_sz(map_args.size)); // 8bpp
+    this.__watermap_data = new ByteBuffer(wmwm_sz(map_args.size) * wmwm_sz(map_args.size) * 4, ByteBuffer.LITTLE_ENDIAN); // 32bpp
+    this.__foam_mask_data = new ByteBuffer(wmfm_sz(map_args.size) * wmfm_sz(map_args.size), ByteBuffer.LITTLE_ENDIAN); // 8bpp
+    this.__flatness_data = new ByteBuffer(wmfl_sz(map_args.size) * wmfl_sz(map_args.size), ByteBuffer.LITTLE_ENDIAN); // 8bpp
+    this.__depth_bias_data = new ByteBuffer(wmdb_sz(map_args.size) * wmdb_sz(map_args.size), ByteBuffer.LITTLE_ENDIAN); // 8bpp
+    this.__terrain_type_data = new ByteBuffer(wmtt_sz(map_args.size) * wmtt_sz(map_args.size), ByteBuffer.LITTLE_ENDIAN); // 8bpp
 
     // On NodeJs I seem to be hitting the Buffer constructor instead of ArrayBuffer, leading to non-zero initialised
     // memory. Explicitly zero to avoid this.
@@ -1322,7 +1342,29 @@ class sc_map_prop {
     this.__rotation_z = rotation_z;
     this.__scale = scale;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeCString(this.__blueprint_path);
+    output.writeFloat32(this.__position[0]);
+    output.writeFloat32(this.__position[1]);
+    output.writeFloat32(this.__position[2]);
+    output.writeFloat32(this.__rotation_x[0]);
+    output.writeFloat32(this.__rotation_x[1]);
+    output.writeFloat32(this.__rotation_x[2]);
+    output.writeFloat32(this.__rotation_y[0]);
+    output.writeFloat32(this.__rotation_y[1]);
+    output.writeFloat32(this.__rotation_y[2]);
+    output.writeFloat32(this.__rotation_z[0]);
+    output.writeFloat32(this.__rotation_z[1]);
+    output.writeFloat32(this.__rotation_z[2]);
+    output.writeFloat32(this.__scale[0]);
+    output.writeFloat32(this.__scale[1]);
+    output.writeFloat32(this.__scale[2]);
+
+    return output;
+  }
 
   create(map_args) {
 
@@ -1354,7 +1396,17 @@ class sc_map_props {
     // Record fields
     this.__props = props;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(this.__props.length);
+    for (let i = 0; i < this.__props.length; i++) {
+      output.append(this.__props[i].save().flip().compact());
+    }
+
+    return output;
+  }
 
   create(map_args) {
 
@@ -1417,20 +1469,20 @@ export class sc_map {
       this.decals.save(),
       this.normalmap.save(),
       this.texturemap.save(),
-      //this.watermap.save(),
-      //this.props.save()
+      this.watermap.save(),
+      this.props.save()
     ];
 
     // Concatenate all of the above to get the output
-    const output_length = _.reduce(buffers, (sum, term) => { return sum + term.length; }, 0);
-    const output = new Uint8Array(output_length);
-
-    const output = new ByteBuffer();
+    let total_length = 0;
+    let output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
     for (const buffer of buffers) {
-      // Compact: Resizes backing buffer to limit-offset. No good, I want 0-offset
-      // flip: Sets limit to offset and offset to zero. This helps as I can then compact
+      // Flip to make buffer ready for reading, compact to get exactly right sized buffer
+      buffer.flip().compact();
 
-      output.append(buffer.flip().compact());
+      total_length += buffer.capacity();
+
+      output.append(buffer);
     }
 
     // TBD: This will be a Buffer under node, which may not be quite what I want

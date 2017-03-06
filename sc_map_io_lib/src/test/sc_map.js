@@ -563,6 +563,9 @@ describe('sc_map', function() {
   });
 
   describe('saving maps', function() {
+    // DXT5 compression in javascript -> slow :(
+    this.timeout(10000);
+
     before('create a map, save it and reload it', function() {
       this.src_map = new sc.map();
       this.src_map.create({
@@ -584,14 +587,14 @@ describe('sc_map', function() {
     });
 
     it('should write preview image', function() {
-      assert.deepEqual(this.dest_map.preview_image.data, this.src_map.preview_image.data);
+      assert.deepEqual(this.dest_map.preview_image.data.buffer, this.src_map.preview_image.data.buffer);
     });
 
     it('should write heightmap', function() {
       assert.equal(this.dest_map.heightmap.width, this.src_map.heightmap.width);
       assert.equal(this.dest_map.heightmap.height, this.src_map.heightmap.height);
       assert.closeTo(this.dest_map.heightmap.scale, this.src_map.heightmap.scale, 1/409600);
-      assert.deepEqual(this.dest_map.heightmap.data, this.src_map.heightmap.data);
+      assert.deepEqual(this.dest_map.heightmap.data.buffer, this.src_map.heightmap.data.buffer);
     });
 
     it('should write textures', function() {
@@ -609,69 +612,69 @@ describe('sc_map', function() {
     });
 
     it('should write lighting', function() {
-      assert.equal(this.dest_map.lighting.lighting_multiplier, this.src_map.lighting_multiplier);
-      assert.equal(this.dest_map.lighting.lighting_sun_direction[0], this.src_map.lighting.lighting_sun_direction[0]);
-      assert.equal(this.dest_map.lighting.lighting_sun_direction[1], this.src_map.lighting.lighting_sun_direction[1]);
-      assert.equal(this.dest_map.lighting.lighting_sun_direction[2], this.src_map.lighting.lighting_sun_direction[2]);
-      assert.equal(this.dest_map.lighting.lighting_sun_ambience[0],  this.src_map.lighting.lighting_sun_ambience[0]);
-      assert.equal(this.dest_map.lighting.lighting_sun_ambience[1],  this.src_map.lighting.lighting_sun_ambience[1]);
-      assert.equal(this.dest_map.lighting.lighting_sun_ambience[2],  this.src_map.lighting.lighting_sun_ambience[2]);
-      assert.equal(this.dest_map.lighting.lighting_sun_colour[0],    this.src_map.lighting.lighting_sun_colour[0]);
-      assert.equal(this.dest_map.lighting.lighting_sun_colour[1],    this.src_map.lighting.lighting_sun_colour[1]);
-      assert.equal(this.dest_map.lighting.lighting_sun_colour[2],    this.src_map.lighting.lighting_sun_colour[2]);
-      assert.equal(this.dest_map.lighting.shadow_fill_colour[0],     this.src_map.lighting.shadow_fill_colour[0]);
-      assert.equal(this.dest_map.lighting.shadow_fill_colour[1],     this.src_map.lighting.shadow_fill_colour[1]);
-      assert.equal(this.dest_map.lighting.shadow_fill_colour[2],     this.src_map.lighting.shadow_fill_colour[2]);
-      assert.equal(this.dest_map.lighting.specular_colour[0],        this.src_map.lighting.specular_colour[0]);
-      assert.equal(this.dest_map.lighting.specular_colour[1],        this.src_map.lighting.specular_colour[1]);
-      assert.equal(this.dest_map.lighting.specular_colour[2],        this.src_map.lighting.specular_colour[2]);
-      assert.equal(this.dest_map.lighting.specular_colour[3],        this.src_map.lighting.specular_colour[3]);
-      assert.equal(this.dest_map.lighting.bloom,                     this.src_map.lighting.bloom);
-      assert.equal(this.dest_map.lighting.fog_colour[0],             this.src_map.lighting.fog_colour[0]);
-      assert.equal(this.dest_map.lighting.fog_colour[1],             this.src_map.lighting.fog_colour[1]);
-      assert.equal(this.dest_map.lighting.fog_colour[2],             this.src_map.lighting.fog_colour[2]);
-      assert.equal(this.dest_map.lighting.fog_start,                 this.src_map.lighting.fog_start);
-      assert.equal(this.dest_map.lighting.fog_end,                   this.src_map.lighting.fog_end);
+      assert.closeTo(this.dest_map.lighting.lighting_multiplier,       this.src_map.lighting.lighting_multiplier, 1/409600);
+      assert.closeTo(this.dest_map.lighting.lighting_sun_direction[0], this.src_map.lighting.lighting_sun_direction[0], 1/409600);
+      assert.closeTo(this.dest_map.lighting.lighting_sun_direction[1], this.src_map.lighting.lighting_sun_direction[1], 1/409600);
+      assert.closeTo(this.dest_map.lighting.lighting_sun_direction[2], this.src_map.lighting.lighting_sun_direction[2], 1/409600);
+      assert.closeTo(this.dest_map.lighting.lighting_sun_ambience[0],  this.src_map.lighting.lighting_sun_ambience[0], 1/409600);
+      assert.closeTo(this.dest_map.lighting.lighting_sun_ambience[1],  this.src_map.lighting.lighting_sun_ambience[1], 1/409600);
+      assert.closeTo(this.dest_map.lighting.lighting_sun_ambience[2],  this.src_map.lighting.lighting_sun_ambience[2], 1/409600);
+      assert.closeTo(this.dest_map.lighting.lighting_sun_colour[0],    this.src_map.lighting.lighting_sun_colour[0], 1/409600);
+      assert.closeTo(this.dest_map.lighting.lighting_sun_colour[1],    this.src_map.lighting.lighting_sun_colour[1], 1/409600);
+      assert.closeTo(this.dest_map.lighting.lighting_sun_colour[2],    this.src_map.lighting.lighting_sun_colour[2], 1/409600);
+      assert.closeTo(this.dest_map.lighting.shadow_fill_colour[0],     this.src_map.lighting.shadow_fill_colour[0], 1/409600);
+      assert.closeTo(this.dest_map.lighting.shadow_fill_colour[1],     this.src_map.lighting.shadow_fill_colour[1], 1/409600);
+      assert.closeTo(this.dest_map.lighting.shadow_fill_colour[2],     this.src_map.lighting.shadow_fill_colour[2], 1/409600);
+      assert.closeTo(this.dest_map.lighting.specular_colour[0],        this.src_map.lighting.specular_colour[0], 1/409600);
+      assert.closeTo(this.dest_map.lighting.specular_colour[1],        this.src_map.lighting.specular_colour[1], 1/409600);
+      assert.closeTo(this.dest_map.lighting.specular_colour[2],        this.src_map.lighting.specular_colour[2], 1/409600);
+      assert.closeTo(this.dest_map.lighting.specular_colour[3],        this.src_map.lighting.specular_colour[3], 1/409600);
+      assert.closeTo(this.dest_map.lighting.bloom,                     this.src_map.lighting.bloom, 1/409600);
+      assert.closeTo(this.dest_map.lighting.fog_colour[0],             this.src_map.lighting.fog_colour[0], 1/409600);
+      assert.closeTo(this.dest_map.lighting.fog_colour[1],             this.src_map.lighting.fog_colour[1], 1/409600);
+      assert.closeTo(this.dest_map.lighting.fog_colour[2],             this.src_map.lighting.fog_colour[2], 1/409600);
+      assert.closeTo(this.dest_map.lighting.fog_start,                 this.src_map.lighting.fog_start, 1/409600);
+      assert.closeTo(this.dest_map.lighting.fog_end,                   this.src_map.lighting.fog_end, 1/409600);
     });
 
     it('should write water', function() {
-      assert.equal(this.dest_map.water.has_water,                             this.src_map.water.has_water);
-      assert.equal(this.dest_map.water.elevation,                             this.src_map.water.elevation);
-      assert.equal(this.dest_map.water.elevation_deep,                        this.src_map.water.elevation_deep);
-      assert.equal(this.dest_map.water.elevation_abyss,                       this.src_map.water.elevation_abyss);
-      assert.equal(this.dest_map.water.surface_colour[0],                     this.src_map.water.surface_colour[0]);
-      assert.equal(this.dest_map.water.surface_colour[1],                     this.src_map.water.surface_colour[1]);
-      assert.equal(this.dest_map.water.surface_colour[2],                     this.src_map.water.surface_colour[2]);
-      assert.equal(this.dest_map.water.colour_lerp[0],                        this.src_map.water.colour_lerp[0]);
-      assert.equal(this.dest_map.water.colour_lerp[1],                        this.src_map.water.colour_lerp[1]);
-      assert.equal(this.dest_map.water.refraction_scale,                      this.src_map.water.refraction_scale);
-      assert.equal(this.dest_map.water.fresnel_bias,                          this.src_map.water.fresnel_bias);
-      assert.equal(this.dest_map.water.fresnel_power,                         this.src_map.water.fresnel_power);
-      assert.equal(this.dest_map.water.unit_reflection,                       this.src_map.water.unit_reflection);
-      assert.equal(this.dest_map.water.sky_reflection,                        this.src_map.water.sky_reflection);
-      assert.equal(this.dest_map.water.water_sun_shininess,                   this.src_map.water.water_sun_shininess);
-      assert.equal(this.dest_map.water.water_sun_strength,                    this.src_map.water.water_sun_strength);
-      assert.equal(this.dest_map.water.water_sun_direction[0],                this.src_map.water.water_sun_direction[0]);
-      assert.equal(this.dest_map.water.water_sun_direction[1],                this.src_map.water.water_sun_direction[1]);
-      assert.equal(this.dest_map.water.water_sun_direction[2],                this.src_map.water.water_sun_direction[2]);
-      assert.equal(this.dest_map.water.water_sun_colour[0],                   this.src_map.water.water_sun_colour[0]);
-      assert.equal(this.dest_map.water.water_sun_colour[1],                   this.src_map.water.water_sun_colour[1]);
-      assert.equal(this.dest_map.water.water_sun_colour[2],                   this.src_map.water.water_sun_colour[2]);
-      assert.equal(this.dest_map.water.water_sun_reflection,                  this.src_map.water.water_sun_reflection);
-      assert.equal(this.dest_map.water.water_sun_glow,                        this.src_map.water.water_sun_glow);
-      assert.equal(this.dest_map.water.water_cubemap_file,                    this.src_map.water.water_cubemap_file);
-      assert.equal(this.dest_map.water.water_ramp_file,                       this.src_map.water.water_ramp_file);
-      assert.equal(this.dest_map.water.normal_repeat[0],                      this.src_map.water.normal_repeat[0]);
-      assert.equal(this.dest_map.water.normal_repeat[1],                      this.src_map.water.normal_repeat[0]);
-      assert.equal(this.dest_map.water.normal_repeat[2],                      this.src_map.water.normal_repeat[0]);
-      assert.equal(this.dest_map.water.normal_repeat[3],                      this.src_map.water.normal_repeat[0]);
-      assert.equal(this.dest_map.water.water_textures[0].normal_movement[0],  this.src_map.water.water_textures[0].normal_movement[0]);
-      assert.equal(this.dest_map.water.water_textures[0].normal_movement[1],  this.src_map.water.water_textures[0].normal_movement[1]);
-      assert.equal(this.dest_map.water.water_textures[0].texture_file,        this.src_map.water.water_textures[0].texture_file);
-      assert.equal(this.dest_map.water.water_textures[1].texture_file,        this.src_map.water.water_textures[1].texture_file);
-      assert.equal(this.dest_map.water.water_textures[2].texture_file,        this.src_map.water.water_textures[2].texture_file);
-      assert.equal(this.dest_map.water.water_textures[3].texture_file,        this.src_map.water.water_textures[3].texture_file);
-      assert.equal(this.dest_map.water.wave_generators.length,                this.src_map.water.wave_generators.length);
+      assert.equal(this.dest_map.water.has_water,                               this.src_map.water.has_water);
+      assert.closeTo(this.dest_map.water.elevation,                             this.src_map.water.elevation, 1/409600);
+      assert.closeTo(this.dest_map.water.elevation_deep,                        this.src_map.water.elevation_deep, 1/409600);
+      assert.closeTo(this.dest_map.water.elevation_abyss,                       this.src_map.water.elevation_abyss, 1/409600);
+      assert.closeTo(this.dest_map.water.surface_colour[0],                     this.src_map.water.surface_colour[0], 1/409600);
+      assert.closeTo(this.dest_map.water.surface_colour[1],                     this.src_map.water.surface_colour[1], 1/409600);
+      assert.closeTo(this.dest_map.water.surface_colour[2],                     this.src_map.water.surface_colour[2], 1/409600);
+      assert.closeTo(this.dest_map.water.colour_lerp[0],                        this.src_map.water.colour_lerp[0], 1/409600);
+      assert.closeTo(this.dest_map.water.colour_lerp[1],                        this.src_map.water.colour_lerp[1], 1/409600);
+      assert.closeTo(this.dest_map.water.refraction_scale,                      this.src_map.water.refraction_scale, 1/409600);
+      assert.closeTo(this.dest_map.water.fresnel_bias,                          this.src_map.water.fresnel_bias, 1/409600);
+      assert.closeTo(this.dest_map.water.fresnel_power,                         this.src_map.water.fresnel_power, 1/409600);
+      assert.closeTo(this.dest_map.water.unit_reflection,                       this.src_map.water.unit_reflection, 1/409600);
+      assert.closeTo(this.dest_map.water.sky_reflection,                        this.src_map.water.sky_reflection, 1/409600);
+      assert.closeTo(this.dest_map.water.water_sun_shininess,                   this.src_map.water.water_sun_shininess, 1/409600);
+      assert.closeTo(this.dest_map.water.water_sun_strength,                    this.src_map.water.water_sun_strength, 1/409600);
+      assert.closeTo(this.dest_map.water.water_sun_direction[0],                this.src_map.water.water_sun_direction[0], 1/409600);
+      assert.closeTo(this.dest_map.water.water_sun_direction[1],                this.src_map.water.water_sun_direction[1], 1/409600);
+      assert.closeTo(this.dest_map.water.water_sun_direction[2],                this.src_map.water.water_sun_direction[2], 1/409600);
+      assert.closeTo(this.dest_map.water.water_sun_colour[0],                   this.src_map.water.water_sun_colour[0], 1/409600);
+      assert.closeTo(this.dest_map.water.water_sun_colour[1],                   this.src_map.water.water_sun_colour[1], 1/409600);
+      assert.closeTo(this.dest_map.water.water_sun_colour[2],                   this.src_map.water.water_sun_colour[2], 1/409600);
+      assert.closeTo(this.dest_map.water.water_sun_reflection,                  this.src_map.water.water_sun_reflection, 1/409600);
+      assert.closeTo(this.dest_map.water.water_sun_glow,                        this.src_map.water.water_sun_glow, 1/409600);
+      assert.equal(this.dest_map.water.water_cubemap_file,                      this.src_map.water.water_cubemap_file);
+      assert.equal(this.dest_map.water.water_ramp_file,                         this.src_map.water.water_ramp_file);
+      assert.closeTo(this.dest_map.water.normal_repeat[0],                      this.src_map.water.normal_repeat[0], 1/409600);
+      assert.closeTo(this.dest_map.water.normal_repeat[1],                      this.src_map.water.normal_repeat[1], 1/409600);
+      assert.closeTo(this.dest_map.water.normal_repeat[2],                      this.src_map.water.normal_repeat[2], 1/409600);
+      assert.closeTo(this.dest_map.water.normal_repeat[3],                      this.src_map.water.normal_repeat[3], 1/409600);
+      assert.closeTo(this.dest_map.water.water_textures[0].normal_movement[0],  this.src_map.water.water_textures[0].normal_movement[0], 1/409600);
+      assert.closeTo(this.dest_map.water.water_textures[0].normal_movement[1],  this.src_map.water.water_textures[0].normal_movement[1], 1/409600);
+      assert.equal(this.dest_map.water.water_textures[0].texture_file,          this.src_map.water.water_textures[0].texture_file);
+      assert.equal(this.dest_map.water.water_textures[1].texture_file,          this.src_map.water.water_textures[1].texture_file);
+      assert.equal(this.dest_map.water.water_textures[2].texture_file,          this.src_map.water.water_textures[2].texture_file);
+      assert.equal(this.dest_map.water.water_textures[3].texture_file,          this.src_map.water.water_textures[3].texture_file);
+      assert.equal(this.dest_map.water.wave_generators.length,                  this.src_map.water.wave_generators.length);
     });
 
     it('should write layers', function() {
@@ -740,23 +743,40 @@ describe('sc_map', function() {
     });
 
     it('should write texture maps', function() {
-      asssert.equal(this.dest_map.texturemap.chan0_3.data.capacity(), this.src_map.texturemap.chan0_3.data.capacity());
-      asssert.equal(this.dest_map.texturemap.chan0_3.data[0], this.src_map.texturemap.chan0_3.data[0]);
-      asssert.equal(this.dest_map.texturemap.chan0_3.data[1], this.src_map.texturemap.chan0_3.data[1]);
-      asssert.equal(this.dest_map.texturemap.chan0_3.data[2], this.src_map.texturemap.chan0_3.data[2]);
-      asssert.equal(this.dest_map.texturemap.chan0_3.data[3], this.src_map.texturemap.chan0_3.data[3]);
+      assert.equal(this.dest_map.texturemap.chan0_3.capacity(), this.src_map.texturemap.chan0_3.capacity());
+      assert.equal(this.dest_map.texturemap.chan0_3[0], this.src_map.texturemap.chan0_3[0]);
+      assert.equal(this.dest_map.texturemap.chan0_3[1], this.src_map.texturemap.chan0_3[1]);
+      assert.equal(this.dest_map.texturemap.chan0_3[2], this.src_map.texturemap.chan0_3[2]);
+      assert.equal(this.dest_map.texturemap.chan0_3[3], this.src_map.texturemap.chan0_3[3]);
 
-      asssert.equal(this.dest_map.texturemap.chan4_7.data.capacity(), this.src_map.texturemap.chan4_7.data.capacity());
-      asssert.equal(this.dest_map.texturemap.chan4_7.data[0], this.src_map.texturemap.chan4_7.data[0]);
-      asssert.equal(this.dest_map.texturemap.chan4_7.data[1], this.src_map.texturemap.chan4_7.data[1]);
-      asssert.equal(this.dest_map.texturemap.chan4_7.data[2], this.src_map.texturemap.chan4_7.data[2]);
-      asssert.equal(this.dest_map.texturemap.chan4_7.data[3], this.src_map.texturemap.chan4_7.data[3]);
+      assert.equal(this.dest_map.texturemap.chan4_7.capacity(), this.src_map.texturemap.chan4_7.capacity());
+      assert.equal(this.dest_map.texturemap.chan4_7[0], this.src_map.texturemap.chan4_7[0]);
+      assert.equal(this.dest_map.texturemap.chan4_7[1], this.src_map.texturemap.chan4_7[1]);
+      assert.equal(this.dest_map.texturemap.chan4_7[2], this.src_map.texturemap.chan4_7[2]);
+      assert.equal(this.dest_map.texturemap.chan4_7[3], this.src_map.texturemap.chan4_7[3]);
     });
 
     it('should write water maps', function() {
+      assert.deepEqual(this.dest_map.watermap.watermap_data.buffer,     this.src_map.watermap.watermap_data.buffer.buffer);
+      assert.deepEqual(this.dest_map.watermap.foam_mask_data.buffer,    this.src_map.watermap.foam_mask_data.buffer);
+      assert.deepEqual(this.dest_map.watermap.flatness_data.buffer,     this.src_map.watermap.flatness_data.buffer);
+      assert.deepEqual(this.dest_map.watermap.depth_bias_data.buffer,   this.src_map.watermap.depth_bias_data.buffer);
+      assert.deepEqual(this.dest_map.watermap.terrain_type_data.buffer, this.src_map.watermap.terrain_type_data.buffer);
+      assert.equal(this.dest_map.watermap.watermap_width,               this.src_map.watermap.watermap_width);
+      assert.equal(this.dest_map.watermap.watermap_height,              this.src_map.watermap.watermap_height);
+      assert.equal(this.dest_map.watermap.foam_mask_width,              this.src_map.watermap.foam_mask_width);
+      assert.equal(this.dest_map.watermap.foam_mask_height,             this.src_map.watermap.foam_mask_height);
+      assert.equal(this.dest_map.watermap.flatness_width,               this.src_map.watermap.flatness_width);
+      assert.equal(this.dest_map.watermap.flatness_height,              this.src_map.watermap.flatness_height);
+      assert.equal(this.dest_map.watermap.depth_bias_width,             this.src_map.watermap.depth_bias_width);
+      assert.equal(this.dest_map.watermap.depth_bias_height,            this.src_map.watermap.depth_bias_height);
+      assert.equal(this.dest_map.watermap.terrain_type_width,           this.src_map.watermap.terrain_type_width);
+      assert.equal(this.dest_map.watermap.terrain_type_height,          this.src_map.watermap.terrain_type_height);
     });
 
     it('should write props', function() {
+      // TODO: Check props are serialised right!
+      assert.equal(this.dest_map.props.props.length, this.src_map.props.props.length);
     });
   });
 
