@@ -757,7 +757,7 @@ describe('sc_map', function() {
     });
 
     it('should write water maps', function() {
-      assert.deepEqual(this.dest_map.watermap.watermap_data.buffer,     this.src_map.watermap.watermap_data.buffer.buffer);
+      assert.deepEqual(this.dest_map.watermap.watermap_data.buffer,     this.src_map.watermap.watermap_data.buffer);
       assert.deepEqual(this.dest_map.watermap.foam_mask_data.buffer,    this.src_map.watermap.foam_mask_data.buffer);
       assert.deepEqual(this.dest_map.watermap.flatness_data.buffer,     this.src_map.watermap.flatness_data.buffer);
       assert.deepEqual(this.dest_map.watermap.depth_bias_data.buffer,   this.src_map.watermap.depth_bias_data.buffer);
