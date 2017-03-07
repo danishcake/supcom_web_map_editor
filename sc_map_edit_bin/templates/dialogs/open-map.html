@@ -1,0 +1,42 @@
+<div class="modal-header dialog-header-notify">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <h4 class="modal-title"><span class="glyphicon glyphicon-open"></span> Open Map</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+    <div class="col-lg-12">
+      <uib-tabset active="data.open_mode_tab_index">
+        <uib-tab index="0" heading="Archive">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <file-upload onopen="load_archive">x.zip</file-upload>
+            </div>
+          </div>
+        </uib-tab>
+        <uib-tab index="1" heading="Individual Files">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="btn-group-vertical">
+                <file-upload onopen="open_scenario" ng-class="data.validity.scenario_set ? 'btn-success' : 'btn-default'">x_scenario.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scenario_set"></span></file-upload>
+                <file-upload onopen="open_save" ng-class="data.validity.save_set ? 'btn-success' : 'btn-default'">x_save.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.save_set"></span></file-upload>
+                <file-upload onopen="open_script" ng-class="data.validity.script_set ? 'btn-success' : 'btn-default'">x_script.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.script_set"></span></file-upload>
+                <file-upload onopen="open_scmap" ng-class="data.validity.scmap_set ? 'btn-success' : 'btn-default'">x.scmap&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scmap_set"></span></file-upload>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info" role="alert" ng-hide="data.validity.all_set">
+            <span ng-show="!data.validity.all_set">You need to select all of the map files to continue</span>
+          </div>
+          <label class="btn btn-default pull-right" ng-click="load_individual_files()" ng-disabled="!data.validity.all_set">OK</label>
+
+        </uib-tab>
+      </uib-tabset>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <span class="pull-left">Supreme Commander maps are split over several files - a large binary file and several lua scripts. You can either open an archive containing all the required files, or load them individually.</span>
+</div>

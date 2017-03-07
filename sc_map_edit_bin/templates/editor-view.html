@@ -1,1 +1,6 @@
-<canvas id="editor-view"></canvas>
+<canvas id="editor-view"
+        msd-wheel="on_wheel($event, $delta, $deltaX, $deltaY)"
+        ng-mousemove="on_mousemove($event)"
+        ng-mouseup="on_mouseup($event)"
+        ng-mouseleave="on_mouseleave($event)">
+</canvas>

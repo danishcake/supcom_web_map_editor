@@ -9,15 +9,48 @@
  * TODO: Add readFloat32Array helper function
  */
 import check from "./sc_check";
-import {sc_dds} from "./sc_dds";
+import {sc_dds, sc_dds_pixelformat} from "./sc_dds";
+import {_} from "underscore";
+const ByteBuffer = require('bytebuffer');
+
 
 /*
  * Used to determine valid dds texture sizes
  * These are square, with a fixed size header
  * Used by the texturemap and water maps
  */
-let dds_sz2 = function(x, y) { return x * y + 128; };
-let dds_sz = function(d) { return dds_sz2(d, d); };
+const dds_dxt5_sz2 = function(x, y) { return x * y + 128; };
+const dds_dxt5_sz = function(d) { return dds_dxt5_sz2(d, d); };
+const dds_raw_sz2 = function(x, y) { return 4 * x * y + 128; };
+const dds_raw_sz = function(d) { return dds_raw_sz2(d, d); };
+
+/* Used to determine height map size from a zero based size enum */
+const hm_sz = function(idx) {
+  check.between(0, 4, idx, "Invalid map size");
+  const lut = [256, 512, 1024, 2048, 4096];
+  return lut[idx];
+};
+
+/* Used to determine texture map size from a zero based size enum */
+const tm_sz = function(idx) {
+  check.between(0, 4, idx, "Invalid map size");
+  const lut = [128, 256, 512, 1024, 2048];
+  return lut[idx];
+};
+
+/* Used to determine normal map size from a zero based size enum */
+const nm_sz = hm_sz;
+/* Used to determine water map size from a zero based size enum */
+const wmwm_sz = tm_sz;
+/* Used to determine foam mask size from a zero based size enum */
+const wmfm_sz = tm_sz;
+/* Used to determine water flatness data size from a zero based size enum */
+const wmfl_sz = tm_sz;
+/* Used to determine water depth bias size from a zero based size enum */
+const wmdb_sz = tm_sz;
+/* Used to determine terrain type size from a zero based size enum */
+const wmtt_sz = hm_sz;
+
 
 /**
  * Initial header
@@ -49,7 +82,25 @@ class sc_map_header {
     this.__width = width;
     this.__height = height;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const output = new ByteBuffer(30, ByteBuffer.LITTLE_ENDIAN);
+    output.writeInt32(0x1a70614d);                  // Magic
+    output.writeInt32(2);                           // Major version
+    output.writeInt32(2);                           // Unknown 1
+    output.writeInt32(0xEDFEEFBE);                  // Unknown 2 - Endianness check?
+    output.writeFloat32(this.__width);
+    output.writeFloat32(this.__height);
+    output.writeInt32(0);                           // Unknown 3
+    output.writeInt16(0);                           // Unknown 4
+
+    return output;
+  }
+
+  create(map_args) {
+    this.__width = hm_sz(map_args.size);
+    this.__height = hm_sz(map_args.size);
+  }
 }
 
 /**
@@ -67,23 +118,37 @@ class sc_map_preview_image {
     // Sanity check the preview image length
     check.between(0, 256*256*4+128, preview_image_length, "Invalid preview image length");
 
-    let preview_image_data = new sc_dds();
     let starting_remaining = input.remaining();
-    preview_image_data.load(input);
+    let preview_image_data = sc_dds.load(input);
 
     // Sanity check correct number of bytes read
     let bytes_read = starting_remaining - input.remaining();
-    check.equal(bytes_read, preview_image_length, `Wrong number of bytes read extracting prerview image (req ${preview_image_length} found ${bytes_read}`);
+    check.equal(bytes_read, preview_image_length, `Wrong number of bytes read extracting preview image (req ${preview_image_length} found ${bytes_read}`);
 
     // Minor version is included in this section for lack of a better place to put it
-    // TODO: Restore this to 56 when I find some good test data
     let minor_version = input.readInt32();
     check.equal(56, minor_version, "Incorrect minor version in header");
 
     // Record fields
     this.__data = preview_image_data.data;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const output = new ByteBuffer(4 + 256 * 256 * 4 + 128 + 4, ByteBuffer.LITTLE_ENDIAN);
+    output.writeInt32(256 * 256 * 4 + 128);                                   // Length of DDS texture
+
+    sc_dds.save(output, this.data, 256, 256, sc_dds_pixelformat.RawARGB);     // Preview image (Uncompressed DDS)
+
+    output.writeInt32(56);                                                    // Minor version
+
+    return output;
+  }
+
+  create(map_args) {
+    // Blank dds, excluding header
+    // TBD: Change this to store the DDS header and ARGB data (as is available post load?)
+    this.__data = new ByteBuffer(256 * 256 * 4, ByteBuffer.LITTLE_ENDIAN);
+  }
 }
 
 /**
@@ -105,13 +170,13 @@ class sc_map_heightmap {
   load(input) {
     let width = input.readInt32();
     let height = input.readInt32();
-    let scale = input.readFloat32();     // Vertical scale (typicaly 1/128)
+    let scale = input.readFloat32();     // Vertical scale (typically 1/128)
 
     // Sanity checks
-    check.one_of([256, 512, 1024, 2048, 4096], width, "Invalid heightmap width");
-    check.one_of([256, 512, 1024, 2048, 4096], height, "Invalid heightmap height");
+    check.one_of([hm_sz(0), hm_sz(1), hm_sz(2), hm_sz(3), hm_sz(4)], width, "Invalid heightmap width");
+    check.one_of([hm_sz(0), hm_sz(1), hm_sz(2), hm_sz(3), hm_sz(4)], height, "Invalid heightmap height");
 
-    let data = input.readBytes((width + 1) * (height + 1) * 2);
+    let data = input.readBytes((width + 1) * (height + 1) * 2).compact();
 
     // Record fields
     this.__width = width;
@@ -119,7 +184,36 @@ class sc_map_heightmap {
     this.__scale = scale;
     this.__data = data;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const hm_count = (this.__width + 1) * (this.__height + 1);
+
+    // 2 ints, 1 float and hm_count shorts
+    const output = new ByteBuffer(12 + hm_count * 2, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(this.__width);
+    output.writeInt32(this.__height);
+    output.writeFloat32(this.__scale);
+
+    output.append(this.__data);
+
+    return output;
+  }
+
+  create(map_args) {
+    this.__width = hm_sz(map_args.size);
+    this.__height = hm_sz(map_args.size);
+    this.__scale = 1 / 128;
+    const hm_count = (this.__width + 1) * (this.__height + 1);
+    this.__data = new ByteBuffer(hm_count * 2, ByteBuffer.LITTLE_ENDIAN);
+
+    const hm_default = map_args.default_height || 32 * 1024;
+    // Fill with some default height
+    for (let i = 0; i < hm_count; i++) {
+      this.__data.writeUint16(hm_default);
+    }
+    this.__data.reset();
+  }
 }
 
 /**
@@ -181,7 +275,32 @@ class sc_map_textures {
     this.__sky_cubemap_texture_path = sky_cubemap_texture_path;
     this.__environment_cubemaps = environment_cubemaps;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeByte(0);
+    output.writeCString(this.__terrain_shader);
+    output.writeCString(this.__background_texture_path);
+    output.writeCString(this.__sky_cubemap_texture_path);
+
+    output.writeInt32(this.__environment_cubemaps.length);
+    for (let i = 0; i < this.__environment_cubemaps.length; i++) {
+      output.writeCString(this.__environment_cubemaps[i].name);
+      output.writeCString(this.__environment_cubemaps[i].file);
+    }
+
+    return output;
+  }
+
+  create(map_args) {
+    this.__terrain_shader = "TTerrain";
+    this.__background_texture_path = "/textures/environment/defaultbackground.dds";
+    this.__sky_cubemap_texture_path = "/textures/environment/defaultskycube.dds";
+    this.__environment_cubemaps = [
+      new sc_map_environment_cubemap("<default>", "/textures/environment/defaultenvcube.dds")
+    ];
+  }
 }
 
 /**
@@ -250,7 +369,62 @@ class sc_map_lighting {
     this.__fog_start = fog_start;
     this.__fog_end = fog_end;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const output = new ByteBuffer(23 * 4, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeFloat32(this.__lighting_multiplier);
+    output.writeFloat32(this.__lighting_sun_direction[0]);
+    output.writeFloat32(this.__lighting_sun_direction[1]);
+    output.writeFloat32(this.__lighting_sun_direction[2]);
+    output.writeFloat32(this.__lighting_sun_ambience[0]);
+    output.writeFloat32(this.__lighting_sun_ambience[1]);
+    output.writeFloat32(this.__lighting_sun_ambience[2]);
+    output.writeFloat32(this.__lighting_sun_colour[0]);
+    output.writeFloat32(this.__lighting_sun_colour[1]);
+    output.writeFloat32(this.__lighting_sun_colour[2]);
+    output.writeFloat32(this.__shadow_fill_colour[0]);
+    output.writeFloat32(this.__shadow_fill_colour[1]);
+    output.writeFloat32(this.__shadow_fill_colour[2]);
+    output.writeFloat32(this.__specular_colour[0]);
+    output.writeFloat32(this.__specular_colour[1]);
+    output.writeFloat32(this.__specular_colour[2]);
+    output.writeFloat32(this.__specular_colour[3]);
+    output.writeFloat32(this.__bloom);
+    output.writeFloat32(this.__fog_colour[0]);
+    output.writeFloat32(this.__fog_colour[1]);
+    output.writeFloat32(this.__fog_colour[2]);
+    output.writeFloat32(this.__fog_start);
+    output.writeFloat32(this.__fog_end);
+
+    return output;
+  }
+
+  create(map_args) {
+    this.__lighting_multiplier = 1.5;
+    this.__lighting_sun_direction[0] = 0.7071;
+    this.__lighting_sun_direction[1] = 0.7071;
+    this.__lighting_sun_direction[2] = 0;
+    this.__lighting_sun_ambience[0] = 0.2;
+    this.__lighting_sun_ambience[1] = 0.2;
+    this.__lighting_sun_ambience[2] = 0.2;
+    this.__lighting_sun_colour[0] = 1;
+    this.__lighting_sun_colour[1] = 1;
+    this.__lighting_sun_colour[2] = 1;
+    this.__shadow_fill_colour[0] = 0.7;
+    this.__shadow_fill_colour[1] = 0.7;
+    this.__shadow_fill_colour[2] = 0.75;
+    this.__specular_colour[0] = 0;
+    this.__specular_colour[1] = 0;
+    this.__specular_colour[2] = 0;
+    this.__specular_colour[3] = 0;
+    this.__bloom = 0.08;
+    this.__fog_colour[0] = 0.8;
+    this.__fog_colour[1] = 1;
+    this.__fog_colour[2] = 0.8;
+    this.__fog_start = 1000;
+    this.__fog_end = 1000;
+  }
 }
 
 /**
@@ -272,7 +446,16 @@ class sc_map_water_texture {
     // Sanity checks
     check.between(1, 512, this.__texture_file.length, "Suspicious water texture filename length");
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeFloat32(this.__normal_movement[0]);
+    output.writeFloat32(this.__normal_movement[1]);
+    output.writeCString(this.__texture_file);
+
+    return output;
+  }
 }
 
 /**
@@ -340,7 +523,31 @@ class sc_map_wave_generator {
     check.between(1, 512, this.__ramp_file.length, "Suspicious ramp filename length");
   }
 
-  save(output) {}
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeCString(this.__texture_file);
+    output.writeCString(this.__ramp_file);
+    output.writeFloat32(this.__position[0]);
+    output.writeFloat32(this.__position[1]);
+    output.writeFloat32(this.__position[2]);
+    output.writeFloat32(this.__rotation);
+    output.writeFloat32(this.__velocity[0]);
+    output.writeFloat32(this.__velocity[1]);
+    output.writeFloat32(this.__velocity[2]);
+    output.writeFloat32(this.__lifetime_first);
+    output.writeFloat32(this.__lifetime_last);
+    output.writeFloat32(this.__period_first);
+    output.writeFloat32(this.__period_last);
+    output.writeFloat32(this.__scale_first);
+    output.writeFloat32(this.__scale_last);
+    output.writeFloat32(this.__frame_count); // TODO: This cannot really be a float can it?
+    output.writeFloat32(this.__frame_rate_first);
+    output.writeFloat32(this.__frame_rate_second);
+    output.writeFloat32(this.__strip_count);
+
+    return output;
+  }
 }
 
 /**
@@ -401,7 +608,8 @@ class sc_map_water {
     let elevation_deep = input.readFloat32();
     let elevation_abyss = input.readFloat32();
     let surface_colour = [input.readFloat32(),
-                          input.readFloat32(), input.readFloat32()];
+                          input.readFloat32(),
+                          input.readFloat32()];
     let colour_lerp = [input.readFloat32(),
                        input.readFloat32()];
     let refraction_scale = input.readFloat32();
@@ -444,7 +652,7 @@ class sc_map_water {
     // Sanity checks
     check.between(0, elevation, elevation_deep, "Deep elevation higher than elevation");
     check.between(0, elevation_deep, elevation_abyss, "Abyss elevation higher than deep elevation");
-    
+
     // Record fields
     this.__has_water = has_water;
     this.__elevation = elevation;
@@ -469,16 +677,102 @@ class sc_map_water {
     this.__water_textures = water_textures;
     this.__wave_generators = wave_generators;
   }
-  save(output) {} // TODO: Add serialise to ByteBuffer
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeByte(this.__has_water ? 1 : 0);
+    output.writeFloat32(this.__elevation);
+    output.writeFloat32(this.__elevation_deep);
+    output.writeFloat32(this.__elevation_abyss);
+    output.writeFloat32(this.__surface_colour[0]);
+    output.writeFloat32(this.__surface_colour[1]);
+    output.writeFloat32(this.__surface_colour[2]);
+    output.writeFloat32(this.__colour_lerp[0]);
+    output.writeFloat32(this.__colour_lerp[1]);
+    output.writeFloat32(this.__refraction_scale);
+    output.writeFloat32(this.__fresnel_bias);
+    output.writeFloat32(this.__fresnel_power);
+    output.writeFloat32(this.__unit_reflection);
+    output.writeFloat32(this.__sky_reflection);
+    output.writeFloat32(this.__water_sun_shininess);
+    output.writeFloat32(this.__water_sun_strength);
+    output.writeFloat32(this.__water_sun_direction[0]);
+    output.writeFloat32(this.__water_sun_direction[1]);
+    output.writeFloat32(this.__water_sun_direction[2]);
+    output.writeFloat32(this.__water_sun_colour[0]);
+    output.writeFloat32(this.__water_sun_colour[1]);
+    output.writeFloat32(this.__water_sun_colour[2]);
+    output.writeFloat32(this.__water_sun_reflection);
+    output.writeFloat32(this.__water_sun_glow);
+    output.writeCString(this.__water_cubemap_file);
+    output.writeCString(this.__water_ramp_file);
+    output.writeFloat32(this.__normal_repeat[0]);
+    output.writeFloat32(this.__normal_repeat[1]);
+    output.writeFloat32(this.__normal_repeat[2]);
+    output.writeFloat32(this.__normal_repeat[3]);
+
+    for (let i = 0; i < this.__water_textures.length; i++) {
+      output.append(this.__water_textures[i].save().flip().compact());
+    }
+
+    output.writeInt32(this.__wave_generators.length);
+    for (let i = 0; i < this.__wave_generators.length; i++) {
+      output.append(this.__wave_generators[i].save().flip().compact());
+    }
+
+    return output;
+  }
+
+  create(map_args) {
+    this.__has_water = true;
+    let terrain_height = map_args.default_height || 32 * 1024;
+
+    // TODO: Figure out a nice way to do the below bit
+    this.__elevation = terrain_height * 0.75 / 128;
+    this.__elevation_deep = terrain_height * 0.50 / 128;
+    this.__elevation_abyss = terrain_height * 0.25 / 128;
+    this.__surface_colour[0] = 0.0;
+    this.__surface_colour[1] = 0.7;
+    this.__surface_colour[2] = 1.5;
+    this.__colour_lerp[0] = 0.064;
+    this.__colour_lerp[1] = 0.119;
+    this.__refraction_scale = 0.375;
+    this.__fresnel_bias = 0.15;
+    this.__fresnel_power = 1.5;
+    this.__unit_reflection = 0.5;
+    this.__sky_reflection = 1.5;
+    this.__water_sun_shininess = 50;
+    this.__water_sun_strength = 10;
+    this.__water_sun_direction[0] = 0.0999;
+    this.__water_sun_direction[1] = -0.9626;
+    this.__water_sun_direction[2] = 0.2519;
+    this.__water_sun_colour[0] = 0.8127;
+    this.__water_sun_colour[1] = 0.4741;
+    this.__water_sun_colour[2] = 0.3386;
+    this.__water_sun_reflection = 5;
+    this.__water_sun_glow = 0.1;
+    this.__water_cubemap_file = "/textures/engine/waterCubemap.dds";
+    this.__water_ramp_file = "/textures/engine/waterramp.dds";
+    this.__normal_repeat[0] = 0.0009;
+    this.__normal_repeat[1] = 0.0090;
+    this.__normal_repeat[2] = 0.0500;
+    this.__normal_repeat[3] = 0.5000;
+
+    for (let i = 0; i < 4; i++) {
+      let water_texture = new sc_map_water_texture([0.5000, -0.9500], "/textures/engine/waves.dds");
+      this.__water_textures[i] = water_texture;
+    }
+  }
 }
 
 /**
  * Layer entry
  */
 class sc_map_layer {
-  constructor() {
-    this.__texture_file = undefined;
-    this.__texture_scale = undefined;
+  constructor(texture_file, texture_scale) {
+    this.__texture_file = texture_file;
+    this.__texture_scale = texture_scale;
   }
 
   get texture_file() { return this.__texture_file; }
@@ -495,7 +789,15 @@ class sc_map_layer {
     this.__texture_file = texture_file;
     this.__texture_scale = texture_scale;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeCString(this.__texture_file);
+    output.writeFloat32(this.__texture_scale);
+
+    return output;
+  }
 }
 
 /**
@@ -528,12 +830,55 @@ class sc_map_layers {
       normal_data.push(layer)
     }
 
-    
+
     // Record fields
     this.__albedo_data = albedo_data;
     this.__normal_data = normal_data;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    // Write 24 mystery bytes
+    for (let i = 0; i < 24; i++) {
+      output.writeByte(0);
+    }
+
+    for (let i = 0; i < 10; i++) {
+      output.append(this.__albedo_data[i].save().flip().compact());
+    }
+
+    for (let i = 0; i < 9; i++) {
+      output.append(this.__normal_data[i].save().flip().compact());
+    }
+
+    return output;
+  }
+
+  create(map_args) {
+    // TODO: Fully specify layers. What do blank layers even mean? No albedo/normals applied?
+    // entirely unused?
+    this.__albedo_data[0] = new sc_map_layer("/env/evergreen/layers/rockmed_albedo.dds", 10);
+    this.__albedo_data[1] = new sc_map_layer("/env/swamp/layers/sw_sphagnum_03_albedo.dds", 4);
+    this.__albedo_data[2] = new sc_map_layer("/env/evergreen2/layers/eg_grass001_albedo.dds", 4);
+    this.__albedo_data[3] = new sc_map_layer("/env/evergreen/layers/rockmed_albedo.dds", 10);
+    this.__albedo_data[4] = new sc_map_layer("/env/evergreen2/layers/eg_rock_albedo.dds", 15);
+    this.__albedo_data[5] = new sc_map_layer("", 4);
+    this.__albedo_data[6] = new sc_map_layer("", 4);
+    this.__albedo_data[7] = new sc_map_layer("", 4);
+    this.__albedo_data[8] = new sc_map_layer("", 4);
+    this.__albedo_data[9] = new sc_map_layer("/env/evergreen/layers/macrotexture000_albedo.dds", 128);
+
+    this.__normal_data[0] = new sc_map_layer("/env/evergreen/layers/SandLight_normals.dds", 4);
+    this.__normal_data[1] = new sc_map_layer("/env/evergreen/layers/grass001_normals.dds", 4);
+    this.__normal_data[2] = new sc_map_layer("/env/evergreen/layers/Dirt001_normals.dds", 4);
+    this.__normal_data[3] = new sc_map_layer("/env/evergreen/layers/RockMed_normals.dds", 4);
+    this.__normal_data[4] = new sc_map_layer("/env/evergreen/layers/snow001_normals.dds", 4);
+    this.__normal_data[5] = new sc_map_layer("", 4);
+    this.__normal_data[6] = new sc_map_layer("", 4);
+    this.__normal_data[7] = new sc_map_layer("", 4);
+    this.__normal_data[8] = new sc_map_layer("", 4);
+  }
 }
 
 /**
@@ -552,7 +897,7 @@ class sc_map_decal {
     this.__near_cutoff_lod = undefined;
     this.__owner_army = undefined;
   }
-  
+
   get id() { return this.__id; }
   get decal_type() { return this.__decal_type; }
   get texture_count() { return this.__texture_count; }
@@ -563,15 +908,15 @@ class sc_map_decal {
   get cutoff_lod() { return this.__cutoff_lod; }
   get near_cutoff_lod() { return this.__near_cutoff_lod; }
   get owner_army() { return this.__owner_army; }
-  
+
   load(input) {
     let id = input.readInt32();
     let decal_type = input.readInt32();
     let texture_count = input.readInt32();
-    
+
     // Sanity checks
     check.equal(1, texture_count, "Only single decal textures are supported");
-    
+
     let texture_file = input.readIString();
     let scale = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
     let position = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
@@ -583,7 +928,7 @@ class sc_map_decal {
     // Sanity checks
     check.between(0, 512, texture_file.length, "Suspicious layer texture filename length");
     check.between(0, 16, owner_army, "Suspicious owner army");
-    
+
     // Record fields
     this.__id = id;
     this.__decal_type = decal_type;
@@ -596,7 +941,34 @@ class sc_map_decal {
     this.__near_cutoff_lod = near_cutoff_lod;
     this.__owner_army = owner_army;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(this.__id);
+    output.writeInt32(this.__decal_type);
+    output.writeInt32(this.__texture_count);
+    output.writeCString(this.__texture_file);
+    output.writeFloat32(this.__scale[0]);
+    output.writeFloat32(this.__scale[1]);
+    output.writeFloat32(this.__scale[2]);
+    output.writeFloat32(this.__position[0]);
+    output.writeFloat32(this.__position[1]);
+    output.writeFloat32(this.__position[2]);
+    output.writeFloat32(this.__rotation[0]);
+    output.writeFloat32(this.__rotation[1]);
+    output.writeFloat32(this.__rotation[2]);
+
+    output.writeFloat32(this.__cutoff_lod);
+    output.writeFloat32(this.__near_cutoff_lod);
+    output.writeInt32(this.__owner_army);
+
+    return output;
+  }
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -608,11 +980,11 @@ class sc_map_decal_group {
     this.__name = undefined;
     this.__data = [];
   }
-  
+
   get id() { return this.__id; }
   get name() { return this.__name; }
   get data() { return this.__data; }
-  
+
   load(input) {
     let id = input.readInt32();
     let name = input.readCString();
@@ -622,8 +994,29 @@ class sc_map_decal_group {
       let item = input.readInt32();
       data.push(item);
     }
+
+    this.__id = id;
+    this.__name = name;
+    this.__data = data;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(this.__id);
+    output.writeCString(this.__name);
+    output.writeInt32(this.__data.length);
+
+    for (let i = 0; i < this.__data.length; i++) {
+      output.writeInt32(this.__data[i]);
+    }
+
+    return output;
+  }
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -641,7 +1034,7 @@ class sc_map_decals {
   load(input) {
     // Skip 8 bytes of unknown
     input.readBytes(8);
-    
+
     let decal_count = input.readInt32();
     let decals = [];
     for (let i = 0; i < decal_count; i++) {
@@ -649,7 +1042,7 @@ class sc_map_decals {
       decal.load(input);
       decals.push(decal);
     }
-    
+
     let decal_group_count = input.readInt32();
     let decal_groups = [];
     for (let i = 0; i < decal_group_count; i++) {
@@ -657,15 +1050,39 @@ class sc_map_decals {
       decal_group.load(input);
       decal_groups.push(decal_group);
     }
-    
+
     // TODO: Could do some sanity checks here - if I understand decal groups as some sort of
     // index buffer we could check against the ids in decals
-    
+
     // Record fields
     this.__decals = decals;
     this.__decal_groups = decal_groups;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    // Write 8 unknown bytes
+    for (let i = 0; i < 8; i++) {
+      output.writeByte(0);
+    }
+
+    output.writeInt32(this.__decals.length);
+    for (let i = 0; i < this.__decals.length; i++) {
+      output.append(this.__decals[i].save().flip().compact());
+    }
+
+    output.writeInt32(this.__decal_groups.length);
+    for (let i = 0; i < this.__decal_groups.length; i++) {
+      output.append(this.__decal_groups[i].save().flip().compact());
+    }
+
+    return output;
+  }
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -690,20 +1107,45 @@ class sc_map_normalmap {
     let data_length = input.readInt32();
 
     // Sanity checks
-    check.one_of([256, 512, 1024, 2048, 4096], width, "Suspcious normal map width"); // TODO: Check it should be 128-2048
-    check.one_of([256, 512, 1024, 2048, 4096], height, "Suspcious normal map width");
+    check.one_of([256, 512, 1024, 2048, 4096], width, "Suspicious normal map width"); // TODO: Check it should be 128-2048
+    check.one_of([256, 512, 1024, 2048, 4096], height, "Suspicious normal map width");
     check.equal(1, count, "Suspicious normal map count");
     check.equal(width * height * 4 / 4 + 128, data_length, "Suspicious normal map length"); // DXT5 achieves 4:1 compression, plus some header
 
-    let normal_map = new sc_dds();
-    normal_map.load(input);
+    let normal_map = sc_dds.load(input);
 
     // Record fields
     this.__width = width;
     this.__height = height;
     this.__data = normal_map.data;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(this.__width);
+    output.writeInt32(this.__height);
+    output.writeInt32(1); // Normal map count
+    output.writeInt32(this.__width * this.__height  * 4 / 4 + 128);
+    sc_dds.save(output, this.__data, this.__width, this.__height, sc_dds_pixelformat.DXT5);
+
+    return output;
+  }
+
+  create(map_args) {
+    this.__width = nm_sz(map_args.size);
+    this.__height = nm_sz(map_args.size);
+    this.__data = new ByteBuffer(this.__width * this.__height * 4, ByteBuffer.LITTLE_ENDIAN);
+
+    // Fill normalmap with 'pointing up' vector.
+    // TODO: Check this is up!
+    for (let i = 0; i < this.__width * this.__height; i++) {
+      this.__data.writeUint8(0);
+      this.__data.writeUint8(0);
+      this.__data.writeUint8(1);
+      this.__data.writeUint8(0);
+    }
+   }
 }
 
 /**
@@ -715,21 +1157,24 @@ class sc_map_texturemap {
   constructor() {
     this.__chan0_3 = undefined;
     this.__chan4_7 = undefined;
+    this.__width = undefined;
+    this.__height = undefined;
   }
 
   get chan0_3() { return this.__chan0_3; }
   get chan4_7() { return this.__chan4_7; }
+  get width() { return this.__width; }
+  get height() { return this.__height; }
 
   load(input) {
     let chan_data = [undefined, undefined];
     for (let chan = 0; chan < 2; chan++) {
       let chan_length = input.readInt32();
       // Sanity check texture map length
-      check.one_of([dds_sz(256), dds_sz(512), dds_sz(1024), dds_sz(2048), dds_sz(4096)], chan_length, "Suspicious texture map length");
+      check.one_of([dds_raw_sz(tm_sz(0)), dds_raw_sz(tm_sz(1)), dds_raw_sz(tm_sz(2)), dds_raw_sz(tm_sz(3)), dds_raw_sz(tm_sz(4))], chan_length, "Suspicious texture map length");
 
-      let chan_dds = new sc_dds();
       let starting_remaining = input.remaining();
-      chan_dds.load(input);
+      let chan_dds = sc_dds.load(input);
       let bytes_read = starting_remaining - input.remaining();
       // Sanity check correct number of bytes read
       check.equal(bytes_read, chan_length, `Wrong number of bytes read extracting texture map ${chan} (req ${chan_length} found ${bytes_read}`);
@@ -741,7 +1186,25 @@ class sc_map_texturemap {
     this.__chan0_3 = chan_data[0];
     this.__chan4_7 = chan_data[1];
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(dds_raw_sz(this.__width, this.__height));
+    sc_dds.save(output, this.__chan0_3, this.__width, this.__height, sc_dds_pixelformat.RawARGB);
+
+    output.writeInt32(dds_raw_sz(this.__width, this.__height));
+    sc_dds.save(output, this.__chan4_7, this.__width, this.__height, sc_dds_pixelformat.RawARGB);
+
+    return output;
+  }
+
+  create(map_args) {
+    this.__chan0_3 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4, ByteBuffer.LITTLE_ENDIAN);
+    this.__chan4_7 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4, ByteBuffer.LITTLE_ENDIAN);
+    this.__width = tm_sz(map_args.size);
+    this.__height = tm_sz(map_args.size);
+  }
 }
 
 /**
@@ -752,8 +1215,6 @@ class sc_map_watermap {
     this.__heightmap = heightmap;
 
     this.__watermap_data = undefined;
-    this.__watermap_width = undefined;
-    this.__watermap_height = undefined
     this.__foam_mask_data = undefined;
     this.__flatness_data = undefined;
     this.__depth_bias_data = undefined;
@@ -761,8 +1222,8 @@ class sc_map_watermap {
   }
 
   get watermap_data() { return this.__watermap_data; }
-  get watermap_width() { return this.__watermap_width; }
-  get watermap_height() { return this.__watermap_height; }
+  get watermap_width() { return this.__heightmap.width / 2; }
+  get watermap_height() { return this.__heightmap.height / 2; }
   get foam_mask_data() { return this.__foam_mask_data; }
   get foam_mask_width() { return this.__heightmap.width / 2; }
   get foam_mask_height() { return this.__heightmap.height / 2; }
@@ -782,11 +1243,10 @@ class sc_map_watermap {
 
     // Sanity check water map length
     // TBD: Check bounds are correct
-    check.equal(dds_sz2(this.__heightmap.width / 2, this.__heightmap.height / 2), watermap_length, "Suspicious water map length")
+    check.equal(dds_dxt5_sz2(this.__heightmap.width / 2, this.__heightmap.height / 2), watermap_length, "Suspicious water map length")
 
-    let watermap_dds = new sc_dds();
     let starting_remaining = input.remaining();
-    watermap_dds.load(input);
+    let watermap_dds = sc_dds.load(input);
     let bytes_read = starting_remaining - input.remaining();
     // Sanity check correct number of bytes read
     check.equal(bytes_read, watermap_length, `Wrong number of bytes read extracting watermap (req ${watermap_length} found ${bytes_read}`);
@@ -804,14 +1264,46 @@ class sc_map_watermap {
 
     // Record fields
     this.__watermap_data = watermap_dds.data;
-    this.__watermap_width = watermap_dds.width;
-    this.__watermap_height = watermap_dds.height;
     this.__foam_mask_data = foam_mask_data;
     this.__flatness_data = flatness_data;
     this.__depth_bias_data = depth_bias_data;
     this.__terrain_type_data = terrain_type_data;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    // Write 4 unknown bytes
+    for (let i = 0; i < 4; i++) {
+      output.writeByte(0);
+    }
+
+    output.writeInt32(dds_dxt5_sz2(this.__heightmap.width / 2, this.__heightmap.height / 2));
+    sc_dds.save(output, this.__watermap_data, this.__heightmap.width / 2, this.__heightmap.height / 2, sc_dds_pixelformat.DXT5);
+
+    output.append(this.__foam_mask_data);
+    output.append(this.__flatness_data);
+    output.append(this.__depth_bias_data);
+    output.append(this.__terrain_type_data);
+
+    return output;
+  }
+
+  create(map_args) {
+    this.__watermap_data = new ByteBuffer(wmwm_sz(map_args.size) * wmwm_sz(map_args.size) * 4, ByteBuffer.LITTLE_ENDIAN); // 32bpp
+    this.__foam_mask_data = new ByteBuffer(wmfm_sz(map_args.size) * wmfm_sz(map_args.size), ByteBuffer.LITTLE_ENDIAN); // 8bpp
+    this.__flatness_data = new ByteBuffer(wmfl_sz(map_args.size) * wmfl_sz(map_args.size), ByteBuffer.LITTLE_ENDIAN); // 8bpp
+    this.__depth_bias_data = new ByteBuffer(wmdb_sz(map_args.size) * wmdb_sz(map_args.size), ByteBuffer.LITTLE_ENDIAN); // 8bpp
+    this.__terrain_type_data = new ByteBuffer(wmtt_sz(map_args.size) * wmtt_sz(map_args.size), ByteBuffer.LITTLE_ENDIAN); // 8bpp
+
+    // On NodeJs I seem to be hitting the Buffer constructor instead of ArrayBuffer, leading to non-zero initialised
+    // memory. Explicitly zero to avoid this.
+    this.__watermap_data.fill(0).reset();
+    this.__foam_mask_data.fill(0).reset();
+    this.__flatness_data.fill(0).reset();
+    this.__depth_bias_data.fill(0).reset();
+    this.__terrain_type_data.fill(0).reset();
+  }
 }
 
 /**
@@ -850,7 +1342,33 @@ class sc_map_prop {
     this.__rotation_z = rotation_z;
     this.__scale = scale;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeCString(this.__blueprint_path);
+    output.writeFloat32(this.__position[0]);
+    output.writeFloat32(this.__position[1]);
+    output.writeFloat32(this.__position[2]);
+    output.writeFloat32(this.__rotation_x[0]);
+    output.writeFloat32(this.__rotation_x[1]);
+    output.writeFloat32(this.__rotation_x[2]);
+    output.writeFloat32(this.__rotation_y[0]);
+    output.writeFloat32(this.__rotation_y[1]);
+    output.writeFloat32(this.__rotation_y[2]);
+    output.writeFloat32(this.__rotation_z[0]);
+    output.writeFloat32(this.__rotation_z[1]);
+    output.writeFloat32(this.__rotation_z[2]);
+    output.writeFloat32(this.__scale[0]);
+    output.writeFloat32(this.__scale[1]);
+    output.writeFloat32(this.__scale[2]);
+
+    return output;
+  }
+
+  create(map_args) {
+
+  }
 }
 
 /**
@@ -878,7 +1396,21 @@ class sc_map_props {
     // Record fields
     this.__props = props;
   }
-  save(output) {}
+
+  save() {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    output.writeInt32(this.__props.length);
+    for (let i = 0; i < this.__props.length; i++) {
+      output.append(this.__props[i].save().flip().compact());
+    }
+
+    return output;
+  }
+
+  create(map_args) {
+
+  }
 }
 
 export class sc_map {
@@ -925,18 +1457,62 @@ export class sc_map {
     this.props.load(input);
   }
 
-  save(output) {
-    this.header.save(output);
-    this.preview_image.save(output);
-    this.heightmap.save(output);
-    this.textures.save(output);
-    this.lighting.save(output);
-    this.water.save(output);
-    this.layers.save(output);
-    this.decals.save(output);
-    this.normalmap.save(output);
-    this.texturemap.save(output);
-    this.watermap.save(output);
-    this.props.save(output);
+  save() {
+    const buffers = [
+      this.header.save(),
+      this.preview_image.save(),
+      this.heightmap.save(),
+      this.textures.save(),
+      this.lighting.save(),
+      this.water.save(),
+      this.layers.save(),
+      this.decals.save(),
+      this.normalmap.save(),
+      this.texturemap.save(),
+      this.watermap.save(),
+      this.props.save()
+    ];
+
+    // Concatenate all of the above to get the output
+    let total_length = 0;
+    let output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+    for (const buffer of buffers) {
+      // Flip to make buffer ready for reading, compact to get exactly right sized buffer
+      buffer.flip().compact();
+
+      total_length += buffer.capacity();
+
+      output.append(buffer);
+    }
+
+    // TBD: This will be a Buffer under node, which may not be quite what I want
+    return output.flip().compact().buffer;
+  }
+
+  /**
+   * Creates a new map.
+   * @param map_args {Object}
+   * At a minimum map_args must contain the size field.
+   * {
+   *   name: "Name of map",               // not used in this class, serialised by Lua related classes
+   *   author: "Name of author",          // not used in this class, serialised by Lua related classes
+   *   description: "Description of map", // not used in this class, serialised by Lua related classes
+   *   size: integer,                     // 0 -> 5x5, 4 -> 80x80
+   *   default_height: Uint16             // Initial value of empty heightmap. Defaults to 16 * 1024
+   * }
+   */
+  create(map_args) {
+    this.header.create(map_args);
+    this.preview_image.create(map_args);
+    this.heightmap.create(map_args);
+    this.textures.create(map_args);
+    this.lighting.create(map_args);
+    this.water.create(map_args);
+    this.layers.create(map_args);
+    this.decals.create(map_args);
+    this.normalmap.create(map_args);
+    this.texturemap.create(map_args);
+    this.watermap.create(map_args);
+    this.props.create(map_args);
   }
 }

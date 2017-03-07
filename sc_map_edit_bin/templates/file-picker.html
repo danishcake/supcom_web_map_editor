@@ -1,0 +1,4 @@
+<form id="file_picker_form">
+  <input id="file_picker" type="file" onchange="angular.element(this).scope().file_changed(this)" style="display:none">
+</form>
+<label class="btn btn-default" ng-click="show_file_open_dialog()"><span class="glyphicon glyphicon-open"></span>&nbsp;<ng-transclude></ng-transclude></label>

@@ -11,12 +11,19 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
 
   $scope.new_map = function() {
     let dlg = dialogs.create("templates/dialogs/new-map.html", "new-map", {}, modal_dlg_opts);
-    dlg.result.then(function(map) {
-      dialogs.error('New Map','Not (fully) implemented.');
+    dlg.result.then(function(map_parameters) {
+      editor_state.create_map(map_parameters);
     });
   };
   $scope.open_map = function() {
-    dialogs.error('Open Map','Not implemented.');
+    let dlg = dialogs.create("templates/dialogs/open-map.html", "open-map", {}, modal_dlg_opts);
+    dlg.result.then(function(map) {
+      try {
+        editor_state.load_map(map);
+      } catch(error) {
+        dialogs.error('Failed to open map', error.message);
+      }
+    });
   };
   $scope.save_map = function() {
     dialogs.error('Save Map','Not implemented.');

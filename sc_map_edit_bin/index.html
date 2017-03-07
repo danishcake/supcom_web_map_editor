@@ -15,13 +15,56 @@
   <script src="../node_modules/angular-sanitize/angular-sanitize.js"></script>
   <script src="../node_modules/angular-dialog-service/dist/dialogs.js"></script>
   <script src="../node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+  <script src="../node_modules/bytebuffer/dist/bytebuffer.js"></script>
+  <script src="../node_modules/underscore/underscore.js"></script>
+  <script src="../node_modules/angular-mousewheel/node_modules/hamsterjs/hamster.js"></script>
+  <script src="../node_modules/angular-mousewheel/mousewheel.js"></script>
+  <script src="../node_modules/underscore/underscore.js"></script>
+  <script src="../node_modules/gl-matrix/dist/gl-matrix-min.js"></script>
   <script src="dist/app.js"></script>
   <script src="dist/controllers/editor-menu.js"></script>
   <script src="dist/controllers/editor-view.js"></script>
   <script src="dist/controllers/top-menu.js"></script>
   <script src="dist/controllers/dialogs/new-map.js"></script>
+  <script src="dist/controllers/dialogs/open-map.js"></script>
   <script src="dist/directives/top-menu.js"></script>
   <script src="dist/directives/editor-menu.js"></script>
   <script src="dist/directives/editor-view.js"></script>
+  <script src="dist/directives/file-picker.js"></script>
   <script src="dist/services/editor-state.js"></script>
+  <script src="dist/webgl/effect.js"></script>
+  <script src="dist/webgl/camera.js"></script>
+  <script src="dist/webgl/heightmap.js"></script>
+  <script src="lib/io_lib/sc_map.js"></script>
+
+  <!-- Shaders related to rendering terrain -->
+  <script id="vs-terrain-greyscale" type="x-shader/x-fragment">
+    precision highp float;
+    attribute vec3 aVertexPosition;
+    varying highp float vHeight;
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform vec2 uMapSize;
+    uniform highp sampler2D uHeightmap;
+    uniform highp float uHeightmapScale;
+    uniform highp float uShadeMin;
+    uniform highp float uShadeMax;
+
+    void main(void) {
+        vec2 textureCoord = aVertexPosition.xy / uMapSize;
+        highp float height = texture2D(uHeightmap, textureCoord).a;
+        vec3 displacedPosition = aVertexPosition + vec3(0, 0, height * uHeightmapScale);
+        gl_Position = uPMatrix * uMVMatrix * vec4(displacedPosition, 1.0);
+        vHeight = (height - uShadeMin) / (uShadeMax - uShadeMin);
+    }
+  </script>
+
+
+  <script id="fs-terrain-greyscale" type="x-shader/x-vertex">
+    precision mediump float;
+    varying highp float vHeight;
+    void main(void) {
+        gl_FragColor = vec4(vHeight, vHeight, vHeight, 1.0);
+    }
+  </script>
 </html>
