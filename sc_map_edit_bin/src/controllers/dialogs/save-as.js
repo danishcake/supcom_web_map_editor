@@ -74,7 +74,7 @@ angular.module('sc_map_edit_bin.controllers').controller("save-as",
       },
       (b64_serialised_map, next) => {
         // Write to local storage
-        localStorage.setItem("sc_map_edit_bin.saved_map", b64_serialised_map);
+        localStorage.setItem("sc_map_edit_bin.save.scmap", b64_serialised_map);
         $timeout(() => { next(); }, 100);
       }
     ],
