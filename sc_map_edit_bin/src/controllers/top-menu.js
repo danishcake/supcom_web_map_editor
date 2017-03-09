@@ -29,7 +29,7 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
     dialogs.error('Save Map','Not implemented.');
   };
   $scope.save_map_as = function() {
-    dialogs.error('Save Map As','Not implemented.');
+    dialogs.create("templates/dialogs/save-as.html", "save-as", {}, modal_dlg_opts);
   };
   $scope.edit_metadata = function() {
     dialogs.error('Metadata','Not implemented.');

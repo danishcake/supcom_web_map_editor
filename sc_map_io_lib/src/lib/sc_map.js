@@ -1457,6 +1457,10 @@ export class sc_map {
     this.props.load(input);
   }
 
+  /**
+   * Saves the map
+   * @return {ByteBuffer}
+   */
   save() {
     const buffers = [
       this.header.save(),
@@ -1486,7 +1490,7 @@ export class sc_map {
     }
 
     // TBD: This will be a Buffer under node, which may not be quite what I want
-    return output.flip().compact().buffer;
+    return output.flip().compact();
   }
 
   /**

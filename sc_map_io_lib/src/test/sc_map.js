@@ -578,7 +578,7 @@ describe('sc_map', function() {
       const roundtrip_buffer = this.src_map.save();
 
       this.dest_map = new sc.map();
-      this.dest_map.load(ByteBuffer.wrap(roundtrip_buffer, ByteBuffer.LITTLE_ENDIAN));
+      this.dest_map.load(roundtrip_buffer);
     });
 
     it('should write header', function() {
