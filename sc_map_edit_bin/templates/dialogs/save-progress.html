@@ -1,0 +1,12 @@
+<div class="modal-header dialog-header-wait">
+  <h4 class="modal-title"><span class="glyphicon glyphicon-file"></span> Saving</h4>
+</div>
+
+<div class="modal-body">
+  <p>{{data.progress_text}}</p>
+  <uib-progressbar class="progress-striped active" max="100" value="data.progress_value"></uib-progressbar>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-default pull-right" ng-click="ok()" ng-disabled="!data.finished">OK</button>
+</div>

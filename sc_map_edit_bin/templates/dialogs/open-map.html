@@ -7,22 +7,28 @@
   <div class="row">
     <div class="col-lg-12">
       <uib-tabset active="data.open_mode_tab_index">
-        <uib-tab index="0" heading="Archive">
+        <uib-tab index="0" heading="Browser localstorage">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <button class="btn" ng-class="data.validity.all_set ? 'btn-success' : 'btn-default'" ng-click="load_localstorage()" ng-disabled="!data.local_storage_has_map"><span class="glyphicon glyphicon-open"></span>&nbsp;Open&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.all_set"></button><p>
+              <div ng-show="!data.local_storage_has_map" uib-alert class="alert-warning">No map saved to browser localstorage</div>
+            </div>
+          </div>
+        </uib-tab>
+        <uib-tab index="1" heading="Archive">
           <div class="panel panel-default">
             <div class="panel-body">
               <file-upload onopen="load_archive">x.zip</file-upload>
             </div>
           </div>
         </uib-tab>
-        <uib-tab index="1" heading="Individual Files">
+        <uib-tab index="2" heading="Individual Files">
           <div class="panel panel-default">
             <div class="panel-body">
-              <div class="btn-group-vertical">
-                <file-upload onopen="open_scenario" ng-class="data.validity.scenario_set ? 'btn-success' : 'btn-default'">x_scenario.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scenario_set"></span></file-upload>
-                <file-upload onopen="open_save" ng-class="data.validity.save_set ? 'btn-success' : 'btn-default'">x_save.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.save_set"></span></file-upload>
-                <file-upload onopen="open_script" ng-class="data.validity.script_set ? 'btn-success' : 'btn-default'">x_script.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.script_set"></span></file-upload>
-                <file-upload onopen="open_scmap" ng-class="data.validity.scmap_set ? 'btn-success' : 'btn-default'">x.scmap&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scmap_set"></span></file-upload>
-              </div>
+              <file-upload onopen="open_scenario" ng-class="data.validity.scenario_set ? 'btn-success' : 'btn-default'">x_scenario.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scenario_set"></span></file-upload><br/>
+              <file-upload onopen="open_save" ng-class="data.validity.save_set ? 'btn-success' : 'btn-default'">x_save.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.save_set"></span></file-upload><br/>
+              <file-upload onopen="open_script" ng-class="data.validity.script_set ? 'btn-success' : 'btn-default'">x_script.lua&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.script_set"></span></file-upload><br/>
+              <file-upload onopen="open_scmap" ng-class="data.validity.scmap_set ? 'btn-success' : 'btn-default'">x.scmap&nbsp;<span class="glyphicon glyphicon-ok pull-right" ng-show="data.validity.scmap_set"></span></file-upload><br/>
             </div>
           </div>
 

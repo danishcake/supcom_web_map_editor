@@ -1,8 +1,10 @@
 angular.module('sc_map_edit_bin.controllers').controller("open-map",
 ["$scope", "$uibModalInstance", "dialogs", "data", function($scope, $uibModalInstance, dialogs, data) {
 
+  const local_storage_has_map = localStorage.getItem("sc_map_edit_bin.save.scmap") !== null;
+
   $scope.data = {
-    open_mode_tab_index: 0,
+    open_mode_tab_index: local_storage_has_map ? 0 : 1,
     validity:
     {
       scenario_set: false,
@@ -18,7 +20,8 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
         script: null
       },
       scmap: null
-    }
+    },
+    local_storage_has_map: local_storage_has_map
   }
 
   $scope.update_validity = function() {
@@ -32,6 +35,25 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
   $scope.cancel = function() {
     $uibModalInstance.dismiss();
   };
+
+  $scope.load_localstorage = function() {
+    try {
+      // Retrive scmap from localstorage and load
+      const b64_serialised_scmap = localStorage.getItem("sc_map_edit_bin.save.scmap");
+      const serialised_scmap = dcodeIO.ByteBuffer.wrap(b64_serialised_scmap, "base64", dcodeIO.ByteBuffer.LITTLE_ENDIAN);
+      const scmap = new sc_map_io_lib.sc.map();
+      scmap.load(serialised_scmap);
+
+      // Sucessfully loaded .scmap
+      $scope.data.map.scmap = scmap;
+      $scope.data.map.save_location = "localstorage";
+      // TODO: Load scripts
+
+      $uibModalInstance.close($scope.data.map);
+    } catch(error) {
+      dialogs.error('Error parsing .scmap', error.message);
+    }
+  }
 
   $scope.load_archive = function(archive_buffer) {
     // TODO: Extract the individual buffers from the archive
@@ -59,7 +81,6 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
   };
 
   $scope.open_save = function(save_buffer) {
-
     try {
       let save = new sc_map_io_lib.sc.script.save()
       save.load(dcodeIO.ByteBuffer.wrap(save_buffer, dcodeIO.ByteBuffer.LITTLE_ENDIAN));
@@ -76,8 +97,6 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
   };
 
   $scope.open_script = function(script_buffer) {
-
-
     $scope.data.validity.script_set = true;
     $scope.update_validity();
   };

@@ -42,6 +42,22 @@ export class sc_edit_heightmap extends sc_edit_view_base {
 
 
   /**
+   * Exports the working heightmap to a serialisable heightmap,
+   * clamping values to  Uint16 values
+   */
+  export_to_heightmap(heightmap) {
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        let height = Math.floor(this.get_pixel([x, y]));
+        height = height > 65535 ? 65535 : height;
+        height = height < 0 ? 0 : height;
+        heightmap.data.writeUint16(height, (y * this.width + x) * 2);
+      }
+    }
+  }
+
+
+  /**
    * Clears the dirty region
    */
   reset_dirty_region() {

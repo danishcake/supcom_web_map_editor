@@ -14,3 +14,9 @@ angular.module('sc_map_edit_bin.controllers', ['sc_map_edit_bin.services',
                                                'dialogs.main']);
 angular.module('sc_map_edit_bin.directives', []);
 angular.module('sc_map_edit_bin.services', []);
+
+// Standard modal dialog options used all over the place
+const modal_dlg_opts = {
+  backdrop: 'static',
+  size: 'lg'
+};

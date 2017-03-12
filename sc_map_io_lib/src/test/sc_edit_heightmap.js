@@ -20,6 +20,21 @@ describe('sc_edit_heightmap', function() {
     });
   });
 
+  describe('exports to existing heightmap', function() {
+    let map = new sc_map();
+    map.create({size: 0, default_height: 1000});
+    let edit_heightmap = new sc_edit_heightmap(map.heightmap);
+    edit_heightmap.set_pixel([0, 0], 50);
+    edit_heightmap.export_to_heightmap(map.heightmap);
+
+    it('should have same heights', function () {
+      assert.equal(50, edit_heightmap.working_heightmap[0]);
+      assert.equal(50, map.heightmap.data.readUint16(0));
+      assert.equal(1000, edit_heightmap.working_heightmap[1]);
+      assert.equal(1000, map.heightmap.data.readUint16(2));
+    });
+  });
+
   describe('dirty region tracking', function() {
     let map = new sc_map();
     map.create({size: 0, default_height: 1000});

@@ -1168,6 +1168,9 @@ class sc_map_texturemap {
 
   load(input) {
     let chan_data = [undefined, undefined];
+    let width = undefined;
+    let height = undefined;
+
     for (let chan = 0; chan < 2; chan++) {
       let chan_length = input.readInt32();
       // Sanity check texture map length
@@ -1180,11 +1183,17 @@ class sc_map_texturemap {
       check.equal(bytes_read, chan_length, `Wrong number of bytes read extracting texture map ${chan} (req ${chan_length} found ${bytes_read}`);
 
       chan_data[chan] = chan_dds.data;
+
+      // This assumes that both texture maps have equal dimensions
+      width = chan_dds.width;
+      height = chan_dds.height;
     }
 
     // Record fields
     this.__chan0_3 = chan_data[0];
     this.__chan4_7 = chan_data[1];
+    this.__width = width;
+    this.__height = height;
   }
 
   save() {
@@ -1457,6 +1466,10 @@ export class sc_map {
     this.props.load(input);
   }
 
+  /**
+   * Saves the map
+   * @return {ByteBuffer}
+   */
   save() {
     const buffers = [
       this.header.save(),
@@ -1486,7 +1499,7 @@ export class sc_map {
     }
 
     // TBD: This will be a Buffer under node, which may not be quite what I want
-    return output.flip().compact().buffer;
+    return output.flip().compact();
   }
 
   /**
