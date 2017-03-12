@@ -8,6 +8,19 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   let service = {};
 
   service.tool = null; // TODO: Add a select tool
+  service.save_location = "unsaved";
+
+  /**
+   * Returns the location the map was most recently saved to or loaded from
+   */
+  service.get_save_location = () => { return service.save_location; };
+
+
+  /**
+   * Sets the most recently saved to location
+   */
+  service.set_save_location = (location) => { service.save_location = location; };
+
 
   /**
    * Builds a tool from the current tool_data
@@ -81,6 +94,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     service.map = map.scmap;
     service.scripts.scenario = map.scripts.scenario;
     service.scripts.save = map.scripts.save;
+    service.save_location = map.save_location;
 
     // Build editable heightmap
     service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);

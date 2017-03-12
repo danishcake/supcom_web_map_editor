@@ -46,6 +46,7 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
 
       // Sucessfully loaded .scmap
       $scope.data.map.scmap = scmap;
+      $scope.data.map.save_location = "localstorage";
       // TODO: Load scripts
 
       $uibModalInstance.close($scope.data.map);

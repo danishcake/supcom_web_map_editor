@@ -9,21 +9,14 @@
     <div class="col-lg-8">
       <div class="btn-group">
         <label class="btn btn-default" ng-model="data.mode" ng-change="mode_change()" uib-btn-radio="0">Browser localstorage</label>
-        <label class="btn btn-default" ng-model="data.mode" ng-change="mode_change()" uib-btn-radio="1">Directory</label>
-        <label class="btn btn-default" ng-model="data.mode" ng-change="mode_change()" uib-btn-radio="2">Zip file</label>
+        <label class="btn btn-default" ng-model="data.mode" ng-change="mode_change()" uib-btn-radio="1">Zip file</label>
       </div>
     </div>
   </div>
-  <div class="row" ng-show="data.mode === 1 || data.mode === 2">
+  <div class="row" ng-show="data.mode === 1">
     <div class="col-lg-4"><h6>Location</h6></div>
     <div class="col-lg-8">
-      <div class="input-group" ng-if="data.mode === 1">
-        <input type="text" class="form-control" placeholder="Directory">
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="button">Browse</button>
-        </span>
-      </div>
-      <div class="input-group" ng-if="data.mode === 2">
+      <div class="input-group">
         <input type="text" class="form-control" placeholder="Zip file">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button">Browse</button>

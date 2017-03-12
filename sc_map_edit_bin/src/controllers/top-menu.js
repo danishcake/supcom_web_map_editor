@@ -2,13 +2,6 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
 ["$scope", "editor_state", "dialogs", function($scope, editor_state, dialogs) {
   $scope.editor_state = editor_state;
 
-  // Standard modal dialog options
-  const modal_dlg_opts = {
-    backdrop: 'static',
-    size: 'lg'
-  };
-
-
   $scope.new_map = function() {
     let dlg = dialogs.create("templates/dialogs/new-map.html", "new-map", {}, modal_dlg_opts);
     dlg.result.then(function(map_parameters) {
@@ -26,7 +19,21 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
     });
   };
   $scope.save_map = function() {
-    dialogs.error('Save Map','Not implemented.');
+    switch(editor_state.get_save_location()) {
+      case "unsaved":
+        dialogs.create("templates/dialogs/save-as.html", "save-as", {}, modal_dlg_opts);
+        break;
+
+      default:
+        dialogs.create("templates/dialogs/save-progress.html",
+                       "save-progress",
+                       {
+                         map: editor_state.map,
+                         edit_heightmap: editor_state.edit_heightmap
+                       },
+                       modal_dlg_opts);
+        break;
+    }
   };
   $scope.save_map_as = function() {
     dialogs.create("templates/dialogs/save-as.html", "save-as", {}, modal_dlg_opts);
