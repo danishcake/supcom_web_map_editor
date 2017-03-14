@@ -64,6 +64,29 @@ describe('sc_script', function() {
         assert.equal("/maps/Shuriken_Valley/Shuriken_Valley_script.lua", scenario_script.script_filename);
       });
     });
+
+    describe('creation', function() {
+      it('should derive filenames from map name', function() {
+        let script = new sc.script.scenario()
+        script.create({
+          name: "Awesome Volcano",               // Used to determine filenames
+          author: "1337 internet tag",
+          description: "Description of map",
+          size: 0,
+          default_height: 0
+        });
+
+        assert.equal(script.name,            "Awesome Volcano");
+        assert.equal(script.description,     "Description of map");
+        assert.equal(script.map_filename,    "awesome_volcano.scmap");
+        assert.equal(script.save_filename,   "awesome_volcano_save.lua");
+        assert.equal(script.script_filename, "awesome_volcano_script.lua");
+      });
+    });
+
+    describe('saving', function() {
+
+    });
   });
 
 
@@ -90,6 +113,24 @@ describe('sc_script', function() {
       // TODO: Do I actually need to worry about this?
       it('should load armies', function() {
       });
+    });
+
+    describe('creation', function() {
+      it('should do nothing', function() {
+        let script = new sc.script.save()
+        script.create({
+          name: "Awesome Volcano",               // Used to determine filenames
+          author: "1337 internet tag",
+          description: "Description of map",
+          size: 0,
+          default_height: 0
+        });
+
+        assert.equal(0, Object.keys(script.markers).length);
+      });
+    });
+
+    describe('saving', function() {
     });
   });
 });

@@ -223,7 +223,29 @@ export class sc_script_scenario extends sc_script_base {
   }
 
   save(output) {}
-  create(script_args) {}
+
+
+  /**
+   * Creates a new scenario script.
+   * @param script_args {Object}
+   * At a minimum map_args must contain the size field.
+   * {
+   *   name: "Name of map",               // Used to determine filenames
+   *   author: "Name of author",
+   *   description: "Description of map",
+   *   size: integer,                     // Not used by script serialisation
+   *   default_height: Uint16             // Not used by script serialisation
+   * }
+   */
+  create(map_args) {
+    const filename_stem = map_args.name.replace(' ', '_').toLowerCase();
+
+    this.__name = map_args.name;
+    this.__description = map_args.description;
+    this.__map_filename = `${filename_stem}.scmap`;
+    this.__save_filename = `${filename_stem}_save.lua`;
+    this.__script_filename = `${filename_stem}_script.lua`;
+  }
 }
 
 /**
@@ -261,6 +283,7 @@ class sc_script_marker {
     // TODO: Load the type specific fields
   }
   save(output) {}
+
   create(script_args) {}
 }
 
@@ -312,6 +335,11 @@ export class sc_script_save extends sc_script_base {
   }
 
   save(output) {}
-  create(script_args) {}
+
+  /**
+   * Creates a map with no markers - effectively does nothing
+   */
+  create(script_args) {
+  }
 }
 
