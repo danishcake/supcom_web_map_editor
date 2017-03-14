@@ -222,7 +222,73 @@ export class sc_script_scenario extends sc_script_base {
     // TODO: Map size and forces
   }
 
-  save(output) {}
+  save() {
+    /** We're aiming for this:
+     *
+     * version = 3
+     * ScenarioInfo = {
+     *     name = 'Shuriken Valley',
+     *     description = 'Ai Markers. By Claimer9',
+     *     type = 'skirmish',
+     *     starts = true,
+     *     preview = '',
+     *     size = {256, 256},
+     *     map = '/maps/Shuriken_Valley/Shuriken_Valley.scmap',
+     *     save = '/maps/Shuriken_Valley/Shuriken_Valley_save.lua',
+     *     script = '/maps/Shuriken_Valley/Shuriken_Valley_script.lua',
+     *     norushradius = 0.000000,
+     *     norushoffsetX_ARMY_1 = 0.000000,
+     *     norushoffsetY_ARMY_1 = 0.000000,
+     *     norushoffsetX_ARMY_2 = 0.000000,
+     *     norushoffsetY_ARMY_2 = 0.000000,
+     *     Configurations = {
+     *         ['standard'] = {
+     *             teams = {
+     *                 { name = 'FFA', armies = {'ARMY_1','ARMY_2',} },
+     *             },
+     *             customprops = {
+     *             },
+     *         },
+     *     }
+     * }
+     */
+
+    let output =
+      `version = 3\n`                                             +
+      `ScenarioInfo = {\n`                                        +
+      `    name                 = '${this.__name}',\n`            +
+      `    description          = '${this.__description}',\n`     +
+      `    type                 = 'skirmish',\n`                  +
+      `    starts               = true,\n`                        +
+      `    preview              = '',\n`                          +
+      `    size                 = {256,256},\n`                   + // TODO: This is wrong! Load/create it too
+      `    map                  = '${this.__map_filename}',\n`    +
+      `    save                 = '${this.__save_filename}',\n`   +
+      `    script               = '${this.__script_filename}',\n` +
+      `    norushradius         = 0.0,\n`                         +
+      `    norushoffsetX_ARMY_1 = 0.0,\n`                         +
+      `    norushoffsetY_ARMY_1 = 0.0,\n`                         +
+      `    norushoffsetX_ARMY_2 = 0.0,\n`                         +
+      `    norushoffsetY_ARMY_2 = 0.0,\n`                         +
+      // TODO: Add per-army no rush radii here (load/create and maybe edit!)
+      `    Configurations = {\n`                                  +
+      `        ['standard'] = {\n`                                +
+      `            teams = {\n`                                   +
+      `                {\n`                                       +
+      `                    name = 'FFA',\n`                       +
+      `                    armies = {\n`                          +
+      `                        'ARMY_1', 'ARMY2'\n`               + // TODO: Add armies heres
+      `                    }\n`                                   +
+      `                },\n`                                      +
+      `            },\n`                                          +
+      `            customprops = {\n`                             +
+      `            }\n`                                           +
+      `        }\n`                                               +
+      `    }\n`                                                   +
+      `}\n`;
+
+    return ByteBuffer.wrap(output, ByteBuffer.LITTLE_ENDIAN);
+  }
 
 
   /**
@@ -334,7 +400,10 @@ export class sc_script_save extends sc_script_base {
     this.__markers = markers;
   }
 
-  save(output) {}
+  save() {
+    let output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+    return output.flip().compact();
+  }
 
   /**
    * Creates a map with no markers - effectively does nothing

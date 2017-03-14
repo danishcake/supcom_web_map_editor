@@ -35,11 +35,11 @@ describe('sc_script', function() {
 
 
   describe('sc_script_scenario', function() {
-    describe('loading', function() {
-      let scenario_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley/Shuriken_Valley_scenario.lua");
+    let scenario_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley/Shuriken_Valley_scenario.lua");
+    let scenario_data_bb = ByteBuffer.wrap(scenario_data, ByteBuffer.LITTLE_ENDIAN);
 
+    describe('loading', function() {
       it('should extract name from scenario', function () {
-        let scenario_data_bb = ByteBuffer.wrap(scenario_data, ByteBuffer.LITTLE_ENDIAN);
         let scenario_script = new sc.script.scenario();
         scenario_script.load(scenario_data_bb);
 
@@ -47,7 +47,6 @@ describe('sc_script', function() {
       });
 
       it('should extract description from scenario', function () {
-        let scenario_data_bb = ByteBuffer.wrap(scenario_data, ByteBuffer.LITTLE_ENDIAN);
         let scenario_script = new sc.script.scenario();
         scenario_script.load(scenario_data_bb);
 
@@ -55,7 +54,6 @@ describe('sc_script', function() {
       });
 
       it('should extract other scripts from scenario', function () {
-        let scenario_data_bb = ByteBuffer.wrap(scenario_data, ByteBuffer.LITTLE_ENDIAN);
         let scenario_script = new sc.script.scenario();
         scenario_script.load(scenario_data_bb);
 
@@ -85,7 +83,24 @@ describe('sc_script', function() {
     });
 
     describe('saving', function() {
+      let scenario_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley/Shuriken_Valley_scenario.lua");
 
+      it('should accurately recreate the after a roundtrip', function() {
+        let scenario_script = new sc.script.scenario();
+        scenario_script.load(scenario_data_bb);
+
+        let roundtrip_scenario_bb = scenario_script.save();
+        let roundtrip_scenario_script = new sc.script.scenario();
+        roundtrip_scenario_script.load(roundtrip_scenario_bb);
+
+        assert.equal("Shuriken Valley", scenario_script.name);
+        assert.equal("Ai Markers. By Claimer9", scenario_script.description);
+        assert.equal("/maps/Shuriken_Valley/Shuriken_Valley.scmap", scenario_script.map_filename);
+        assert.equal("/maps/Shuriken_Valley/Shuriken_Valley_save.lua", scenario_script.save_filename);
+        assert.equal("/maps/Shuriken_Valley/Shuriken_Valley_script.lua", scenario_script.script_filename);
+      });
+
+      // TODO: It would be good to add tests for all the non-explicitly required fieldss
     });
   });
 
@@ -93,9 +108,9 @@ describe('sc_script', function() {
   describe('sc_script_save', function() {
     describe('loading', function() {
       let save_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley/Shuriken_Valley_save.lua");
+      let save_data_bb = ByteBuffer.wrap(save_data, ByteBuffer.LITTLE_ENDIAN);
 
       it('should load markers', function() {
-        let save_data_bb = ByteBuffer.wrap(save_data, ByteBuffer.LITTLE_ENDIAN);
         let save_script = new sc.script.save();
         save_script.load(save_data_bb);
 
