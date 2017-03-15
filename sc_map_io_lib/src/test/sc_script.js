@@ -39,27 +39,27 @@ describe('sc_script', function() {
     let scenario_data_bb = ByteBuffer.wrap(scenario_data, ByteBuffer.LITTLE_ENDIAN);
 
     describe('loading', function() {
-      it('should extract name from scenario', function () {
-        let scenario_script = new sc.script.scenario();
-        scenario_script.load(scenario_data_bb);
+      let scenario_script = new sc.script.scenario();
+      scenario_script.load(scenario_data_bb);
 
+      it('should extract name from scenario', function () {
         assert.equal("Shuriken Valley", scenario_script.name);
       });
 
       it('should extract description from scenario', function () {
-        let scenario_script = new sc.script.scenario();
-        scenario_script.load(scenario_data_bb);
-
         assert.equal("Ai Markers. By Claimer9", scenario_script.description);
       });
 
       it('should extract other scripts from scenario', function () {
-        let scenario_script = new sc.script.scenario();
-        scenario_script.load(scenario_data_bb);
-
         assert.equal("/maps/Shuriken_Valley/Shuriken_Valley.scmap", scenario_script.map_filename);
         assert.equal("/maps/Shuriken_Valley/Shuriken_Valley_save.lua", scenario_script.save_filename);
         assert.equal("/maps/Shuriken_Valley/Shuriken_Valley_script.lua", scenario_script.script_filename);
+      });
+
+      it('should extract armies', function() {
+        assert.equal(2, scenario_script.armies.length);
+        assert.equal("ARMY_1", scenario_script.armies[0]);
+        assert.equal("ARMY_2", scenario_script.armies[1]);
       });
     });
 

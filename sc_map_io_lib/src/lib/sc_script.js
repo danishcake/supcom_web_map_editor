@@ -11,6 +11,7 @@
 const ByteBuffer = require('bytebuffer');
 const Lua5_1 = require('../thirdparty/lua5.1.5.min').Lua5_1;
 const lua = Lua5_1.C;
+const _ = require('underscore');
 
 /**
  * Base script class
@@ -191,6 +192,8 @@ export class sc_script_base {
 /**
  * Scenario script class
  * Loads and parses a map _scenario.lua file
+ * Limitation: Only the first configuration listed will be used
+ * Limitation: No rush offsets are ignored and will be written as zero
  */
 export class sc_script_scenario extends sc_script_base {
   constructor() {
@@ -200,6 +203,7 @@ export class sc_script_scenario extends sc_script_base {
     this.__map_filename = undefined;
     this.__save_filename = undefined;
     this.__script_filename = undefined;
+    this.__armies = [];
   }
 
   get name() { return this.__name; }
@@ -207,6 +211,7 @@ export class sc_script_scenario extends sc_script_base {
   get map_filename() { return this.__map_filename; }
   get save_filename() { return this.__save_filename; }
   get script_filename() { return this.__script_filename; }
+  get armies() { return this.__armies; }
 
   /**
    * Executes input as a Lua script and extracts scenario fields
@@ -221,6 +226,21 @@ export class sc_script_scenario extends sc_script_base {
     let map_filename = this.query_global("ScenarioInfo.map");
     let save_filename = this.query_global("ScenarioInfo.save");
     let script_filename = this.query_global("ScenarioInfo.script");
+    let army_configurations = this.query_global("ScenarioInfo.Configurations");
+
+    if (Object.keys(army_configurations).length != 1) {
+      console.log(`Only a single army configuration is supported, the first will be used`);
+    }
+
+    let army_configuration = army_configurations[Object.keys(army_configurations)[0]];
+    let teams = army_configuration.teams;
+
+    if (Object.keys(teams).length != 1) {
+      console.log(`Only a single team is supported, the first will be used`);
+    }
+
+    let team = teams[Object.keys(teams)[0]];
+    let armies = _.values(team.armies);
 
     // Record fields
     this.__name = name;
@@ -228,8 +248,9 @@ export class sc_script_scenario extends sc_script_base {
     this.__map_filename = map_filename;
     this.__save_filename = save_filename;
     this.__script_filename = script_filename;
+    this.__armies = armies;
 
-    // TODO: Map size and forces
+    // TODO: Map size
   }
 
   save() {
