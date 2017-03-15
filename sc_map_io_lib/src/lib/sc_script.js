@@ -119,7 +119,6 @@ export class sc_script_base {
 
     // Push the remaining elements onto the stack
     for (let i = 0 ; i < remaining_elements.length; i++){
-
       if (!lua.lua_istable(this.__lua_state, -1)) {
         throw new Error(`Expected a table at the top of the stack but found ${lua.lua_typename(this.__lua_state, lua.lua_type(this.__lua_state, -1))}. Path was ${path_elements.slice(0, i)}`);
       }
@@ -159,10 +158,21 @@ export class sc_script_base {
 
       lua.lua_pushnil(this.__lua_state);
       while (lua.lua_next(this.__lua_state, -2)) {
-        if (!lua.lua_type(this.__lua_state, -2) == lua.LUA_TTABLE) {
+        // Stack now has -3: table
+        //               -2: key
+        //               -1: value
+        // While Lua is rather forgiving in what can be a key in a table (hint: anything)
+        // I'm only going to support numbers and strings
+        let key = null;
+        if (lua.lua_type(this.__lua_state, -2) === lua.LUA_TSTRING) {
+          key = lua.lua_tostring(this.__lua_state, -2);
+        } else if (lua.lua_type(this.__lua_state, -2) === lua.LUA_TNUMBER) {
+          key = lua.lua_tonumber(this.__lua_state, -2);
+        } else {
+          console.log(`Not key is not a string or a number`);
           throw new Error(`Table key must be a string but found ${lua.lua_typename(this.__lua_state, lua.lua_type(this.__lua_state, -2))}`);
         }
-        let key = lua.lua_tostring(this.__lua_state, -2);
+
         ret[key] = this.convert_top_of_stack();
 
         // Pop value, leave key for next iteration
