@@ -204,6 +204,7 @@ export class sc_script_scenario extends sc_script_base {
     this.__save_filename = undefined;
     this.__script_filename = undefined;
     this.__armies = [];
+    this.__map_size = [undefined, undefined];
   }
 
   get name() { return this.__name; }
@@ -212,6 +213,7 @@ export class sc_script_scenario extends sc_script_base {
   get save_filename() { return this.__save_filename; }
   get script_filename() { return this.__script_filename; }
   get armies() { return this.__armies; }
+  get map_size() { return this.__map_size; }
 
   /**
    * Executes input as a Lua script and extracts scenario fields
@@ -227,6 +229,7 @@ export class sc_script_scenario extends sc_script_base {
     let save_filename = this.query_global("ScenarioInfo.save");
     let script_filename = this.query_global("ScenarioInfo.script");
     let army_configurations = this.query_global("ScenarioInfo.Configurations");
+    let map_size = this.query_global("ScenarioInfo.size");
 
     if (Object.keys(army_configurations).length != 1) {
       console.log(`Only a single army configuration is supported, the first will be used`);
@@ -249,8 +252,7 @@ export class sc_script_scenario extends sc_script_base {
     this.__save_filename = save_filename;
     this.__script_filename = script_filename;
     this.__armies = armies;
-
-    // TODO: Map size
+    this.__map_size = [map_size[1], map_size[2]];
   }
 
   save() {
@@ -285,37 +287,47 @@ export class sc_script_scenario extends sc_script_base {
      */
 
     let output =
-      `version = 3\n`                                             +
-      `ScenarioInfo = {\n`                                        +
-      `    name                 = '${this.__name}',\n`            +
-      `    description          = '${this.__description}',\n`     +
-      `    type                 = 'skirmish',\n`                  +
-      `    starts               = true,\n`                        +
-      `    preview              = '',\n`                          +
-      `    size                 = {256,256},\n`                   + // TODO: This is wrong! Load/create it too
-      `    map                  = '${this.__map_filename}',\n`    +
-      `    save                 = '${this.__save_filename}',\n`   +
-      `    script               = '${this.__script_filename}',\n` +
-      `    norushradius         = 0.0,\n`                         +
-      `    norushoffsetX_ARMY_1 = 0.0,\n`                         +
-      `    norushoffsetY_ARMY_1 = 0.0,\n`                         +
-      `    norushoffsetX_ARMY_2 = 0.0,\n`                         +
-      `    norushoffsetY_ARMY_2 = 0.0,\n`                         +
-      // TODO: Add per-army no rush radii here (load/create and maybe edit!)
-      `    Configurations = {\n`                                  +
-      `        ['standard'] = {\n`                                +
-      `            teams = {\n`                                   +
-      `                {\n`                                       +
-      `                    name = 'FFA',\n`                       +
-      `                    armies = {\n`                          +
-      `                        'ARMY_1', 'ARMY2'\n`               + // TODO: Add armies heres
-      `                    }\n`                                   +
-      `                },\n`                                      +
-      `            },\n`                                          +
-      `            customprops = {\n`                             +
-      `            }\n`                                           +
-      `        }\n`                                               +
-      `    }\n`                                                   +
+      `version = 3\n`                                                               +
+      `ScenarioInfo = {\n`                                                          +
+      `    name                 = '${this.__name}',\n`                              +
+      `    description          = '${this.__description}',\n`                       +
+      `    type                 = 'skirmish',\n`                                    +
+      `    starts               = true,\n`                                          +
+      `    preview              = '',\n`                                            +
+      `    size                 = {${this.__map_size[0]},${this.__map_size[1]}},\n` + // TODO: This is wrong! Load/create it too
+      `    map                  = '${this.__map_filename}',\n`                      +
+      `    save                 = '${this.__save_filename}',\n`                     +
+      `    script               = '${this.__script_filename}',\n`                   +
+      `    norushradius         = 0.0,\n`;
+
+    // Add armies norushoffsets
+    for (let i = 0; i < this.__armies.length; i++) {
+      output = output +
+        `    norushoffsetX_ARMY_${i + 1} = 0.0,\n` +
+        `    norushoffsetY_ARMY_${i + 1} = 0.0,\n`;
+    }
+
+      // Add the army configuration
+    output = output                         +
+      `    Configurations = {\n`            +
+      `        ['standard'] = {\n`          +
+      `            teams = {\n`             +
+      `                {\n`                 +
+      `                    name = 'FFA',\n` +
+      `                    armies = {`;
+
+    for (let i = 0; i < this.__armies.length; i++) {
+      output = output +
+        `'ARMY_${i + 1}', `;
+    }
+
+    output = output + `}\n`           +
+      `                },\n`          +
+      `            },\n`              +
+      `            customprops = {\n` +
+      `            }\n`               +
+      `        }\n`                   +
+      `    }\n`                       +
       `}\n`;
 
     return ByteBuffer.wrap(output, ByteBuffer.LITTLE_ENDIAN);
@@ -342,6 +354,9 @@ export class sc_script_scenario extends sc_script_base {
     this.__map_filename = `${filename_stem}.scmap`;
     this.__save_filename = `${filename_stem}_save.lua`;
     this.__script_filename = `${filename_stem}_script.lua`;
+
+    const map_scale = Math.pow(2, map_args.size);
+    this.__map_size = [map_scale * 256, map_scale * 256];
   }
 }
 

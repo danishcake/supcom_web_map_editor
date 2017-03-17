@@ -61,24 +61,34 @@ describe('sc_script', function() {
         assert.equal("ARMY_1", scenario_script.armies[0]);
         assert.equal("ARMY_2", scenario_script.armies[1]);
       });
+
+      it('should extract map size', function() {
+        assert.equal(256, scenario_script.map_size[0]);
+        assert.equal(256, scenario_script.map_size[1]);
+      });
     });
 
     describe('creation', function() {
-      it('should derive filenames from map name', function() {
-        let script = new sc.script.scenario()
-        script.create({
-          name: "Awesome Volcano",               // Used to determine filenames
-          author: "1337 internet tag",
-          description: "Description of map",
-          size: 0,
-          default_height: 0
-        });
+      let script = new sc.script.scenario()
+      script.create({
+        name: "Awesome Volcano",               // Used to determine filenames
+        author: "1337 internet tag",
+        description: "Description of map",
+        size: 0,
+        default_height: 0
+      });
 
+      it('should derive filenames from map name', function() {
         assert.equal(script.name,            "Awesome Volcano");
         assert.equal(script.description,     "Description of map");
         assert.equal(script.map_filename,    "awesome_volcano.scmap");
         assert.equal(script.save_filename,   "awesome_volcano_save.lua");
         assert.equal(script.script_filename, "awesome_volcano_script.lua");
+      });
+
+      it ('should set map size', function() {
+        assert.equal(script.map_size[0], 256);
+        assert.equal(script.map_size[1], 256);
       });
     });
 
@@ -98,6 +108,9 @@ describe('sc_script', function() {
         assert.equal("/maps/Shuriken_Valley/Shuriken_Valley.scmap", scenario_script.map_filename);
         assert.equal("/maps/Shuriken_Valley/Shuriken_Valley_save.lua", scenario_script.save_filename);
         assert.equal("/maps/Shuriken_Valley/Shuriken_Valley_script.lua", scenario_script.script_filename);
+        assert.equal(2, scenario_script.armies.length);
+        assert.equal("ARMY_1", scenario_script.armies[0]);
+        assert.equal("ARMY_2", scenario_script.armies[1]);
       });
 
       // TODO: It would be good to add tests for all the non-explicitly required fieldss
