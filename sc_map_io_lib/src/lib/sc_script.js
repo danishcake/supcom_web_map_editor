@@ -454,7 +454,35 @@ export class sc_script_save extends sc_script_base {
   /**
    * Creates a map with no markers - effectively does nothing
    */
-  create(script_args) {
+  create(map_args) {
   }
 }
 
+/**
+ * Script 'script'. This is unlike the other scripts as it doesn't perform any loading
+ * and is serialised the same every time
+ */
+export class sc_script_script {
+  constructor() {}
+
+  /**
+   * Writes a standard startup script
+   */
+  save() {
+    let output =
+      "local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')\n" +
+      "function OnPopulate()\n"                                          +
+      " ScenarioUtils.InitializeArmies()\n"                              +
+      "end\n"                                                            +
+      "\n"                                                               +
+      "function OnStart(self)\n"
+      "end\n";
+
+      return ByteBuffer.wrap(output, ByteBuffer.LITTLE_ENDIAN);
+  }
+
+  /**
+   * Does nothing - present for consistency
+   */
+  create(map_args) {}
+}
