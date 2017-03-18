@@ -24,6 +24,7 @@
     "bootstrap": "^3.3.6",
     "bytebuffer": "^5.0.1",
     "gl-matrix": "^2.3.2",
+    "hamsterjs": "^1.1.2",
     "sinon": "^1.17.6",
     "underscore": "^1.8.3"
   }
