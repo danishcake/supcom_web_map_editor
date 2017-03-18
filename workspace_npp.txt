@@ -101,5 +101,6 @@
     </Project>
     <Project name="root">
         <File name="Gruntfile.js" />
+        <File name="package.json" />
     </Project>
 </NotepadPlus>
