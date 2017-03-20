@@ -11,6 +11,7 @@
 const ByteBuffer = require('bytebuffer');
 const Lua5_1 = require('../thirdparty/lua5.1.5.min').Lua5_1;
 const lua = Lua5_1.C;
+const _ = require('underscore');
 
 /**
  * Base script class
@@ -119,9 +120,8 @@ export class sc_script_base {
 
     // Push the remaining elements onto the stack
     for (let i = 0 ; i < remaining_elements.length; i++){
-
       if (!lua.lua_istable(this.__lua_state, -1)) {
-        throw new Error(`Expected a table at the top of the stack but found ${lua.lua_typename(this.__lua_state, lua.lua_type(this.__lua_state, -1))}. Path was ${path_elements.slice(0, i)}`);
+        throw new Error(`Expected a table at the top of the stack but found ${lua.lua_typename(this.__lua_state, lua.lua_type(this.__lua_state, -1))}. Path was ${first_element}.${path_elements.slice(0, i)}`);
       }
 
       lua.lua_getfield(this.__lua_state, -1, remaining_elements[i]);
@@ -159,10 +159,21 @@ export class sc_script_base {
 
       lua.lua_pushnil(this.__lua_state);
       while (lua.lua_next(this.__lua_state, -2)) {
-        if (!lua.lua_type(this.__lua_state, -2) == lua.LUA_TTABLE) {
+        // Stack now has -3: table
+        //               -2: key
+        //               -1: value
+        // While Lua is rather forgiving in what can be a key in a table (hint: anything)
+        // I'm only going to support numbers and strings
+        let key = null;
+        if (lua.lua_type(this.__lua_state, -2) === lua.LUA_TSTRING) {
+          key = lua.lua_tostring(this.__lua_state, -2);
+        } else if (lua.lua_type(this.__lua_state, -2) === lua.LUA_TNUMBER) {
+          key = lua.lua_tonumber(this.__lua_state, -2);
+        } else {
+          console.log(`Not key is not a string or a number`);
           throw new Error(`Table key must be a string but found ${lua.lua_typename(this.__lua_state, lua.lua_type(this.__lua_state, -2))}`);
         }
-        let key = lua.lua_tostring(this.__lua_state, -2);
+
         ret[key] = this.convert_top_of_stack();
 
         // Pop value, leave key for next iteration
@@ -181,6 +192,8 @@ export class sc_script_base {
 /**
  * Scenario script class
  * Loads and parses a map _scenario.lua file
+ * Limitation: Only the first configuration listed will be used
+ * Limitation: No rush offsets are ignored and will be written as zero
  */
 export class sc_script_scenario extends sc_script_base {
   constructor() {
@@ -190,6 +203,8 @@ export class sc_script_scenario extends sc_script_base {
     this.__map_filename = undefined;
     this.__save_filename = undefined;
     this.__script_filename = undefined;
+    this.__armies = [];
+    this.__map_size = [undefined, undefined];
   }
 
   get name() { return this.__name; }
@@ -197,6 +212,8 @@ export class sc_script_scenario extends sc_script_base {
   get map_filename() { return this.__map_filename; }
   get save_filename() { return this.__save_filename; }
   get script_filename() { return this.__script_filename; }
+  get armies() { return this.__armies; }
+  get map_size() { return this.__map_size; }
 
   /**
    * Executes input as a Lua script and extracts scenario fields
@@ -211,6 +228,22 @@ export class sc_script_scenario extends sc_script_base {
     let map_filename = this.query_global("ScenarioInfo.map");
     let save_filename = this.query_global("ScenarioInfo.save");
     let script_filename = this.query_global("ScenarioInfo.script");
+    let army_configurations = this.query_global("ScenarioInfo.Configurations");
+    let map_size = this.query_global("ScenarioInfo.size");
+
+    if (Object.keys(army_configurations).length != 1) {
+      console.log(`Only a single army configuration is supported, the first will be used`);
+    }
+
+    let army_configuration = army_configurations[Object.keys(army_configurations)[0]];
+    let teams = army_configuration.teams;
+
+    if (Object.keys(teams).length != 1) {
+      console.log(`Only a single team is supported, the first will be used`);
+    }
+
+    let team = teams[Object.keys(teams)[0]];
+    let armies = _.values(team.armies);
 
     // Record fields
     this.__name = name;
@@ -218,12 +251,113 @@ export class sc_script_scenario extends sc_script_base {
     this.__map_filename = map_filename;
     this.__save_filename = save_filename;
     this.__script_filename = script_filename;
-
-    // TODO: Map size and forces
+    this.__armies = armies;
+    this.__map_size = [map_size[1], map_size[2]];
   }
 
-  save(output) {}
-  create(script_args) {}
+  save() {
+    /** We're aiming for this:
+     *
+     * version = 3
+     * ScenarioInfo = {
+     *     name = 'Shuriken Valley',
+     *     description = 'Ai Markers. By Claimer9',
+     *     type = 'skirmish',
+     *     starts = true,
+     *     preview = '',
+     *     size = {256, 256},
+     *     map = '/maps/Shuriken_Valley/Shuriken_Valley.scmap',
+     *     save = '/maps/Shuriken_Valley/Shuriken_Valley_save.lua',
+     *     script = '/maps/Shuriken_Valley/Shuriken_Valley_script.lua',
+     *     norushradius = 0.000000,
+     *     norushoffsetX_ARMY_1 = 0.000000,
+     *     norushoffsetY_ARMY_1 = 0.000000,
+     *     norushoffsetX_ARMY_2 = 0.000000,
+     *     norushoffsetY_ARMY_2 = 0.000000,
+     *     Configurations = {
+     *         ['standard'] = {
+     *             teams = {
+     *                 { name = 'FFA', armies = {'ARMY_1','ARMY_2',} },
+     *             },
+     *             customprops = {
+     *             },
+     *         },
+     *     }
+     * }
+     */
+
+    let output =
+      `version = 3\n`                                                               +
+      `ScenarioInfo = {\n`                                                          +
+      `    name                 = '${this.__name}',\n`                              +
+      `    description          = '${this.__description}',\n`                       +
+      `    type                 = 'skirmish',\n`                                    +
+      `    starts               = true,\n`                                          +
+      `    preview              = '',\n`                                            +
+      `    size                 = {${this.__map_size[0]},${this.__map_size[1]}},\n` +
+      `    map                  = '${this.__map_filename}',\n`                      +
+      `    save                 = '${this.__save_filename}',\n`                     +
+      `    script               = '${this.__script_filename}',\n`                   +
+      `    norushradius         = 0.0,\n`;
+
+    // Add armies norushoffsets
+    for (let i = 0; i < this.__armies.length; i++) {
+      output = output +
+        `    norushoffsetX_ARMY_${i + 1} = 0.0,\n` +
+        `    norushoffsetY_ARMY_${i + 1} = 0.0,\n`;
+    }
+
+      // Add the army configuration
+    output = output                         +
+      `    Configurations = {\n`            +
+      `        ['standard'] = {\n`          +
+      `            teams = {\n`             +
+      `                {\n`                 +
+      `                    name = 'FFA',\n` +
+      `                    armies = {`;
+
+    for (let i = 0; i < this.__armies.length; i++) {
+      output = output +
+        `'ARMY_${i + 1}', `;
+    }
+
+    output = output + `}\n`           +
+      `                },\n`          +
+      `            },\n`              +
+      `            customprops = {\n` +
+      `            }\n`               +
+      `        }\n`                   +
+      `    }\n`                       +
+      `}\n`;
+
+    return ByteBuffer.wrap(output, ByteBuffer.LITTLE_ENDIAN);
+  }
+
+
+  /**
+   * Creates a new scenario script.
+   * @param script_args {Object}
+   * At a minimum map_args must contain the size field.
+   * {
+   *   name: "Name of map",               // Used to determine filenames
+   *   author: "Name of author",
+   *   description: "Description of map",
+   *   size: integer,                     // Not used by script serialisation
+   *   default_height: Uint16             // Not used by script serialisation
+   * }
+   */
+  create(map_args) {
+    const filename_stem = map_args.name.replace(' ', '_').toLowerCase();
+
+    this.__name = map_args.name;
+    this.__description = map_args.description;
+    this.__map_filename = `${filename_stem}.scmap`;
+    this.__save_filename = `${filename_stem}_save.lua`;
+    this.__script_filename = `${filename_stem}_script.lua`;
+
+    const map_scale = Math.pow(2, map_args.size);
+    this.__map_size = [map_scale * 256, map_scale * 256];
+  }
 }
 
 /**
@@ -242,25 +376,85 @@ export class sc_script_scenario extends sc_script_base {
  */
 class sc_script_marker {
   constructor() {
+    this.__name = undefined;
+    this.__color = undefined;
     this.__type = undefined;
     this.__orientation = undefined;
     this.__position = undefined;
+    this.__prop = undefined;
+    this.__resource = undefined;
+    this.__amount = undefined;
+    this.__editorIcon = undefined;
+    this.__size = undefined;
+    this.__hint = undefined;
   }
 
+  get name() { return this.__name; }
+  get color() { return this.__color; }
   get type() { return this.__type; }
   get orientation() { return this.__orientation; }
   get position() { return this.__position; }
+  get prop() { return this.__prop; }
+  get resource() { return this.__resource; }
+  get amount() { return this.__amount; }
+  get editorIcon() { return this.__editorIcon; }
+  get size() { return this.__size; }
+  get hint() { return this.__hint; }
 
   load(name, input) {
     // Load the common fields
     this.__name = name;
+    this.__color = input.color;
     this.__type = input.type;
     this.__orientation = input.orientation;
     this.__position = input.position;
+    this.__prop = input.prop;
 
-    // TODO: Load the type specific fields
+    // Load uncommon fields
+    // I can't just load all keys as I would lose type information, so instead I'm going to labouriously curate the
+    // possible attributes
+    // If these are not present then the corresponding getter will return undefined
+    // If this gets unweildy I can probably hack some sort of data driven solution together
+    this.__resource = input.resource;     // bool
+    this.__amount = input.amount;         // float
+    this.__editorIcon = input.editorIcon; // string
+    this.__size = input.size;             // float
+    this.__hint = input.hint;             // bool
   }
-  save(output) {}
+
+  save() {
+    // Save common fields
+    let output =
+    `        ['${this.__name}'] ={\n`                                                                                     +
+    `          ['color'] = STRING( '${this.__color}' ),\n`                                                                +
+    `          ['type'] = STRING( '${this.__type}' ),\n`                                                                  +
+    `          ['orientation'] = VECTOR3( ${this.__orientation.x}, ${this.__orientation.y}, ${this.__orientation.z} ),\n` +
+    `          ['position'] = VECTOR3( ${this.__position.x}, ${this.__position.y}, ${this.__position.z} ),\n`             +
+    `          ['prop'] = STRING( '${this.__prop}' ),\n`;
+
+    // Save uncommon fields
+    if (this.__resource !== undefined) {
+      output = output + `          ['resource'] = BOOLEAN( ${this.__resource ? 'true' : 'false'} ),\n`;
+    }
+    if (this.__amount !== undefined) {
+      output = output + `          ['amount'] = FLOAT( ${this.__amount} ),\n`;
+    }
+    if (this.__editorIcon !== undefined) {
+      output = output + `          ['editorIcon'] = STRING( '${this.__editorIcon}' ),\n`;
+    }
+    if (this.__size !== undefined) {
+      output = output + `          ['size'] = FLOAT( ${this.__size} ),\n`;
+    }
+    if (this.__hint !== undefined) {
+      output = output + `          ['hint'] = BOOLEAN( ${this.__hint ? 'true' : 'false'} ),\n`;
+    }
+
+    output = output +
+    `        },\n`;
+
+    return output;
+  }
+
   create(script_args) {}
 }
 
@@ -311,7 +505,62 @@ export class sc_script_save extends sc_script_base {
     this.__markers = markers;
   }
 
-  save(output) {}
-  create(script_args) {}
+  save() {
+    let output =
+    `Scenario = {\n`            +
+    `  MasterChain = {\n`       +
+    `    ['_MASTERCHAIN_'] = {\n` +
+    `      Markers = {\n`;
+
+    for (let marker_idx of Object.keys(this.__markers))
+    {
+      let marker = this.__markers[marker_idx];
+      output = output + marker.save();
+    }
+
+    output = output +
+    `      }\n` +
+    `    }\n`   +
+    `  }\n`     +
+    `}\n`;
+
+    console.log(`Saving script: ${output}`);
+
+    return ByteBuffer.wrap(output, ByteBuffer.LITTLE_ENDIAN);
+  }
+
+  /**
+   * Creates a map with no markers - effectively does nothing
+   */
+  create(map_args) {
+  }
 }
 
+/**
+ * Script 'script'. This is unlike the other scripts as it doesn't perform any loading
+ * and is serialised the same every time
+ */
+export class sc_script_script {
+  constructor() {}
+
+  /**
+   * Writes a standard startup script
+   */
+  save() {
+    let output =
+      "local ScenarioUtils = import('/lua/sim/ScenarioUtilities.lua')\n" +
+      "function OnPopulate()\n"                                          +
+      " ScenarioUtils.InitializeArmies()\n"                              +
+      "end\n"                                                            +
+      "\n"                                                               +
+      "function OnStart(self)\n"
+      "end\n";
+
+      return ByteBuffer.wrap(output, ByteBuffer.LITTLE_ENDIAN);
+  }
+
+  /**
+   * Does nothing - present for consistency
+   */
+  create(map_args) {}
+}

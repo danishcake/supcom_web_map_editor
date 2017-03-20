@@ -9,6 +9,7 @@
                     <File name="sc_map_edit_bin\src\controllers\dialogs\new-map.js" />
                     <File name="sc_map_edit_bin\src\controllers\dialogs\open-map.js" />
                     <File name="sc_map_edit_bin\src\controllers\dialogs\save-as.js" />
+                    <File name="sc_map_edit_bin\src\controllers\dialogs\save-progress.js" />
                 </Folder>
                 <File name="sc_map_edit_bin\src\controllers\editor-menu.js" />
                 <File name="sc_map_edit_bin\src\controllers\editor-view.js" />
@@ -35,6 +36,7 @@
                 <File name="sc_map_edit_bin\templates\dialogs\new-map.html" />
                 <File name="sc_map_edit_bin\templates\dialogs\open-map.html" />
                 <File name="sc_map_edit_bin\templates\dialogs\save-as.html" />
+                <File name="sc_map_edit_bin\templates\dialogs\save-progress.html" />
             </Folder>
             <File name="sc_map_edit_bin\templates\editor-menu.html" />
             <File name="sc_map_edit_bin\templates\editor-view.html" />
