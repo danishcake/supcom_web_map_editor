@@ -294,7 +294,7 @@ export class sc_script_scenario extends sc_script_base {
       `    type                 = 'skirmish',\n`                                    +
       `    starts               = true,\n`                                          +
       `    preview              = '',\n`                                            +
-      `    size                 = {${this.__map_size[0]},${this.__map_size[1]}},\n` + // TODO: This is wrong! Load/create it too
+      `    size                 = {${this.__map_size[0]},${this.__map_size[1]}},\n` +
       `    map                  = '${this.__map_filename}',\n`                      +
       `    save                 = '${this.__save_filename}',\n`                     +
       `    script               = '${this.__script_filename}',\n`                   +
@@ -420,7 +420,7 @@ class sc_script_marker {
     this.__editorIcon = input.editorIcon; // string
     this.__size = input.size;             // float
     this.__hint = input.hint;             // bool
-    }
+  }
 
   save() {
     // Save common fields
