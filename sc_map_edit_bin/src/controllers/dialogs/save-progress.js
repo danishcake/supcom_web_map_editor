@@ -6,49 +6,67 @@ angular.module('sc_map_edit_bin.controllers').controller("save-progress",
     progress_text: "",
     finished: false,
 
-    map:            data.map,
-    edit_heightmap: data.edit_heightmap
-    // TODO: Scripts
+    map:             data.map,
+    edit_heightmap:  data.edit_heightmap,
+    scripts:         data.scripts
   };
 
   // TBD: Do this in stages so I can refresh the UI?
   async.waterfall([
     (next) => {
-      $scope.data.progress_text = "Synchronising heightmap...";
+      $scope.data.progress_text = "Serialising scripts...";
       $scope.data.progress_value = "0";
       $timeout(() => { next(null); }, 50);
     },
     (next) => {
+      const serialised_scripts = {
+        scenario: $scope.data.scripts.scenario.save(),
+        save:     $scope.data.scripts.save.save()
+      };
+      $timeout(() => { next(null, serialised_scripts); }, 50);
+    },
+    (serialised_scripts, next) => {
+      $scope.data.progress_text = "Synchronising heightmap...";
+      $scope.data.progress_value = "0";
+      $timeout(() => { next(null, serialised_scripts); }, 50);
+    },
+    (serialised_scripts, next) => {
       $scope.data.edit_heightmap.export_to_heightmap($scope.data.map.heightmap);
-      $timeout(() => { next(null); }, 50);
+      $timeout(() => { next(null, serialised_scripts); }, 50);
     },
-    (next) => {
-      $scope.data.progress_text = "Serialising...";
+    (serialised_scripts, next) => {
+      $scope.data.progress_text = "Serialising scmap...";
       $scope.data.progress_value = "20";
-      $timeout(() => { next(null); }, 50);
+      $timeout(() => { next(null, serialised_scripts); }, 50);
     },
-    (next) => {
+    (serialised_scripts, next) => {
       let serialised_map = data.map.save();
-      $timeout(() => { next(null, serialised_map); }, 50);
+      $timeout(() => { next(null, serialised_scripts, serialised_map); }, 50);
     },
-    (serialised_map, next) => {
+    (serialised_scripts, serialised_map, next) => {
       $scope.data.progress_text = "Encoding...";
       $scope.data.progress_value = "90";
-      $timeout(() => { next(null, serialised_map); }, 50);
+      $timeout(() => { next(null, serialised_scripts, serialised_map); }, 50);
     },
-    (serialised_map, next) => {
+    (serialised_scripts, serialised_map, next) => {
       // Base64 encode
       let b64_serialised_map = serialised_map.toBase64();
-      $timeout(() => { next(null, b64_serialised_map); }, 50);
+      let b64_serialised_scripts = {
+        scenario: serialised_scripts.scenario.toBase64(),
+        save: serialised_scripts.save.toBase64()
+      };
+      $timeout(() => { next(null, b64_serialised_scripts, b64_serialised_map); }, 50);
     },
-    (b64_serialised_map, next) => {
+    (b64_serialised_scripts, b64_serialised_map, next) => {
       $scope.data.progress_text = "Writing...";
       $scope.data.progress_value = "95";
-      $timeout(() => { next(null, b64_serialised_map); }, 50);
+      $timeout(() => { next(null, b64_serialised_scripts, b64_serialised_map); }, 50);
     },
-    (b64_serialised_map, next) => {
+    (b64_serialised_scripts, b64_serialised_map, next) => {
       // Write to local storage
-      localStorage.setItem("sc_map_edit_bin.save.scmap", b64_serialised_map);
+      localStorage.setItem("sc_map_edit_bin.save.scenario", b64_serialised_scripts.scenario);
+      localStorage.setItem("sc_map_edit_bin.save.save",     b64_serialised_scripts.save);
+      localStorage.setItem("sc_map_edit_bin.save.scmap",    b64_serialised_map);
       $timeout(() => { next(); }, 100);
     }
   ],
