@@ -121,7 +121,7 @@ export class sc_script_base {
     // Push the remaining elements onto the stack
     for (let i = 0 ; i < remaining_elements.length; i++){
       if (!lua.lua_istable(this.__lua_state, -1)) {
-        throw new Error(`Expected a table at the top of the stack but found ${lua.lua_typename(this.__lua_state, lua.lua_type(this.__lua_state, -1))}. Path was ${path_elements.slice(0, i)}`);
+        throw new Error(`Expected a table at the top of the stack but found ${lua.lua_typename(this.__lua_state, lua.lua_type(this.__lua_state, -1))}. Path was ${first_element}.${path_elements.slice(0, i)}`);
       }
 
       lua.lua_getfield(this.__lua_state, -1, remaining_elements[i]);
@@ -376,25 +376,46 @@ export class sc_script_scenario extends sc_script_base {
  */
 class sc_script_marker {
   constructor() {
+    this.__name = undefined;
+    this.__color = undefined;
     this.__type = undefined;
     this.__orientation = undefined;
     this.__position = undefined;
+    this.__prop = undefined;
   }
 
+  get name() { return this.__name; }
+  get color() { return this.__color; }
   get type() { return this.__type; }
   get orientation() { return this.__orientation; }
   get position() { return this.__position; }
+  get prop() { return this.__prop; }
 
   load(name, input) {
     // Load the common fields
     this.__name = name;
+    this.__color = input.color;
     this.__type = input.type;
     this.__orientation = input.orientation;
     this.__position = input.position;
+    this.__prop = input.prop;
 
     // TODO: Load the type specific fields
   }
-  save(output) {}
+
+  save() {
+    let output =
+    `        ['${this.__name}'] ={\n`                                                                                     +
+    `          ['color'] = STRING( '${this.__color}' ),\n`                                                                +
+    `          ['type'] = STRING( '${this.__type}' ),\n`                                                                  +
+    `          ['orientation'] = VECTOR3( ${this.__orientation.x}, ${this.__orientation.y}, ${this.__orientation.z} ),\n` +
+    `          ['position'] = VECTOR3( ${this.__position.x}, ${this.__position.y}, ${this.__position.z} ),\n`             +
+    `          ['prop'] = STRING( '${this.__prop}' ),\n`                                                                  +
+    `        },\n`;
+    // TODO: Save the type specific fields
+
+    return output;
+  }
 
   create(script_args) {}
 }
@@ -447,8 +468,27 @@ export class sc_script_save extends sc_script_base {
   }
 
   save() {
-    let output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
-    return output.flip().compact();
+    let output =
+    `Scenario = {\n`            +
+    `  MasterChain = {\n`       +
+    `    ['_MASTERCHAIN_'] = {\n` +
+    `      Markers = {\n`;
+
+    for (let marker_idx of Object.keys(this.__markers))
+    {
+      let marker = this.__markers[marker_idx];
+      output = output + marker.save();
+    }
+
+    output = output +
+    `      }\n` +
+    `    }\n`   +
+    `  }\n`     +
+    `}\n`;
+
+    console.log(`Saving script: ${output}`);
+
+    return ByteBuffer.wrap(output, ByteBuffer.LITTLE_ENDIAN);
   }
 
   /**
