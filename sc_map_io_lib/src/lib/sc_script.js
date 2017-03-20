@@ -382,6 +382,11 @@ class sc_script_marker {
     this.__orientation = undefined;
     this.__position = undefined;
     this.__prop = undefined;
+    this.__resource = undefined;
+    this.__amount = undefined;
+    this.__editorIcon = undefined;
+    this.__size = undefined;
+    this.__hint = undefined;
   }
 
   get name() { return this.__name; }
@@ -390,6 +395,11 @@ class sc_script_marker {
   get orientation() { return this.__orientation; }
   get position() { return this.__position; }
   get prop() { return this.__prop; }
+  get resource() { return this.__resource; }
+  get amount() { return this.__amount; }
+  get editorIcon() { return this.__editorIcon; }
+  get size() { return this.__size; }
+  get hint() { return this.__hint; }
 
   load(name, input) {
     // Load the common fields
@@ -400,19 +410,47 @@ class sc_script_marker {
     this.__position = input.position;
     this.__prop = input.prop;
 
-    // TODO: Load the type specific fields
-  }
+    // Load uncommon fields
+    // I can't just load all keys as I would lose type information, so instead I'm going to labouriously curate the
+    // possible attributes
+    // If these are not present then the corresponding getter will return undefined
+    // If this gets unweildy I can probably hack some sort of data driven solution together
+    this.__resource = input.resource;     // bool
+    this.__amount = input.amount;         // float
+    this.__editorIcon = input.editorIcon; // string
+    this.__size = input.size;             // float
+    this.__hint = input.hint;             // bool
+    }
 
   save() {
+    // Save common fields
     let output =
     `        ['${this.__name}'] ={\n`                                                                                     +
     `          ['color'] = STRING( '${this.__color}' ),\n`                                                                +
     `          ['type'] = STRING( '${this.__type}' ),\n`                                                                  +
     `          ['orientation'] = VECTOR3( ${this.__orientation.x}, ${this.__orientation.y}, ${this.__orientation.z} ),\n` +
     `          ['position'] = VECTOR3( ${this.__position.x}, ${this.__position.y}, ${this.__position.z} ),\n`             +
-    `          ['prop'] = STRING( '${this.__prop}' ),\n`                                                                  +
+    `          ['prop'] = STRING( '${this.__prop}' ),\n`;
+
+    // Save uncommon fields
+    if (this.__resource !== undefined) {
+      output = output + `          ['resource'] = BOOLEAN( ${this.__resource ? 'true' : 'false'} ),\n`;
+    }
+    if (this.__amount !== undefined) {
+      output = output + `          ['amount'] = FLOAT( ${this.__amount} ),\n`;
+    }
+    if (this.__editorIcon !== undefined) {
+      output = output + `          ['editorIcon'] = STRING( '${this.__editorIcon}' ),\n`;
+    }
+    if (this.__size !== undefined) {
+      output = output + `          ['size'] = FLOAT( ${this.__size} ),\n`;
+    }
+    if (this.__hint !== undefined) {
+      output = output + `          ['hint'] = BOOLEAN( ${this.__hint ? 'true' : 'false'} ),\n`;
+    }
+
+    output = output +
     `        },\n`;
-    // TODO: Save the type specific fields
 
     return output;
   }

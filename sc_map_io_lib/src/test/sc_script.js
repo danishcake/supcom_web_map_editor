@@ -122,11 +122,10 @@ describe('sc_script', function() {
     describe('loading', function() {
       let save_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley/Shuriken_Valley_save.lua");
       let save_data_bb = ByteBuffer.wrap(save_data, ByteBuffer.LITTLE_ENDIAN);
+      let save_script = new sc.script.save();
+      save_script.load(save_data_bb);
 
       it('should load markers', function() {
-        let save_script = new sc.script.save();
-        save_script.load(save_data_bb);
-
         assert.closeTo(35.5000, save_script.markers['ARMY_1'].position.x, 0.00001);
         assert.closeTo(75.9766, save_script.markers['ARMY_1'].position.y, 0.00001);
         assert.closeTo(154.500, save_script.markers['ARMY_1'].position.z, 0.00001);
@@ -136,6 +135,13 @@ describe('sc_script', function() {
         assert.closeTo(95.5000, save_script.markers['ARMY_2'].position.z, 0.00001);
 
         assert.isTrue(save_script.markers['ARMY_3'] === undefined);
+      });
+
+      it('should load all marker attributes', function() {
+        assert.equal(true,                               save_script.markers['Mass 00'].resource);
+        assert.closeTo(100.0,                            save_script.markers['Mass 00'].amount, 0.00001);
+        assert.equal('/textures/editor/marker_mass.bmp', save_script.markers['Mass 00'].editorIcon);
+        assert.closeTo(1.0,                              save_script.markers['Mass 00'].size, 0.00001);
       });
 
       // TODO: Do I actually need to worry about this?
@@ -178,6 +184,13 @@ describe('sc_script', function() {
         assert.closeTo(95.5000, save_script_roundtrip.markers['ARMY_2'].position.z, 0.00001);
 
         assert.isTrue(save_script_roundtrip.markers['ARMY_3'] === undefined);
+      });
+
+      it ('should persist all marker attributes', function() {
+        assert.equal(true,                               save_script_roundtrip.markers['Mass 00'].resource);
+        assert.closeTo(100.0,                            save_script_roundtrip.markers['Mass 00'].amount, 0.00001);
+        assert.equal('/textures/editor/marker_mass.bmp', save_script_roundtrip.markers['Mass 00'].editorIcon);
+        assert.closeTo(1.0,                              save_script_roundtrip.markers['Mass 00'].size, 0.00001);
       });
     });
   });
