@@ -524,8 +524,6 @@ export class sc_script_save extends sc_script_base {
     `  }\n`     +
     `}\n`;
 
-    console.log(`Saving script: ${output}`);
-
     return ByteBuffer.wrap(output, ByteBuffer.LITTLE_ENDIAN);
   }
 

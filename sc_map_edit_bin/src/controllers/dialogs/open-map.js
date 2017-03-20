@@ -44,10 +44,21 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
       const scmap = new sc_map_io_lib.sc.map();
       scmap.load(serialised_scmap);
 
+      const b64_serialised_script_scenario = localStorage.getItem("sc_map_edit_bin.save.scenario");
+      const serialised_script_scenario = dcodeIO.ByteBuffer.wrap(b64_serialised_script_scenario, "base64", dcodeIO.ByteBuffer.LITTLE_ENDIAN);
+      const script_scenario = new sc_map_io_lib.sc.script.scenario();
+      script_scenario.load(serialised_script_scenario);
+
+      const b64_serialised_script_save = localStorage.getItem("sc_map_edit_bin.save.save");
+      const serialised_script_save = dcodeIO.ByteBuffer.wrap(b64_serialised_script_save, "base64", dcodeIO.ByteBuffer.LITTLE_ENDIAN);
+      const script_save = new sc_map_io_lib.sc.script.save();
+      script_save.load(serialised_script_save);
+
       // Sucessfully loaded .scmap
       $scope.data.map.scmap = scmap;
+      $scope.data.map.scripts.scenario = script_scenario;
+      $scope.data.map.scripts.save = script_save;
       $scope.data.map.save_location = "localstorage";
-      // TODO: Load scripts
 
       $uibModalInstance.close($scope.data.map);
     } catch(error) {

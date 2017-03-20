@@ -48,7 +48,8 @@ angular.module('sc_map_edit_bin.controllers').controller("save-as",
                    "save-progress",
                    {
                      map: editor_state.map,
-                     edit_heightmap: editor_state.edit_heightmap
+                     edit_heightmap: editor_state.edit_heightmap,
+                     scripts: editor_state.scripts
                    },
                    modal_dlg_opts);
   };
