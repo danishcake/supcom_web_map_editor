@@ -9,15 +9,13 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
     {
       scenario_set: false,
       save_set: false,
-      script_set: false,
       scmap_set: false,
       all_set: false
     },
     map: {
       scripts: {
         scenario: null,
-        save: null,
-        script: null
+        save: null
       },
       scmap: null
     },
@@ -27,7 +25,6 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
   $scope.update_validity = function() {
     $scope.data.validity.all_set = $scope.data.validity.scenario_set &&
                                    $scope.data.validity.save_set &&
-                                   $scope.data.validity.script_set &&
                                    $scope.data.validity.scmap_set;
   };
 
@@ -105,11 +102,6 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
     } catch(error) {
       dialogs.error('Error parsing _save.lua', error.message);
     }
-  };
-
-  $scope.open_script = function(script_buffer) {
-    $scope.data.validity.script_set = true;
-    $scope.update_validity();
   };
 
   $scope.open_scmap = function(scmap_buffer) {
