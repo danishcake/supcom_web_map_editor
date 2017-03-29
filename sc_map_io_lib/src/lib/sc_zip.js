@@ -1,6 +1,6 @@
 const JSZip = require("jszip");
 const ByteBuffer = require('bytebuffer');
-const _ = require("underscore");
+const _ = require('underscore');
 import {sc_script_scenario, sc_script_save} from "./sc_script"
 import {sc_map} from "./sc_map"
 
@@ -94,5 +94,28 @@ export const sc_zip = {
         }
       };
     });
+  },
+
+
+  save: function(map_data) {
+    // All the paths apart from _scenario.lua are explicitly extractable from the scenario file
+    const map_path = map_data.scripts.scenario.map_filename.split('/').slice(-2).join('/');
+    const script_path = map_data.scripts.scenario.script_filename.split('/').slice(-2).join('/');
+    const save_path = map_data.scripts.scenario.save_filename.split('/').slice(-2).join('/');
+
+    // The _scenario.lua path must be built
+    const scenario_path = `${map_path.split('.scmap')[0]}_scenario.lua`;
+
+    const map_bb = map_data.map.save();
+    const script_bb = map_data.scripts.script.save();
+    const save_bb = map_data.scripts.save.save();
+    const scenario_bb = map_data.scripts.scenario.save();
+
+    let zip = new JSZip();
+    zip.file(map_path, map_bb.buffer);
+    zip.file(script_path, script_bb.buffer);
+    zip.file(save_path, save_bb.buffer);
+    zip.file(scenario_path, scenario_bb.buffer);
+    return zip.generateAsync({compresion: 'DEFLATE', type: 'arraybuffer'});
   }
 };

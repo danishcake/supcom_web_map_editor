@@ -81,9 +81,9 @@ describe('sc_script', function() {
       it('should derive filenames from map name', function() {
         assert.equal(script.name,            "Awesome Volcano");
         assert.equal(script.description,     "Description of map");
-        assert.equal(script.map_filename,    "awesome_volcano.scmap");
-        assert.equal(script.save_filename,   "awesome_volcano_save.lua");
-        assert.equal(script.script_filename, "awesome_volcano_script.lua");
+        assert.equal(script.map_filename,    "/maps/Awesome_Volcano/Awesome_Volcano.scmap");
+        assert.equal(script.save_filename,   "/maps/Awesome_Volcano/Awesome_Volcano_save.lua");
+        assert.equal(script.script_filename, "/maps/Awesome_Volcano/Awesome_Volcano_script.lua");
       });
 
       it ('should set map size', function() {

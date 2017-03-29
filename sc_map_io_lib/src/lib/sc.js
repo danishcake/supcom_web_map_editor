@@ -11,7 +11,8 @@ var sc = {
     save: sc_script_save,
     script: sc_script_script
   },
-  edit: sc_edit
+  edit: sc_edit,
+  zip: sc_zip
 };
 
 export { sc }
