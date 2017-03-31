@@ -64,7 +64,18 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
   }
 
   $scope.load_archive = function(archive_buffer) {
-    // TODO: Extract the individual buffers from the archive
+    sc_map_io_lib.sc.zip.load(archive_buffer)
+    .then((map) => {
+      $scope.data.map.scmap = map.scmap;
+      $scope.data.map.scripts.scenario = map.scripts.scenario;
+      $scope.data.map.scripts.save = map.scripts.save;
+      $scope.data.map.save_location = "zipfile";
+
+      $uibModalInstance.close($scope.data.map);
+    })
+    .catch((error) => {
+      dialogs.error('Error loading map from zipfile', error.message);
+    });
   };
 
   $scope.load_individual_files = function() {
