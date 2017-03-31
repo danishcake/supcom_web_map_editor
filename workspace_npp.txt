@@ -98,6 +98,7 @@
                 <File name="sc_map_io_lib\src\test\sc_edit_view_methods.js" />
                 <File name="sc_map_io_lib\src\test\sc_edit_tool_flatten.js" />
                 <File name="sc_map_io_lib\src\test\sc_edit_tool_smooth.js" />
+                <File name="sc_map_io_lib\src\test\sc_zip.js" />
             </Folder>
         </Folder>
     </Project>

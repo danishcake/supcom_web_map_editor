@@ -347,7 +347,7 @@ export class sc_script_scenario extends sc_script_base {
    * }
    */
   create(map_args) {
-    const filename_stem = map_args.name.replace(' ', '_').toLowerCase();
+    const filename_stem = `/maps/${map_args.name.replace(' ', '_')}/${map_args.name.replace(' ', '_')}`;
 
     this.__name = map_args.name;
     this.__description = map_args.description;
