@@ -28,6 +28,7 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
         dialogs.create("templates/dialogs/save-progress.html",
                        "save-progress",
                        {
+                         dest: editor_state.get_save_location(),
                          map: editor_state.map,
                          edit_heightmap: editor_state.edit_heightmap,
                          scripts: editor_state.scripts

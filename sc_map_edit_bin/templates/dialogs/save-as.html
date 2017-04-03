@@ -8,25 +8,14 @@
     <div class="col-lg-4">Location</div>
     <div class="col-lg-8">
       <div class="btn-group">
-        <label class="btn btn-default" ng-model="data.mode" ng-change="mode_change()" uib-btn-radio="0">Browser localstorage</label>
-        <label class="btn btn-default" ng-model="data.mode" ng-change="mode_change()" uib-btn-radio="1">Zip file</label>
-      </div>
-    </div>
-  </div>
-  <div class="row" ng-show="data.mode === 1">
-    <div class="col-lg-4"><h6>Location</h6></div>
-    <div class="col-lg-8">
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Zip file">
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="button">Browse</button>
-        </span>
+        <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="0">Browser localstorage</label>
+        <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="1">Zip file</label>
       </div>
     </div>
   </div>
 </div>
 
 <div class="modal-footer">
-  <span class="pull-left" ng-show="data.mode === 0">Remember that localstorage is can be cleared by your browser if you clear private data</span>
-  <button type="button" class="btn btn-default pull-right" ng-click="ok()" ng-disabled="!validity.all">OK</button>
+  <span class="pull-left" ng-show="data.mode === 0">Remember that localstorage is deleted if you clear private browsing data</span>
+  <button type="button" class="btn btn-default pull-right" ng-click="ok()">OK</button>
 </div>
