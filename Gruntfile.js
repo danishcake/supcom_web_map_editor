@@ -1,6 +1,8 @@
 /*jslint node: true, indent: 2*/
 'use strict';
 
+
+
 module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-browserify');
@@ -10,6 +12,12 @@ module.exports = function (grunt) {
 
   // Define the configuration for all the tasks
   grunt.initConfig({
+    // Standard path locations
+    paths: {
+      npm_src: 'node_modules',
+      npm_dst: 'sc_map_edit_bin',
+    },
+
     // Configure a mochaTest task
     mochaTest: {
       test_io_lib: {
@@ -79,12 +87,34 @@ module.exports = function (grunt) {
         src: ['**.js'],
         dest: 'sc_map_edit_bin/lib/io_lib',
         ext: '.js'
+      },
+      /**
+       * These should match the items included in index.html
+       */
+      deploy_nodemodules: {
+        expand: true,
+        src: [
+          '<%= paths.npm_src %>/bootstrap/dist/**',
+          '<%= paths.npm_src %>/angular/angular.js',
+          '<%= paths.npm_src %>/angular-sanitize/angular-sanitize.js',
+          '<%= paths.npm_src %>/angular-dialog-service/dist/**',
+          '<%= paths.npm_src %>/angular-ui-bootstrap/dist/**',
+          '<%= paths.npm_src %>/file-saver/FileSaver.js',
+          '<%= paths.npm_src %>/hamsterjs/hamster.js',
+          '<%= paths.npm_src %>/angular-mousewheel/mousewheel.js',
+          '<%= paths.npm_src %>/bytebuffer/dist/**',
+          '<%= paths.npm_src %>/gl-matrix/dist/gl-matrix-min.js',
+          '<%= paths.npm_src %>/async/dist/**',
+          '<%= paths.npm_src %>/underscore/underscore.js'
+        ],
+        dest: '<%= paths.npm_dst %>'
       }
     }
   });
 
   grunt.registerTask('build_edit_bin', [
     'babel:dist_edit_bin',
+    'copy:deploy_nodemodules'
   ]);
 
   grunt.registerTask('build_io_lib', [
