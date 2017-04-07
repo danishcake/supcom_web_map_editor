@@ -41,7 +41,7 @@
   <script src="lib/io_lib/sc_map.js"></script>
 
   <!-- Shaders related to rendering terrain -->
-  <script id="vs-terrain-greyscale" type="x-shader/x-fragment">
+  <script id="vs-terrain-greyscale" type="x-shader/x-vertex">
     precision highp float;
     attribute vec3 aVertexPosition;
     varying highp float vHeight;
@@ -63,11 +63,34 @@
   </script>
 
 
-  <script id="fs-terrain-greyscale" type="x-shader/x-vertex">
+  <script id="fs-terrain-greyscale" type="x-shader/x-fragment">
     precision mediump float;
     varying highp float vHeight;
     void main(void) {
         gl_FragColor = vec4(vHeight, vHeight, vHeight, 1.0);
+    }
+  </script>
+
+  <script id="vs-marker" type="x-shader/x-vertex">
+    precision highp float;
+    varying vec2 vTextureCoordinate;
+    attribute vec3 aVertexPosition;
+    attribute vec2 aTextureCoordinate;
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+
+    void main(void) {
+      gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+      vTextureCoordinate = aTextureCoordinate;
+    }
+  </script>
+
+  <script id="fs-marker" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec2 vTextureCoordinate;
+    uniform highp sampler2D uMarkerTexture;
+    void main(void) {
+        gl_FragColor = texture2D(uMarkerTexture, vTextureCoordinate);
     }
   </script>
 </html>
