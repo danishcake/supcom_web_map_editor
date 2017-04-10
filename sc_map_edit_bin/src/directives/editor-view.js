@@ -28,6 +28,26 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     scope.scene.heightmap.update();
     scope.scene.heightmap.draw(scope.terrainShader, scope.camera);
 
+    // Draw the markers
+    // Clear the depth buffers only
+    gl.clear(gl.DEPTH_BUFFER_BIT);
+    const markers = editor_state.scripts.save.markers;
+    for (let marker_id of Object.keys(markers)) {
+      const marker = markers[marker_id];
+      switch (marker.type) {
+        case "Mass":
+          scope.scene.markers.mass.draw(scope.markerShader, scope.camera, marker.position);
+          break;
+        case "Hydrocarbon":
+          scope.scene.markers.energy.draw(scope.markerShader, scope.camera, marker.position);
+          break;
+        default:
+          scope.scene.markers.unknown.draw(scope.markerShader, scope.camera, marker.position);
+          break;
+      }
+    }
+
+
     // Trigger next redraw in approximately 16ms (for 60Hz monitors)
     scope.scheduleRedraw();
   };
@@ -85,7 +105,12 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
    */
   let initialiseScene = function(scope) {
     scope.scene = {
-      heightmap: new webgl_heightmap(scope.gl, editor_state.edit_heightmap)
+      heightmap: new webgl_heightmap(scope.gl, editor_state.edit_heightmap),
+      markers: {
+        mass: new webgl_marker(scope.gl, scope.textures.mass),
+        energy: new webgl_marker(scope.gl, scope.textures.energy),
+        unknown: new webgl_marker(scope.gl, scope.textures.unknown)
+      }
     };
   }
 
@@ -118,7 +143,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
 
         // Create the terrain shader
         scope.terrainShader = webgl_effect.create_from_dom(gl, "vs-terrain-greyscale", "fs-terrain-greyscale");
-
+        scope.markerShader = webgl_effect.create_from_dom(gl, "vs-marker", "fs-marker");
 
         // Save the context to scope
         scope.gl = gl;
@@ -151,10 +176,22 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
 
       // Setup texture parameters
       gl.bindTexture(gl.TEXTURE_2D, texture_id);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+
+      if ((img.width & (img.width - 1)) == 0) {
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.GL_NEAREST_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+        gl.generateMipmap(gl.TEXTURE_2D);
+      } else {
+        // NPOT texture
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      }
       gl.bindTexture(gl.TEXTURE_2D, null);
+
 
       // Store the texture
       scope.textures[name] = texture_id;

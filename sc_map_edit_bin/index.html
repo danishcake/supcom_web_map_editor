@@ -38,6 +38,7 @@
   <script src="dist/webgl/effect.js"></script>
   <script src="dist/webgl/camera.js"></script>
   <script src="dist/webgl/heightmap.js"></script>
+  <script src="dist/webgl/marker.js"></script>
   <script src="lib/io_lib/sc_map.js"></script>
 
   <!-- Shaders related to rendering terrain -->
@@ -45,7 +46,7 @@
     precision highp float;
     attribute vec3 aVertexPosition;
     varying highp float vHeight;
-    uniform mat4 uMVMatrix;
+    uniform mat4 uVMatrix;
     uniform mat4 uPMatrix;
     uniform vec2 uMapSize;
     uniform highp sampler2D uHeightmap;
@@ -57,7 +58,7 @@
         vec2 textureCoord = aVertexPosition.xy / uMapSize;
         highp float height = texture2D(uHeightmap, textureCoord).a;
         vec3 displacedPosition = aVertexPosition + vec3(0, 0, height * uHeightmapScale);
-        gl_Position = uPMatrix * uMVMatrix * vec4(displacedPosition, 1.0);
+        gl_Position = uPMatrix * uVMatrix * vec4(displacedPosition, 1.0);
         vHeight = (height - uShadeMin) / (uShadeMax - uShadeMin);
     }
   </script>
@@ -76,11 +77,12 @@
     varying vec2 vTextureCoordinate;
     attribute vec3 aVertexPosition;
     attribute vec2 aTextureCoordinate;
-    uniform mat4 uMVMatrix;
+    uniform mat4 uMMatrix;
+    uniform mat4 uVMatrix;
     uniform mat4 uPMatrix;
 
     void main(void) {
-      gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+      gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
       vTextureCoordinate = aTextureCoordinate;
     }
   </script>

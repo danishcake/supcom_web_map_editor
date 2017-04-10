@@ -16,14 +16,14 @@ class webgl_camera {
     this.__up_vector = vec3.fromValues(0, 1, 0);
     this.__zoom = 0;
     this.__steps = 128;
-    this.__model_view = mat4.create();
+    this.__view = mat4.create();
     this.__perspective = mat4.create();
 
     const nearest_length = 22.6;
     const farthest_length = this.__long_edge * 1.1 / 2.0;
     this.__camera_position[2] = nearest_length + (farthest_length - nearest_length) * this.__zoom;
 
-    // Calculate initial model_view/perspective matrices
+    // Calculate initial view/perspective matrices
     this.tick();
   }
 
@@ -32,17 +32,17 @@ class webgl_camera {
    * Updates matrices based on current focus, zoom etc
    */
   tick() {
-    mat4.lookAt(this.__model_view, this.__camera_position, this.__look_at, this.__up_vector);
+    mat4.lookAt(this.__view, this.__camera_position, this.__look_at, this.__up_vector);
     let aspect_ratio = this.__gl.drawingBufferWidth / this.__gl.drawingBufferHeight;
     mat4.perspective(this.__perspective, this.__fov, aspect_ratio, 0.0001, 8192);
   }
 
 
   /**
-   * Returns the current model-view matrix
+   * Returns the current view matrix
    */
-  get modelview() {
-    return this.__model_view;
+  get view() {
+    return this.__view;
   }
 
 
@@ -149,7 +149,7 @@ class webgl_camera {
   project_to_world(position_screen) {
     // Invert view-projection matrix
     let inverted_mvp = mat4.create();
-    mat4.mul(inverted_mvp, this.__perspective, this.__model_view);
+    mat4.mul(inverted_mvp, this.__perspective, this.__view);
     mat4.invert(inverted_mvp, inverted_mvp);
 
     // Express screen position in normalised screen space coordinates

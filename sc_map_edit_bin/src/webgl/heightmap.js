@@ -164,14 +164,14 @@ class webgl_heightmap {
     // vec3 aPosition;
 
     // We require the following uniforms:
-    // uniform mat4 uMVMatrix
+    // uniform mat4 uVMatrix
     // uniform mat4 uPMatrix
     // uniform vec2 uMapSize
     // sampler2D uHeightmap;
     // sampler2D uTexturemap0_3; // TODO: Add these in once I get simple case working
     // sampler2D uTexturemap4_7; // TODO: Add these in once I get simple case working
 
-    if (!effect.set_uniform_mat4("uMVMatrix", camera.modelview) ||
+    if (!effect.set_uniform_mat4("uVMatrix", camera.view) ||
         !effect.set_uniform_mat4("uPMatrix", camera.projection) ||
         !effect.set_uniform_vec2("uMapSize", this.__map_size)   ||
         !effect.set_uniform_sampler2d("uHeightmap", this.__height_texture) ||
@@ -199,7 +199,8 @@ class webgl_heightmap {
     gl.drawElements(gl.TRIANGLES, this.__element_count * 3, gl.UNSIGNED_INT, 0)
 
     // TBD: Unbind stuff?
-    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    // I think I only need to unbind the 'global' stuff. I can leave the effect specific stuff bound
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     // gl.vertexAttribPointer(effect.attributes.aVertexPosition.index, 3, gl.FLOAT, false, 0, 0);
     // gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }

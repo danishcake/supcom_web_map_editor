@@ -28,6 +28,7 @@
                 <File name="sc_map_edit_bin\src\webgl\camera.js" />
                 <File name="sc_map_edit_bin\src\webgl\effect.js" />
                 <File name="sc_map_edit_bin\src\webgl\heightmap.js" />
+                <File name="sc_map_edit_bin\src\webgl\marker.js" />
             </Folder>
             <File name="sc_map_edit_bin\src\app.js" />
         </Folder>
