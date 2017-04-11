@@ -178,6 +178,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       gl.bindTexture(gl.TEXTURE_2D, texture_id);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 
       if ((img.width & (img.width - 1)) == 0) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.GL_NEAREST_MIPMAP_LINEAR);
