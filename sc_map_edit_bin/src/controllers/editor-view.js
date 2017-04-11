@@ -21,7 +21,18 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
     // LMB held during move, start/apply a tool step
     if ((evt.buttons & 1) && editor_state.tool !== null) {
       const grid_position = [Math.round(world_position[0]), Math.round(world_position[1])];
-      editor_state.tool.apply(editor_state.edit_heightmap, grid_position);
+      editor_state.tool.apply(editor_state.edit_heightmap, editor_state.scripts.save, grid_position);
+    }
+  };
+
+
+  $scope.on_mousedown = function(evt) {
+    // LMB depressed, do tool first prep
+    if (evt.which == 1 && editor_state.tool !== null) {
+      let world_position = $scope.camera.project_to_world([evt.offsetX, evt.offsetY]);
+
+      const grid_position = [Math.round(world_position[0]), Math.round(world_position[1])];
+      editor_state.tool.start(editor_state.edit_heightmap, editor_state.scripts.save, grid_position);
     }
   };
 

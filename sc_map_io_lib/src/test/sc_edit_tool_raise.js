@@ -22,7 +22,7 @@ describe('sc_edit_tool_raise', function() {
     assert.equal(1000, this.hm.get_pixel([128, 128]));
 
     let tool = new sc_edit_tool_raise(16, 8, 10);
-    tool.apply(this.hm, [128, 128]);
+    tool.start(this.hm, null, [128, 128]);
     tool.end();
 
     // All pixels within radius 8 of centre will now be raised by 10
@@ -40,7 +40,7 @@ describe('sc_edit_tool_raise', function() {
 
   it('raises terrain outside outer radius by nothing', function() {
     let tool = new sc_edit_tool_raise(16, 8, 10);
-    tool.apply(this.hm, [128, 128]);
+    tool.start(this.hm, null, [128, 128]);
     tool.end();
 
     // All pixels outside radius 16 of centre will be unchanged
@@ -58,7 +58,7 @@ describe('sc_edit_tool_raise', function() {
 
   it('raises terrain between inner and outer radius by amount between nothing and stength', function() {
     let tool = new sc_edit_tool_raise(16, 8, 8);
-    tool.apply(this.hm, [128, 128]);
+    tool.start(this.hm, null, [128, 128]);
     tool.end();
 
 
@@ -98,7 +98,7 @@ describe('sc_edit_tool_raise', function() {
   it('marks the affected region as dirty', function() {
     this.hm.reset_dirty_region();
     let tool = new sc_edit_tool_raise(16, 8, 8);
-    tool.apply(this.hm, [128, 128]);
+    tool.start(this.hm, null, [128, 128]);
     tool.end();
 
     assert.equal(128 - 16, this.hm.dirty_region.left);
@@ -108,7 +108,7 @@ describe('sc_edit_tool_raise', function() {
     assert.equal(33,       this.hm.dirty_region.width);
     assert.equal(33,       this.hm.dirty_region.height);
 
-    tool.apply(this.hm, [64, 128]);
+    tool.start(this.hm, null, [64, 128]);
     tool.end();
 
     assert.equal(64  - 16, this.hm.dirty_region.left);

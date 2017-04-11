@@ -21,7 +21,7 @@ describe('sc_edit_tool_flatten', function() {
     assert.equal(1290, this.hm.get_pixel([128, 129]));
 
     let tool = new sc_edit_tool_flatten(16, 8, 10);
-    tool.apply(this.hm, [128, 128]);
+    tool.start(this.hm, null, [128, 128]);
     tool.end();
 
     // All pixels within radius 8 of centre will now be set to 100
@@ -39,7 +39,7 @@ describe('sc_edit_tool_flatten', function() {
 
   it('blends pixels within outer radius', function() {
     let tool = new sc_edit_tool_flatten(16, 8, 10);
-    tool.apply(this.hm, [128, 128]);
+    tool.start(this.hm, null, [128, 128]);
     tool.end();
 
     // The region between 8 and 16 pixels radius will fall off towards the original value
@@ -62,10 +62,10 @@ describe('sc_edit_tool_flatten', function() {
   it('ratchets pixels closer to the target value', function() {
     // As you move the cursor it shouldn't revert pixels to their old values around the edge
     let tool = new sc_edit_tool_flatten(16, 8, 10);
-    tool.apply(this.hm, [128, 128]);
-    tool.apply(this.hm, [132, 128]);
-    tool.apply(this.hm, [136, 128]);
-    tool.apply(this.hm, [140, 128]);
+    tool.start(this.hm, null, [128, 128]);
+    tool.apply(this.hm, null, [132, 128]);
+    tool.apply(this.hm, null, [136, 128]);
+    tool.apply(this.hm, null, [140, 128]);
     tool.end();
 
     assert.closeTo(1280, this.hm.get_pixel([128 - 17, 128]), 1, `Pixel at [${128-17}, 128] unchanged`);

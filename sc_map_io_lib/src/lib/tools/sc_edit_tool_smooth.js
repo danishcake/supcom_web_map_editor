@@ -18,7 +18,7 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
   /**
    * Prepares a heightmap patch to apply using blend
    */
-  __prepare_impl(edit_heightmap, position) {
+  __start_impl(edit_heightmap, position) {
     // Create the patch that will be applied periodically
     this.__patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1]);
 

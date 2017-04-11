@@ -24,19 +24,19 @@ describe('sc_edit_tool', function() {
 
 
   describe('heightmap tool lifecycle methods', function() {
-    it('should call __prepare_impl immediately on first apply', function () {
+    it('should call __start_impl immediately on start', function () {
       let tool = new sc_edit_tool_base(16, 8, 10);
-      let prepare_impl_spy = sinon.spy(tool, '__prepare_impl');
+      let start_impl_spy = sinon.spy(tool, '__start_impl');
 
-      tool.apply(this.edit_heightmap, [0, 0]);
-      assert(prepare_impl_spy.withArgs(this.edit_heightmap, [0, 0]).calledOnce);
+      tool.start(this.edit_heightmap, null, [0, 0]);
+      assert(start_impl_spy.withArgs(this.edit_heightmap, [0, 0]).calledOnce);
     });
 
-    it('should call __apply_impl immediately on first apply', function () {
+    it('should call __apply_impl immediately on start', function () {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.apply(this.edit_heightmap, [0, 0]);
+      tool.start(this.edit_heightmap, null, [0, 0]);
       assert(apply_impl_spy.withArgs(this.edit_heightmap, [0, 0]).calledOnce);
     });
 
@@ -44,9 +44,17 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let end_impl_spy = sinon.spy(tool, '__end_impl');
 
-      tool.apply(this.edit_heightmap, [0, 0]);
+      tool.start(this.edit_heightmap, null, [0, 0]);
       tool.end();
       assert(end_impl_spy.calledOnce);
+    });
+
+    it('should only call __apply_impl on apply call if active', function() {
+      let tool = new sc_edit_tool_base(16, 8, 10);
+      let apply_impl_spy = sinon.spy(tool, '__apply_impl');
+
+      tool.apply(this.edit_heightmap, null, [0, 0]);
+      assert(!apply_impl_spy.called);
     });
 
     it('should only call __end_impl on end call if active', function () {
@@ -65,8 +73,8 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.apply(this.edit_heightmap, [0, 0]);
-      tool.apply(this.edit_heightmap, [10, 0]);
+      tool.start(this.edit_heightmap, null, [0, 0]);
+      tool.apply(this.edit_heightmap, null, [10, 0]);
       assert.equal(apply_impl_spy.callCount, 6);
 
       assert.closeTo(apply_impl_spy.getCall(0).args[1][0], 0,  0.0001);
@@ -87,8 +95,8 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.apply(this.edit_heightmap, [0, 0]);
-      tool.apply(this.edit_heightmap, [9, 0]);
+      tool.start(this.edit_heightmap, null, [0, 0]);
+      tool.apply(this.edit_heightmap, null, [9, 0]);
       assert.equal(apply_impl_spy.callCount, 5);
     });
   });

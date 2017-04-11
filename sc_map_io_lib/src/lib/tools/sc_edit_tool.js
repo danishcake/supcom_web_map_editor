@@ -47,12 +47,29 @@ export class sc_edit_tool_base {
 
 
   /**
-   * Apply function. This should be called at every position where the mouse moves.
+   * Start function. Called when the mouse is first depressed
    * @param {sc_edit_heightmap} edit_heightmap Heightmap to edit
+   * @param {sc_script_save} save_script Save script to edit
    * @param {number} new_position x/y-coordinate of centre of tool, measured from top/left
    */
-  apply(edit_heightmap, new_position) {
+  start(edit_heightmap, save_script, new_position) {
+    // First application, so apply once at current position
+    this.__start_impl(edit_heightmap, new_position);
+    this.__apply_impl(edit_heightmap, new_position);
 
+    // Store last position and mark active
+    this.__active = true;
+    this.__position = new_position;
+  }
+
+
+  /**
+   * Apply function. This should be called at every position where the mouse moves.
+   * @param {sc_edit_heightmap} edit_heightmap Heightmap to edit
+   * @param {sc_script_save} save_script Save script to edit
+   * @param {number} new_position x/y-coordinate of centre of tool, measured from top/left
+   */
+  apply(edit_heightmap, save_script, new_position) {
     if (this.__active) {
       // Previously active. Calculate intermediate steps and apply at each
       const interpolated_points = this.__calculate_intermediate_points(this.__position, new_position);
@@ -60,15 +77,10 @@ export class sc_edit_tool_base {
       for (let point of interpolated_points) {
         this.__apply_impl(edit_heightmap, point);
       }
-    } else {
-      // First application, so apply once at current position
-      this.__prepare_impl(edit_heightmap, new_position);
-      this.__apply_impl(edit_heightmap, new_position);
-    }
 
-    // Store last position
-    this.__position = new_position;
-    this.__active = true;
+      // Store last position
+      this.__position = new_position;
+    }
   }
 
 
@@ -111,7 +123,7 @@ export class sc_edit_tool_base {
   }
 
 
-  __prepare_impl(edit_heightmap, position) {
+  __start_impl(edit_heightmap, position) {
 
   }
 
