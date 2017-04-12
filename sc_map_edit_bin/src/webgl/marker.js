@@ -59,17 +59,17 @@ class webgl_marker {
     this.__element_count = indices.length / 3;
   }
 
-  draw(effect, camera, position) {
+  draw(effect, camera, position, selected) {
     effect.start();
 
-    this.__bind_effect(effect, camera, position);
+    this.__bind_effect(effect, camera, position, selected);
     this.__draw_mesh();
 
     effect.stop();
   }
 
 
-  __bind_effect(effect, camera, position) {
+  __bind_effect(effect, camera, position, selected) {
 
     let gl = this.__gl;
 
@@ -77,6 +77,7 @@ class webgl_marker {
     // uniform mat4 uMMatrix;
     // uniform mat4 uVMatrix;
     // uniform mat4 uPMatrix;
+    // uniform medp vec3 uTint;
     // uniform highp sampler2D uMarkerTexture;
 
     // We require the following attributes:
@@ -86,10 +87,16 @@ class webgl_marker {
     this.__view = mat4.create();
     mat4.fromTranslation(this.__model_matrix, [position.x, position.z, 0]);
 
+    let tint = [0, 0, 0];
+    if (selected) {
+      tint = [0.2, 0.2, 0.8];
+    }
+
     if (!effect.set_uniform_mat4("uMMatrix", this.__model_matrix) ||
         !effect.set_uniform_mat4("uVMatrix", camera.view) ||
         !effect.set_uniform_mat4("uPMatrix", camera.projection) ||
         !effect.set_uniform_sampler2d("uMarkerTexture", this.__texture) ||
+        !effect.set_uniform_vec3("uTint", tint) ||
         !effect.bind_attribute("aVertexPosition", this.__vertex_buffer) ||
         !effect.bind_attribute("aTextureCoordinate", this.__uv_buffer))
     {
