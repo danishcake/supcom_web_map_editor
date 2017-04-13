@@ -165,32 +165,50 @@ describe('sc_script', function() {
     });
 
     describe('saving', function() {
-      let save_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley/Shuriken_Valley_save.lua");
-      let save_data_bb = ByteBuffer.wrap(save_data, ByteBuffer.LITTLE_ENDIAN);
-      let save_script = new sc.script.save();
-      save_script.load(save_data_bb);
+      beforeEach('Load, save and load a map', function() {
+        let save_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley/Shuriken_Valley_save.lua");
+        let save_data_bb = ByteBuffer.wrap(save_data, ByteBuffer.LITTLE_ENDIAN);
+        let save_script = new sc.script.save();
+        save_script.load(save_data_bb);
 
-      let save_script_roundtrip_bb = save_script.save();
-      let save_script_roundtrip = new sc.script.save();
-      save_script_roundtrip.load(save_script_roundtrip_bb);
-
-      it('should persist markers', function() {
-        assert.closeTo(35.5000, save_script_roundtrip.markers['ARMY_1'].position.x, 0.00001);
-        assert.closeTo(75.9766, save_script_roundtrip.markers['ARMY_1'].position.y, 0.00001);
-        assert.closeTo(154.500, save_script_roundtrip.markers['ARMY_1'].position.z, 0.00001);
-
-        assert.closeTo(221.500, save_script_roundtrip.markers['ARMY_2'].position.x, 0.00001);
-        assert.closeTo(75.9766, save_script_roundtrip.markers['ARMY_2'].position.y, 0.00001);
-        assert.closeTo(95.5000, save_script_roundtrip.markers['ARMY_2'].position.z, 0.00001);
-
-        assert.isTrue(save_script_roundtrip.markers['ARMY_3'] === undefined);
+        let save_script_roundtrip_bb = save_script.save();
+        this.save_script_roundtrip = new sc.script.save();
+        this.save_script_roundtrip.load(save_script_roundtrip_bb);
       });
 
-      it ('should persist all marker attributes', function() {
-        assert.equal(true,                               save_script_roundtrip.markers['Mass 00'].resource);
-        assert.closeTo(100.0,                            save_script_roundtrip.markers['Mass 00'].amount, 0.00001);
-        assert.equal('/textures/editor/marker_mass.bmp', save_script_roundtrip.markers['Mass 00'].editorIcon);
-        assert.closeTo(1.0,                              save_script_roundtrip.markers['Mass 00'].size, 0.00001);
+
+      it('should persist markers', function() {
+        assert.closeTo(35.5000, this.save_script_roundtrip.markers['ARMY_1'].position.x, 0.00001);
+        assert.closeTo(75.9766, this.save_script_roundtrip.markers['ARMY_1'].position.y, 0.00001);
+        assert.closeTo(154.500, this.save_script_roundtrip.markers['ARMY_1'].position.z, 0.00001);
+
+        assert.closeTo(221.500, this.save_script_roundtrip.markers['ARMY_2'].position.x, 0.00001);
+        assert.closeTo(75.9766, this.save_script_roundtrip.markers['ARMY_2'].position.y, 0.00001);
+        assert.closeTo(95.5000, this.save_script_roundtrip.markers['ARMY_2'].position.z, 0.00001);
+
+        assert.isTrue(this.save_script_roundtrip.markers['ARMY_3'] === undefined);
+      });
+
+      it('should persist all marker attributes', function() {
+        assert.equal(true,                               this.save_script_roundtrip.markers['Mass 00'].resource);
+        assert.closeTo(100.0,                            this.save_script_roundtrip.markers['Mass 00'].amount, 0.00001);
+        assert.equal('/textures/editor/marker_mass.bmp', this.save_script_roundtrip.markers['Mass 00'].editorIcon);
+        assert.closeTo(1.0,                              this.save_script_roundtrip.markers['Mass 00'].size, 0.00001);
+      });
+
+      it('should not persist selected attribute', function() {
+        // Repeat the above, adding selected true
+        let save_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley/Shuriken_Valley_save.lua");
+        let save_data_bb = ByteBuffer.wrap(save_data, ByteBuffer.LITTLE_ENDIAN);
+        let save_script = new sc.script.save();
+        save_script.load(save_data_bb);
+        save_script.markers['Mass 00'].selected = true;
+
+        let save_script_roundtrip_bb = save_script.save();
+        const save_script_roundtrip = new sc.script.save();
+        save_script_roundtrip.load(save_script_roundtrip_bb);
+
+        assert.notProperty(save_script_roundtrip.markers['Mass 00'], 'selected');
       });
     });
   });

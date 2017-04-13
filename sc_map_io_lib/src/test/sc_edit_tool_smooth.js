@@ -21,7 +21,7 @@ describe('sc_edit_tool_smooth', function() {
   it('moves inner region towards average', function() {
     let tool = new sc_edit_tool_smooth(16, 8, 64);
     tool.start(this.hm, null, [128, 64]);
-    tool.end();
+    tool.end(this.hm, null, [0, 0]);
 
     // Average at this region is 16 scanlines of 500 and 17 scanlines of 1000
     // -> (16 * 500 + 17 * 1000) / 33 = 757
@@ -33,7 +33,7 @@ describe('sc_edit_tool_smooth', function() {
   it('has full effect at 255 intensity', function() {
     let tool = new sc_edit_tool_smooth(16, 8, 255);
     tool.start(this.hm, null, [128, 64]);
-    tool.end();
+    tool.end(this.hm, null, [0, 0]);
     
     // 100% intensity, so move to average of 757
     assert.closeTo(757, this.hm.get_pixel([128, 63]), 1, `Pixel at [128, 63] fully smoothed`); // 63- start at 500
@@ -43,7 +43,7 @@ describe('sc_edit_tool_smooth', function() {
   it('has radial falloff in the effect around periphery', function() {
     let tool = new sc_edit_tool_smooth(16, 8, 255);
     tool.start(this.hm, null, [128, 64]);
-    tool.end();
+    tool.end(this.hm, null, [0, 0]);
 
     // 50% effect, so (500 + 757) / 2 = 628
     // 50% effect, so (1000 + 757) / 2 = 878
@@ -54,7 +54,7 @@ describe('sc_edit_tool_smooth', function() {
   it('has no effect at 0 intensity', function() {
     let tool = new sc_edit_tool_smooth(16, 8, 0);
     tool.start(this.hm, null, [128, 64]);
-    tool.end();
+    tool.end(this.hm, null, [0, 0]);
 
     assert.closeTo(500, this.hm.get_pixel([128, 63]), 1, `Pixel at [128, 63] unchanged`); // 63- start at 500
     assert.closeTo(1000, this.hm.get_pixel([128, 64]), 1, `Pixel at [128, 64] unchanged`); // 64+ start at 1000
@@ -73,6 +73,6 @@ describe('sc_edit_tool_smooth', function() {
     // Applying again 8 pixels left fully smooths
     tool.apply(this.hm, null, [120, 64]);
     assert.closeTo(757, this.hm.get_pixel([128-12, 63]), 1, `Pixel at [128 - 12, 63] still half smoothed`);
-    tool.end();
+    tool.end(this.hm, null, [0, 0]);
   });
 });

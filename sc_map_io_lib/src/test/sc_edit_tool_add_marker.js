@@ -38,7 +38,7 @@ describe('sc_edit_tool_add_marker', function() {
     assert.equal(1, Object.keys(this.save_script.markers).length);
 
     // .end resets state and allows a second marker
-    tool.end();
+    tool.end(null, this.save_script, [0, 0]);
     tool.start(null, this.save_script, [0, 0]);
     assert.equal(2, Object.keys(this.save_script.markers).length);
   });
@@ -47,9 +47,9 @@ describe('sc_edit_tool_add_marker', function() {
     let tool = new sc_edit_tool_add_marker(this.marker_template);
 
     tool.start(null, this.save_script, [0, 0]);
-    tool.end();
+    tool.end(null, this.save_script, [0, 0]);
     tool.start(null, this.save_script, [0, 0]);
-    tool.end();
+    tool.end(null, this.save_script, [0, 0]);
 
     assert.property(this.save_script.markers, 'MASSPOINT_0');
     assert.property(this.save_script.markers, 'MASSPOINT_1');

@@ -45,7 +45,7 @@ describe('sc_edit_tool', function() {
       let end_impl_spy = sinon.spy(tool, '__end_impl');
 
       tool.start(this.edit_heightmap, null, [0, 0]);
-      tool.end();
+      tool.end(this.edit_heightmap, null, [0, 0]);
       assert(end_impl_spy.calledOnce);
     });
 
@@ -61,7 +61,7 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let end_impl_spy = sinon.spy(tool, '__end_impl');
 
-      tool.end();
+      tool.end(this.edit_heightmap, null, [0, 0]);
       assert(!end_impl_spy.called);
     });
   });

@@ -86,8 +86,11 @@ export class sc_edit_tool_base {
 
   /**
    * Finish application of a tool
+   * @param {sc_edit_heightmap} edit_heightmap Heightmap to edit
+   * @param {sc_script_save} save_script Save script to edit
+   * @param {number} new_position x/y-coordinate of centre of tool, measured from top/left
    */
-  end() {
+  end(edit_heightmap, save_script, new_position) {
     if (this.__active) {
       this.__end_impl();
     }
