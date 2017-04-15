@@ -48,49 +48,46 @@ export class sc_edit_tool_base {
 
   /**
    * Start function. Called when the mouse is first depressed
-   * @param {sc_edit_heightmap} edit_heightmap Heightmap to edit
-   * @param {sc_script_save} save_script Save script to edit
-   * @param {number} new_position x/y-coordinate of centre of tool, measured from top/left
+   * @param {sc_edit_tool_data} data Data to edit
+   * @param {sc_edit_tool_args} args How and where to apply tool
    */
-  start(edit_heightmap, save_script, new_position) {
+  start(data, args) {
     // First application, so apply once at current position
-    this.__start_impl(edit_heightmap, new_position);
-    this.__apply_impl(edit_heightmap, new_position);
+    this.__start_impl(data.edit_heightmap, args.grid_position);
+    this.__apply_impl(data.edit_heightmap, args.grid_position);
 
     // Store last position and mark active
     this.__active = true;
-    this.__position = new_position;
+    this.__position = args.grid_position;
   }
 
 
   /**
    * Apply function. This should be called at every position where the mouse moves.
-   * @param {sc_edit_heightmap} edit_heightmap Heightmap to edit
-   * @param {sc_script_save} save_script Save script to edit
-   * @param {number} new_position x/y-coordinate of centre of tool, measured from top/left
+   * @param {sc_edit_tool_data} data Data to edit
+   * @param {sc_edit_tool_args} args How and where to apply tool
    */
-  apply(edit_heightmap, save_script, new_position) {
+  apply(data, args) {
     if (this.__active) {
       // Previously active. Calculate intermediate steps and apply at each
-      const interpolated_points = this.__calculate_intermediate_points(this.__position, new_position);
+      const interpolated_points = this.__calculate_intermediate_points(this.__position, args.grid_position);
 
       for (let point of interpolated_points) {
-        this.__apply_impl(edit_heightmap, point);
+        this.__apply_impl(data.edit_heightmap, point);
       }
 
       // Store last position
-      this.__position = new_position;
+      this.__position = args.grid_position;
     }
   }
 
 
   /**
    * Finish application of a tool
-   * @param {sc_edit_heightmap} edit_heightmap Heightmap to edit
-   * @param {sc_script_save} save_script Save script to edit
-   * @param {number} new_position x/y-coordinate of centre of tool, measured from top/left
+   * @param {sc_edit_tool_data} data Data to edit
+   * @param {sc_edit_tool_args} args How and where to apply tool
    */
-  end(edit_heightmap, save_script, new_position) {
+  end(data, args) {
     if (this.__active) {
       this.__end_impl();
     }

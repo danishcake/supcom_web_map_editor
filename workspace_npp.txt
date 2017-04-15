@@ -54,6 +54,9 @@
                     <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_raise.js" />
                     <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_flatten.js" />
                     <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_smooth.js" />
+                    <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_add_marker.js" />
+                    <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_select_marker.js" />
+                    <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_args.js" />
                 </Folder>
                 <Folder name="views">
                     <File name="sc_map_io_lib\src\lib\views\sc_edit_view.js" />
@@ -89,17 +92,18 @@
                 </Folder>
                 <File name="sc_map_io_lib\src\test\sc_bitfield.js" />
                 <File name="sc_map_io_lib\src\test\sc_dds.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_heightmap.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_symmetry.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_tool.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_tool_raise.js" />
                 <File name="sc_map_io_lib\src\test\sc_map.js" />
                 <File name="sc_map_io_lib\src\test\sc_rect.js" />
                 <File name="sc_map_io_lib\src\test\sc_script.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_heightmap.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_symmetry.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_flatten.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_raise.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_smooth.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_add_marker.js" />
                 <File name="sc_map_io_lib\src\test\sc_edit_view_snapshot.js" />
                 <File name="sc_map_io_lib\src\test\sc_edit_view_methods.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_tool_flatten.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_tool_smooth.js" />
                 <File name="sc_map_io_lib\src\test\sc_zip.js" />
             </Folder>
         </Folder>

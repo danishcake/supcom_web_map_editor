@@ -38,14 +38,13 @@ export class sc_edit_tool_add_marker {
 
   /**
    * Start function. This should be called at when mouse first clicked.
-   * @param {sc_edit_heightmap} edit_heightmap Heightmap to edit
-   * @param {sc_edit_heightmap} edit_heightmap Save script to edit
-   * @param {number} new_position x/y-coordinate of centre of tool, measured from top/left
+   * @param {sc_edit_tool_data} data Data to edit
+   * @param {sc_edit_tool_args} args How and where to apply tool
    */
-  start(edit_heightmap, save_script, new_position) {
+  start(data, args) {
     if (!this.__active) {
       // First application, so place marker at current position
-      const marker_names = _.chain(save_script.markers)
+      const marker_names = _.chain(data.save_script.markers)
         .filter((marker, marker_name) => {
           return marker.type === this.__marker_template.type;
         })
@@ -68,11 +67,11 @@ export class sc_edit_tool_add_marker {
       }
 
       // Position marker under cursor
-      marker.position.x = new_position[0];
-      marker.position.z = new_position[1];
+      marker.position.x = args.grid_position[0];
+      marker.position.z = args.grid_position[1];
 
       // Add the marker
-      save_script.markers[marker.name] = marker;
+      data.save_script.markers[marker.name] = marker;
 
       this.__active = true;
     }
@@ -81,20 +80,18 @@ export class sc_edit_tool_add_marker {
 
   /**
    * Apply function. This should be called at every position where the mouse moves.
-   * @param {sc_edit_heightmap} edit_heightmap Heightmap to edit
-   * @param {sc_edit_heightmap} edit_heightmap Save script to edit
-   * @param {number} new_position x/y-coordinate of centre of tool, measured from top/left
+   * @param {sc_edit_tool_data} data Data to edit
+   * @param {sc_edit_tool_args} args How and where to apply tool
    */
-  apply(edit_heightmap, save_script, new_position) {}
+  apply(data, args) {}
 
 
   /**
    * Finish application of a tool
-   * @param {sc_edit_heightmap} edit_heightmap Heightmap to edit
-   * @param {sc_script_save} save_script Save script to edit
-   * @param {number} new_position x/y-coordinate of centre of tool, measured from top/left
+   * @param {sc_edit_tool_data} data Data to edit
+   * @param {sc_edit_tool_args} args How and where to apply tool
    */
-  end(edit_heightmap, save_script, new_position) {
+  end(data, args) {
     this.__active = false;
   }
 }

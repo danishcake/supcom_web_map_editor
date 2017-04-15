@@ -1,5 +1,6 @@
 import { sc } from '../lib/sc';
 import { sc_edit_tool_raise } from '../lib/tools/sc_edit_tool_raise.js';
+import { sc_edit_tool_data, sc_edit_tool_args } from "../lib/tools/sc_edit_tool_args.js"
 const assert = require('chai').assert;
 const sinon = require('sinon');
 
@@ -22,8 +23,10 @@ describe('sc_edit_tool_raise', function() {
     assert.equal(1000, this.hm.get_pixel([128, 128]));
 
     let tool = new sc_edit_tool_raise(16, 8, 10);
-    tool.start(this.hm, null, [128, 128]);
-    tool.end(this.hm, null, [128, 128]);
+    tool.start(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
+    tool.end(new sc_edit_tool_data(this.hm, null),
+             new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
 
     // All pixels within radius 8 of centre will now be raised by 10
     for (let y = -8; y <= 8; y++) {
@@ -40,8 +43,10 @@ describe('sc_edit_tool_raise', function() {
 
   it('raises terrain outside outer radius by nothing', function() {
     let tool = new sc_edit_tool_raise(16, 8, 10);
-    tool.start(this.hm, null, [128, 128]);
-    tool.end(this.HM, null, [128, 128]);
+    tool.start(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
+    tool.end(new sc_edit_tool_data(this.hm, null),
+             new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
 
     // All pixels outside radius 16 of centre will be unchanged
     for (let y = -8; y <= 8; y++) {
@@ -58,8 +63,10 @@ describe('sc_edit_tool_raise', function() {
 
   it('raises terrain between inner and outer radius by amount between nothing and stength', function() {
     let tool = new sc_edit_tool_raise(16, 8, 8);
-    tool.start(this.hm, null, [128, 128]);
-    tool.end(this.hm, null, [128, 128]);
+    tool.start(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
+    tool.end(new sc_edit_tool_data(this.hm, null),
+             new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
 
 
     // 0 128 -> 1008
@@ -98,8 +105,10 @@ describe('sc_edit_tool_raise', function() {
   it('marks the affected region as dirty', function() {
     this.hm.reset_dirty_region();
     let tool = new sc_edit_tool_raise(16, 8, 8);
-    tool.start(this.hm, null, [128, 128]);
-    tool.end(this.hm, null, [128, 128]);
+    tool.start(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
+    tool.end(new sc_edit_tool_data(this.hm, null),
+             new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
 
     assert.equal(128 - 16, this.hm.dirty_region.left);
     assert.equal(128 + 16, this.hm.dirty_region.right);
@@ -108,8 +117,10 @@ describe('sc_edit_tool_raise', function() {
     assert.equal(33,       this.hm.dirty_region.width);
     assert.equal(33,       this.hm.dirty_region.height);
 
-    tool.start(this.hm, null, [64, 128]);
-    tool.end(this.hm, null, [64, 128]);
+    tool.start(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([64, 128], sc_edit_tool_args.modifier_none));
+    tool.end(new sc_edit_tool_data(this.hm, null),
+             new sc_edit_tool_args([64, 128], sc_edit_tool_args.modifier_none));
 
     assert.equal(64  - 16, this.hm.dirty_region.left);
     assert.equal(128 + 16, this.hm.dirty_region.right);
