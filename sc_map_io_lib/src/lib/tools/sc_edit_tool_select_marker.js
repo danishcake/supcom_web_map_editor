@@ -50,25 +50,38 @@ export class sc_edit_tool_select_marker {
 
       this.__started_over_selected_marker = false;
       if (clicked_marker) {
-        if (clicked_marker.selected) {
-          this.__started_over_selected_marker = true;
-        } else {
-          clicked_marker.selected = true;
+        // Deselect currently selected marker if shift held
+        if (args.shift) {
+          if (clicked_marker.selected) {
+            delete clicked_marker.selected;
+          } else {
+            clicked_marker.selected = true;
+          }
 
-          // If shift not held then deselect all other markers
-          _.chain(data.save_script.markers)
-            .filter((marker) => {
-              return marker !== clicked_marker;
-            })
-            .each((marker) => {
-              delete marker.selected;
-            });
+        } else {
+          // Otherwise start moving
+          if (clicked_marker.selected) {
+            this.__started_over_selected_marker = true;
+          } else {
+            clicked_marker.selected = true;
+
+            // If shift not held then deselect all other markers
+            _.chain(data.save_script.markers)
+              .filter((marker) => {
+                return marker !== clicked_marker;
+              })
+              .each((marker) => {
+                delete marker.selected;
+              });
+          }
         }
       } else {
         // If shift not held then deselect all markers
-        _.each(data.save_script.markers, (marker) => {
-          delete marker.selected;
-        });
+        if (!args.shift) {
+          _.each(data.save_script.markers, (marker) => {
+            delete marker.selected;
+          });
+        }
       }
 
       this.__moved = false;
@@ -102,7 +115,7 @@ export class sc_edit_tool_select_marker {
           marker.position.x += delta[0];
           marker.position.z += delta[1];
         });
-      this.__last_position = data.grid_position;
+      this.__last_position = args.grid_position;
     }
   }
 

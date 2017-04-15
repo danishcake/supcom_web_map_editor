@@ -68,6 +68,23 @@ describe('sc_edit_tool_select_marker', function() {
   });
 
   it('will select additional markers if shift held', function() {
+        let tool = new sc_edit_tool_select_marker();
+    tool.start(new sc_edit_tool_data(null, this.save_script),
+               new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
+    tool.apply(new sc_edit_tool_data(null, this.save_script),
+               new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
+    tool.end(new sc_edit_tool_data(null, this.save_script),
+             new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
+
+    tool.start(new sc_edit_tool_data(null, this.save_script),
+               new sc_edit_tool_args([100, 100], sc_edit_tool_args.modifier_shift));
+    tool.apply(new sc_edit_tool_data(null, this.save_script),
+               new sc_edit_tool_args([100, 100], sc_edit_tool_args.modifier_shift));
+    tool.end(new sc_edit_tool_data(null, this.save_script),
+             new sc_edit_tool_args([100, 100], sc_edit_tool_args.modifier_shift));
+
+    assert.isTrue(this.save_script.markers["MASSPOINT_0"].selected);
+    assert.isTrue(this.save_script.markers["MASSPOINT_1"].selected);
   });
 
   it('will deselect other markers if a new marker is selected and shift not held', function() {
@@ -117,6 +134,23 @@ describe('sc_edit_tool_select_marker', function() {
   });
 
   it('will deselect a selected marker if reselected and shift held', function() {
+    let tool = new sc_edit_tool_select_marker();
+    tool.start(new sc_edit_tool_data(null, this.save_script),
+               new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
+    tool.apply(new sc_edit_tool_data(null, this.save_script),
+               new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
+    tool.end(new sc_edit_tool_data(null, this.save_script),
+             new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
+
+    assert.isTrue(this.save_script.markers["MASSPOINT_0"].selected);
+
+    tool.start(new sc_edit_tool_data(null, this.save_script),
+               new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_shift));
+    tool.apply(new sc_edit_tool_data(null, this.save_script),
+               new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_shift));
+    tool.end(new sc_edit_tool_data(null, this.save_script),
+             new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_shift));
+    assert.isNotOk(this.save_script.markers["MASSPOINT_0"].selected);
   });
 
   it('will start move if a selected marker reselected and shift not held', function() {
