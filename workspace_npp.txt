@@ -71,6 +71,7 @@
                 <File name="sc_map_io_lib\src\lib\sc_map.js" />
                 <File name="sc_map_io_lib\src\lib\sc_rect.js" />
                 <File name="sc_map_io_lib\src\lib\sc_script.js" />
+                <File name="sc_map_io_lib\src\lib\sc_zip.js" />
             </Folder>
             <Folder name="test">
                 <Folder name="data">
