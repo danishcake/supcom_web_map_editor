@@ -1,0 +1,33 @@
+<div class="modal-header dialog-header-notify">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <h4 class="modal-title"><span class="glyphicon glyphicon-file"></span> Configure forces</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+    <div class="col-xs-4">Number of players</div>
+    <div class="col-xs-8">
+      <ul uib-pagination total-items="data.max_players" ng-model="data.player_count" max-size="1" items-per-page="1" class="pagination-sm" previous-text="-" next-text="+" ng-change="army_count_change();"></ul>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-4">Spawn locations</div>
+  </div>
+
+
+  <div class="row" ng-repeat="army in data.armies track by $index">
+    <div class="col-xs-1"></div>
+    <div class="col-xs-3">Army {{$index}}:</div>
+    <div class="col-xs-8">
+      <select class="form-control" ng-model="data.armies[$index]" ng-change="army_spawn_change($index, data.armies[$index])">
+        <option ng-repeat="marker_name in data.spawn_markers  | unusedMarkers: data.armies:$index" value="{{marker_name}}" ng-selected="marker_name == army">{{marker_name}}</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <span class="pull-left">Forces define where each player spawns. It's OK to leave this incomplete while editing, but the map won't load correctly in Supreme Commander until complete</span>
+  <button type="button" class="btn btn-default pull-right" ng-click="accept()">OK</button>
+</div>

@@ -50,7 +50,17 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
     dialogs.error('Water','Not implemented.');
   };
   $scope.edit_forces = function() {
-    dialogs.error('Forces','Not implemented.');
+    let dlg = dialogs.create("templates/dialogs/configure-forces.html",
+                             "configure-forces",
+                             {
+                               scripts: editor_state.scripts
+                             },
+                             modal_dlg_opts);
+    dlg.result.then(armies => {
+      editor_state.scripts.scenario.armies.length = 0;
+      _.each(armies, army => editor_state.scripts.scenario.armies.push(army));
+    },
+    () => {});
   };
 
 }]);
