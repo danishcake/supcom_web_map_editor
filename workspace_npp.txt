@@ -10,6 +10,7 @@
                     <File name="sc_map_edit_bin\src\controllers\dialogs\open-map.js" />
                     <File name="sc_map_edit_bin\src\controllers\dialogs\save-as.js" />
                     <File name="sc_map_edit_bin\src\controllers\dialogs\save-progress.js" />
+                    <File name="sc_map_edit_bin\src\controllers\dialogs\configure-forces.js" />
                 </Folder>
                 <File name="sc_map_edit_bin\src\controllers\editor-menu.js" />
                 <File name="sc_map_edit_bin\src\controllers\editor-view.js" />
@@ -28,6 +29,7 @@
                 <File name="sc_map_edit_bin\src\webgl\camera.js" />
                 <File name="sc_map_edit_bin\src\webgl\effect.js" />
                 <File name="sc_map_edit_bin\src\webgl\heightmap.js" />
+                <File name="sc_map_edit_bin\src\webgl\marker.js" />
             </Folder>
             <File name="sc_map_edit_bin\src\app.js" />
         </Folder>
@@ -37,6 +39,7 @@
                 <File name="sc_map_edit_bin\templates\dialogs\open-map.html" />
                 <File name="sc_map_edit_bin\templates\dialogs\save-as.html" />
                 <File name="sc_map_edit_bin\templates\dialogs\save-progress.html" />
+                <File name="sc_map_edit_bin\templates\dialogs\configure-forces.html" />
             </Folder>
             <File name="sc_map_edit_bin\templates\editor-menu.html" />
             <File name="sc_map_edit_bin\templates\editor-view.html" />
@@ -53,6 +56,9 @@
                     <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_raise.js" />
                     <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_flatten.js" />
                     <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_smooth.js" />
+                    <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_add_marker.js" />
+                    <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_select_marker.js" />
+                    <File name="sc_map_io_lib\src\lib\tools\sc_edit_tool_args.js" />
                 </Folder>
                 <Folder name="views">
                     <File name="sc_map_io_lib\src\lib\views\sc_edit_view.js" />
@@ -88,17 +94,19 @@
                 </Folder>
                 <File name="sc_map_io_lib\src\test\sc_bitfield.js" />
                 <File name="sc_map_io_lib\src\test\sc_dds.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_heightmap.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_symmetry.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_tool.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_tool_raise.js" />
                 <File name="sc_map_io_lib\src\test\sc_map.js" />
                 <File name="sc_map_io_lib\src\test\sc_rect.js" />
                 <File name="sc_map_io_lib\src\test\sc_script.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_heightmap.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_symmetry.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_flatten.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_raise.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_smooth.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_add_marker.js" />
+                <File name="sc_map_io_lib\src\test\sc_edit_tool_select_marker.js" />
                 <File name="sc_map_io_lib\src\test\sc_edit_view_snapshot.js" />
                 <File name="sc_map_io_lib\src\test\sc_edit_view_methods.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_tool_flatten.js" />
-                <File name="sc_map_io_lib\src\test\sc_edit_tool_smooth.js" />
                 <File name="sc_map_io_lib\src\test\sc_zip.js" />
             </Folder>
         </Folder>

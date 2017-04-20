@@ -1,13 +1,16 @@
 angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
 ["$scope", "editor_state", function($scope, editor_state) {
   $scope.tool = {
-    category: 'select',
+    category: 'heightmap',
     heightmap: {
       type: 'raise'
     },
     texturemap: {
       texture_index: 0,
       type: 'add'
+    },
+    marker: {
+      type: 'select'
     },
     size: 10,
     strength: 10

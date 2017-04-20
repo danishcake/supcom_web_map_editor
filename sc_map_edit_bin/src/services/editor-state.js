@@ -65,7 +65,51 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
         break;
 
       default:
-        service.tool = null;
+        switch (tool_data.marker.type) {
+          case 'select':
+            service.tool = new sc_map_io_lib.sc.edit.tool.select_marker();
+            break;
+          case 'army':
+            service.tool = new sc_map_io_lib.sc.edit.tool.add_marker( {
+              type: 'Blank Marker',
+              name: 'ARMY', // _${index}
+              position: {x: 0, y: 0, z: 0}, // Will be replaced
+              orientation: {x: 0, y: 0, z: 0},
+              color: 'ff800080',
+              prop: '/env/common/props/markers/M_Blank_prop.bp'
+            });
+            break;
+          case 'mass':
+            service.tool = new sc_map_io_lib.sc.edit.tool.add_marker( {
+              type: 'Mass',
+              name: 'Mass', // _${index}
+              position: {x: 0, y: 0, z: 0}, // Will be replaced
+              orientation: {x: 0, y: 0, z: 0},
+              resource: true,
+              amount: 100.000000,
+              color: 'ff808080',
+              editorIcon: '/textures/editor/marker_mass.bmp',
+              size: 1.000000,
+              prop: '/env/common/props/markers/M_Mass_prop.bp'
+            });
+            break;
+          case 'hydro':
+            service.tool = new sc_map_io_lib.sc.edit.tool.add_marker( {
+              type: 'Hydrocarbon',
+              name: 'Hydrocarbon', // _${index}
+              position: {x: 0, y: 0, z: 0}, // Will be replaced
+              orientation: {x: 0, y: 0, z: 0},
+              resource: true,
+              amount: 100.000000,
+              color: 'ff008000',
+              size: 1.000000,
+              prop: '/env/common/props/markers/M_Hydrocarbon_prop.bp',
+            });
+            break;
+          default:
+            service.tool = null;
+            break;
+        }
         break;
     }
   };

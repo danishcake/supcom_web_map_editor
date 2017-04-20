@@ -21,13 +21,17 @@ export class sc_script_base {
   constructor() {
     // Initialise lua state
     this.__lua_state = lua.lua_open();
-    lua.lua_pushcfunction(this.__lua_state, Lua5_1.Runtime.addFunction(lua_state => {
+    this.__c_functions = [];
+
+    this.__c_functions.push(Lua5_1.Runtime.addFunction(lua_state => {
       lua.luaopen_base(lua_state);
       lua.luaopen_table(lua_state);
       lua.luaopen_io(lua_state);
       lua.luaopen_string(lua_state);
       lua.luaopen_math(lua_state);
     }));
+
+    lua.lua_pushcfunction(this.__lua_state, this.__c_functions[this.__c_functions.length - 1]);
     lua.lua_call(this.__lua_state, 0, 0);
 
     // Bind the basic types that are used in the FA lua scripts
@@ -37,28 +41,25 @@ export class sc_script_base {
     // Results should be pushed onto the stack and the number of results returned
 
     // FLOAT
-    lua.lua_pushcfunction(this.__lua_state, Lua5_1.Runtime.addFunction(lua_state => {
+    this.register_function("FLOAT", lua_state => {
       lua.lua_pushvalue(lua_state, 1);
       return 1;
-    }));
-    lua.lua_setglobal(this.__lua_state, "FLOAT");
+    });
 
     // BOOLEAN
-    lua.lua_pushcfunction(this.__lua_state, Lua5_1.Runtime.addFunction(lua_state => {
+    this.register_function("BOOLEAN", lua_state => {
       lua.lua_pushvalue(lua_state, 1);
       return 1;
-    }));
-    lua.lua_setglobal(this.__lua_state, "BOOLEAN");
+    });
 
     // STRING
-    lua.lua_pushcfunction(this.__lua_state, Lua5_1.Runtime.addFunction(lua_state => {
+    this.register_function("STRING", lua_state => {
       lua.lua_pushvalue(lua_state, 1);
       return 1;
-    }));
-    lua.lua_setglobal(this.__lua_state, "STRING");
+    });
 
     // Vector3
-    lua.lua_pushcfunction(this.__lua_state, Lua5_1.Runtime.addFunction(lua_state => {
+    this.register_function("VECTOR3", lua_state => {
       let x = lua.luaL_checknumber(lua_state, 1);
       let y = lua.luaL_checknumber(lua_state, 2);
       let z = lua.luaL_checknumber(lua_state, 3);
@@ -72,15 +73,47 @@ export class sc_script_base {
       lua.lua_setfield(lua_state, -2, "z");
 
       return 1;
-    }));
-    lua.lua_setglobal(this.__lua_state, "VECTOR3");
+    });
 
     // GROUP
-    lua.lua_pushcfunction(this.__lua_state, Lua5_1.Runtime.addFunction(lua_state => {
+    this.register_function("GROUP", lua_state => {
       lua.lua_pushvalue(lua_state, 1);
       return 1;
-    }));
-    lua.lua_setglobal(this.__lua_state, "GROUP");
+    });
+  }
+
+
+  /**
+   * Registers a function to be run_script
+   * This function MUST be deregistered by calling close_lua later
+   */
+   register_function(name, fn) {
+     this.__c_functions.push(Lua5_1.Runtime.addFunction(fn));
+     lua.lua_pushcfunction(this.__lua_state, this.__c_functions[this.__c_functions.length - 1]);
+     lua.lua_setglobal(this.__lua_state, name);
+   }
+
+
+  /**
+   * Frees lua state
+   * If not done these leak and once enough pile up you get errors from
+   * exhausting RESERVED_FUNCTION_POINTER warnings
+   *
+   * Obviously you can't use any Lua state related bits after calling this.
+   */
+  close_lua() {
+    if (this.__lua_state) {
+      lua.lua_close(this.__lua_state);
+
+      // Just closing the state doesn't free the C functions registered with the lua runtime
+      // I need to remove these manually.
+      for (let c_function of this.__c_functions) {
+        //console.log(`Removing ${c_function}`);
+        Lua5_1.Runtime.removeFunction(c_function);
+      }
+
+      this.__lua_state = null;
+    }
   }
 
 
@@ -253,9 +286,13 @@ export class sc_script_scenario extends sc_script_base {
     this.__script_filename = script_filename;
     this.__armies = armies;
     this.__map_size = [map_size[1], map_size[2]];
+
+    super.close_lua();
   }
 
   save() {
+    super.close_lua();
+
     /** We're aiming for this:
      *
      * version = 3
@@ -423,6 +460,7 @@ class sc_script_marker {
   }
 
   save() {
+
     // Save common fields
     let output =
     `        ['${this.__name}'] ={\n`                                                                                     +
@@ -503,6 +541,8 @@ export class sc_script_save extends sc_script_base {
     // most of the fruity capabilities that provides (prespawned units etc)... yet
     // Record fields
     this.__markers = markers;
+
+    super.close_lua();
   }
 
   save() {
@@ -531,6 +571,7 @@ export class sc_script_save extends sc_script_base {
    * Creates a map with no markers - effectively does nothing
    */
   create(map_args) {
+    super.close_lua();
   }
 }
 

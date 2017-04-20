@@ -1,5 +1,6 @@
 import { sc } from '../lib/sc';
 import { sc_edit_tool_flatten } from '../lib/tools/sc_edit_tool_flatten.js';
+import { sc_edit_tool_data, sc_edit_tool_args } from "../lib/tools/sc_edit_tool_args.js"
 const assert = require('chai').assert;
 const sinon = require('sinon');
 
@@ -21,8 +22,10 @@ describe('sc_edit_tool_flatten', function() {
     assert.equal(1290, this.hm.get_pixel([128, 129]));
 
     let tool = new sc_edit_tool_flatten(16, 8, 10);
-    tool.apply(this.hm, [128, 128]);
-    tool.end();
+    tool.start(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
+    tool.end(new sc_edit_tool_data(this.hm, null),
+             new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
 
     // All pixels within radius 8 of centre will now be set to 100
     for (let y = -8; y <= 8; y++) {
@@ -39,8 +42,10 @@ describe('sc_edit_tool_flatten', function() {
 
   it('blends pixels within outer radius', function() {
     let tool = new sc_edit_tool_flatten(16, 8, 10);
-    tool.apply(this.hm, [128, 128]);
-    tool.end();
+    tool.start(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
+    tool.end(new sc_edit_tool_data(this.hm, null),
+             new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
 
     // The region between 8 and 16 pixels radius will fall off towards the original value
     for (let y = -16; y <= 16; y++) {
@@ -62,11 +67,16 @@ describe('sc_edit_tool_flatten', function() {
   it('ratchets pixels closer to the target value', function() {
     // As you move the cursor it shouldn't revert pixels to their old values around the edge
     let tool = new sc_edit_tool_flatten(16, 8, 10);
-    tool.apply(this.hm, [128, 128]);
-    tool.apply(this.hm, [132, 128]);
-    tool.apply(this.hm, [136, 128]);
-    tool.apply(this.hm, [140, 128]);
-    tool.end();
+    tool.start(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
+    tool.apply(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([132, 128], sc_edit_tool_args.modifier_none));
+    tool.apply(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([136, 128], sc_edit_tool_args.modifier_none));
+    tool.apply(new sc_edit_tool_data(this.hm, null),
+               new sc_edit_tool_args([140, 128], sc_edit_tool_args.modifier_none));
+    tool.end(new sc_edit_tool_data(this.hm, null),
+             new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
 
     assert.closeTo(1280, this.hm.get_pixel([128 - 17, 128]), 1, `Pixel at [${128-17}, 128] unchanged`);
     assert.closeTo(1280, this.hm.get_pixel([128 - 7, 128]), 1, `Pixel at [${128-7}, 128] not unflattened by later applications`);

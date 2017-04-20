@@ -1,9 +1,9 @@
 <div id="editor-menu">
   <!-- Tool category -->
   <div class="btn-group-vertical">
-    <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'select'" uib-tooltip="Selection tool" tooltip-placement="right"><span class="glyphicon glyphicon-move"></span></label>
     <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'heightmap'" uib-tooltip="Heightmap tools" tooltip-placement="right"><span class="glyphicon glyphicon-resize-vertical"></span></label>
     <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'texture'" uib-tooltip="Texture tools" tooltip-placement="right"><span class="glyphicon glyphicon-tint"></span></label>
+    <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'marker'" uib-tooltip="Markers" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
   </div>
 
   <!-- Tool size -->
@@ -26,5 +26,13 @@
     <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'lower'" uib-tooltip="Lower terrain" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-down"></span></label>
     <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'flatten'" uib-tooltip="Flatten terrain" tooltip-placement="right"><span class="glyphicon glyphicon-object-align-horizontal"></span></label>
     <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'smooth'" uib-tooltip="Smooth terrain" tooltip-placement="right"><span class="glyphicon glyphicon-record"></span></label>
+  </div>
+
+  <!-- Marker tools -->
+  <div class="btn-group-vertical" ng-show="tool.category === 'marker'">
+    <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'select'" uib-tooltip="Select" tooltip-placement="right"><span class="glyphicon glyphicon-move"></span></label>
+    <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'army'" uib-tooltip="Army spawn" tooltip-placement="right"><span class="glyphicon glyphicon-home"></span></label>
+    <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'mass'" uib-tooltip="Mass point" tooltip-placement="right"><img src="/img/Mass_icon.png"></label>
+    <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'hydro'" uib-tooltip="Hydrocarbons" tooltip-placement="right"><img src="/img/Energy_icon.png"></label>
   </div>
 </div>

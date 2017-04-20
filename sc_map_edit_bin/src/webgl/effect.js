@@ -7,24 +7,24 @@ class webgl_effect {
     this.gl = gl;
 
     // Build a type LUT for debugging
-    this.__uniform_type_lut = {};
-    this.__uniform_type_lut[gl.FLOAT_VEC2]   = "FLOAT_VEC2";
-    this.__uniform_type_lut[gl.FLOAT_VEC3]   = "FLOAT_VEC3";
-    this.__uniform_type_lut[gl.FLOAT_VEC4]   = "FLOAT_VEC4";
-    this.__uniform_type_lut[gl.INT_VEC2]     = "INT_VEC2";
-    this.__uniform_type_lut[gl.INT_VEC3]     = "INT_VEC3";
-    this.__uniform_type_lut[gl.INT_VEC4]     = "INT_VEC4";
-    this.__uniform_type_lut[gl.BOOL_VEC2]    = "BOOL_VEC2";
-    this.__uniform_type_lut[gl.BOOL_VEC3]    = "BOOL_VEC3";
-    this.__uniform_type_lut[gl.BOOL_VEC4]    = "BOOL_VEC4";
-    this.__uniform_type_lut[gl.FLOAT_MAT2]   = "FLOAT_MAT2";
-    this.__uniform_type_lut[gl.FLOAT_MAT3]   = "FLOAT_MAT3";
-    this.__uniform_type_lut[gl.FLOAT_MAT4]   = "FLOAT_MAT4";
-    this.__uniform_type_lut[gl.BOOL]         = "BOOL";
-    this.__uniform_type_lut[gl.INT]          = "INT";
-    this.__uniform_type_lut[gl.FLOAT]        = "FLOAT";
-    this.__uniform_type_lut[gl.SAMPLER_2D]   = "SAMPLER_2D";
-    this.__uniform_type_lut[gl.SAMPLER_CUBE] = "SAMPLER_CUBE";
+    this.__type_lut = {};
+    this.__type_lut[gl.FLOAT_VEC2]   = "FLOAT_VEC2";
+    this.__type_lut[gl.FLOAT_VEC3]   = "FLOAT_VEC3";
+    this.__type_lut[gl.FLOAT_VEC4]   = "FLOAT_VEC4";
+    this.__type_lut[gl.INT_VEC2]     = "INT_VEC2";
+    this.__type_lut[gl.INT_VEC3]     = "INT_VEC3";
+    this.__type_lut[gl.INT_VEC4]     = "INT_VEC4";
+    this.__type_lut[gl.BOOL_VEC2]    = "BOOL_VEC2";
+    this.__type_lut[gl.BOOL_VEC3]    = "BOOL_VEC3";
+    this.__type_lut[gl.BOOL_VEC4]    = "BOOL_VEC4";
+    this.__type_lut[gl.FLOAT_MAT2]   = "FLOAT_MAT2";
+    this.__type_lut[gl.FLOAT_MAT3]   = "FLOAT_MAT3";
+    this.__type_lut[gl.FLOAT_MAT4]   = "FLOAT_MAT4";
+    this.__type_lut[gl.BOOL]         = "BOOL";
+    this.__type_lut[gl.INT]          = "INT";
+    this.__type_lut[gl.FLOAT]        = "FLOAT";
+    this.__type_lut[gl.SAMPLER_2D]   = "SAMPLER_2D";
+    this.__type_lut[gl.SAMPLER_CUBE] = "SAMPLER_CUBE";
 
 
     this.__compile(vertex_shader_src, fragment_shader_src);
@@ -129,12 +129,20 @@ class webgl_effect {
         };
 
         switch (active_attribute.type) {
+          case gl.FLOAT_VEC2:
+            this.__attributes[active_attribute.name].element_type = gl.FLOAT;
+            this.__attributes[active_attribute.name].element_count = 2;
+            break;
           case gl.FLOAT_VEC3:
             this.__attributes[active_attribute.name].element_type = gl.FLOAT;
             this.__attributes[active_attribute.name].element_count = 3;
             break;
+          case gl.FLOAT_VEC4:
+            this.__attributes[active_attribute.name].element_type = gl.FLOAT;
+            this.__attributes[active_attribute.name].element_count = 4;
+            break;
           default:
-            throw new Error(`Attribute type ${active_attribute.type} is not Vector3f. Only Vector3f supported`);
+            throw new Error(`Attribute type ${this.__get_type_string(active_attribute.type)} not supported`);
             break;
         }
       } else {
@@ -173,7 +181,7 @@ class webgl_effect {
    * Returns a string representation of the given OpenGL type
    */
   __get_type_string(type) {
-    return this.__uniform_type_lut[type] || `UNKNOWN TYPE (${type})`;
+    return this.__type_lut[type] || `UNKNOWN TYPE (${type})`;
   }
 
 

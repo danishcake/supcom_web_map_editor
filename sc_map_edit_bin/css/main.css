@@ -39,6 +39,11 @@
   margin-left: 5px;
 }
 
+
+#editor-menu img {
+  margin-left: -3px;
+}
+
 #editor-view {
   display: block;
   position: absolute;

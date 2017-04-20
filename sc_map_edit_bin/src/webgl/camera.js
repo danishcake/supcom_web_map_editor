@@ -16,14 +16,14 @@ class webgl_camera {
     this.__up_vector = vec3.fromValues(0, 1, 0);
     this.__zoom = 0;
     this.__steps = 128;
-    this.__model_view = mat4.create();
+    this.__view = mat4.create();
     this.__perspective = mat4.create();
 
     const nearest_length = 22.6;
     const farthest_length = this.__long_edge * 1.1 / 2.0;
     this.__camera_position[2] = nearest_length + (farthest_length - nearest_length) * this.__zoom;
 
-    // Calculate initial model_view/perspective matrices
+    // Calculate initial view/perspective matrices
     this.tick();
   }
 
@@ -32,17 +32,17 @@ class webgl_camera {
    * Updates matrices based on current focus, zoom etc
    */
   tick() {
-    mat4.lookAt(this.__model_view, this.__camera_position, this.__look_at, this.__up_vector);
+    mat4.lookAt(this.__view, this.__camera_position, this.__look_at, this.__up_vector);
     let aspect_ratio = this.__gl.drawingBufferWidth / this.__gl.drawingBufferHeight;
     mat4.perspective(this.__perspective, this.__fov, aspect_ratio, 0.0001, 8192);
   }
 
 
   /**
-   * Returns the current model-view matrix
+   * Returns the current view matrix
    */
-  get modelview() {
-    return this.__model_view;
+  get view() {
+    return this.__view;
   }
 
 
@@ -147,10 +147,41 @@ class webgl_camera {
    * This will be used for changing the focus
    */
   project_to_world(position_screen) {
-    // Invert view-projection matrix
-    let inverted_mvp = mat4.create();
-    mat4.mul(inverted_mvp, this.__perspective, this.__model_view);
-    mat4.invert(inverted_mvp, inverted_mvp);
+    // The view matrix cannot be inverted naively as it's numerically unstable.
+    // Instead, lets calculate the inverse view matrix the SNEAKY DEVIOUS way by noticing
+    // that it can be expected as a rotation and translation.
+    // The inverse of a rotation is the transpose, and the inverse of a translation is
+    // trivial.
+    // V = R * T
+    // Vinv = Tinv * Rinv
+    // Rinv:
+    // Top 3x3 + 0,0,0,1, then transpose
+    let inverted_view_rotation = mat4.create();
+    mat4.fromValues(inverted_view_rotation, this.__view[0],  this.__view[1],  this.__view[2],  0,
+                                            this.__view[4],  this.__view[5],  this.__view[6],  0,
+                                            this.__view[8],  this.__view[9],  this.__view[10], 0,
+                                                         0,               0,               0,  1);
+    mat4.transpose(inverted_view_rotation, inverted_view_rotation);
+
+    // Tinv:
+    // Identity + x,y,z,w, then negate x,y,z,w
+    let inverted_view_translation = mat4.create();
+    mat4.fromValues(inverted_view_translation,                1,                0,                0,              0,
+                                                              0,                1,                0,              0,
+                                                              0,                0,                1,              0,
+                                               -this.__view[12], -this.__view[13], -this.__view[14], this.__view[15]);
+
+    let inverted_view = mat4.create();
+    mat4.mul(inverted_view, inverted_view_translation, inverted_view_rotation)
+
+    // Calculate inverse perspective
+    // Less numerically unstable, so OK to just use inversion
+    let inverted_perspective = mat4.create();
+    mat4.invert(inverted_perspective, this.__perspective);
+
+    // Combine to get VPinv
+    let inverted_vp = mat4.create();
+    mat4.mul(inverted_vp, inverted_view, inverted_perspective);
 
     // Express screen position in normalised screen space coordinates
     const half_width = this.__gl.canvas.clientWidth / 2;
@@ -163,8 +194,8 @@ class webgl_camera {
                                                 8192, 1);
 
     // Calculate a ray towards the clicked position
-    let position_world_near = this.__project(inverted_mvp, position_nssc_near);
-    let position_world_far  = this.__project(inverted_mvp, position_nssc_far);
+    let position_world_near = this.__project(inverted_vp, position_nssc_near);
+    let position_world_far  = this.__project(inverted_vp, position_nssc_far);
 
     // Turn the tapped position into a ray
     let ray = vec3.create();
