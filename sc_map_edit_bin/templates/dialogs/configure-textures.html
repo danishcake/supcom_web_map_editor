@@ -1,0 +1,121 @@
+<div class="modal-header dialog-header-notify">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <h4 class="modal-title"><span class="glyphicon glyphicon-list"></span> Configure textures</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+      <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Presets</h3>
+        </div>
+        <div class="panel-body">
+
+          <div class="input-group">
+            <select class="form-control" ng-model="data.selected_preset" ng-change="preset_change()">
+              <option ng-repeat="preset in presets" value="{{preset.name}}" ng-selected="preset.name == data.selected_preset">{{preset.name}}</option>
+            </select>
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button" ng-disabled="data.selected_preset == null">Use</button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+      <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Shaders and base textures</h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-lg-4"><h6>Terrain shader</h6></div>
+            <div class="col-lg-8">
+              <select class="form-control" ng-model="data.textures.terrain_shader">
+                <option ng-repeat="terrain_shader in resources.terrain_shaders" value="{{terrain_shader}}" ng-selected="terrain_shader == data.textures.terrain_shader">{{terrain_shader}}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4"><h6>Background texture</h6></div>
+            <div class="col-lg-8">
+              <select class="form-control" ng-model="data.textures.background_texture_path">
+                <option ng-repeat="background_texture in resources.background_textures" value="{{background_texture}}" ng-selected="background_texture == data.textures.background_texture_path">{{background_texture}}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4"><h6>Sky cubemap texture</h6></div>
+            <div class="col-lg-8">
+              <select class="form-control" ng-model="data.textures.sky_cubemap_texture_path">
+                <option ng-repeat="sky_cubemap_texture in resources.sky_cubemap_textures" value="{{sky_cubemap_texture}}" ng-selected="sky_cubemap_texture == data.textures.sky_cubemap_texture_path">{{sky_cubemap_texture}}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4"><h6>Environment cubemaps</h6></div>
+            <div class="col-lg-8">
+              <p>TODO: Implement editing</p>
+              <p ng-repeat="environment_cubemap in data.textures.environment_cubemaps">{{environment_cubemap.name}}:{{environment_cubemap.file}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+      <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Layers</h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-xs-2"></div>
+            <div class="col-xs-5"><h6>Albedo</h6></div>
+            <div class="col-xs-5"><h6>Normal-map</h6></div>
+          </div>
+          <div class="row" ng-repeat="layer in data.layers.normal_data track by $index">
+            <div class="col-xs-2"><h6>Layer {{$index}}</h6></div>
+            <div class="col-xs-5">
+              <select class="form-control" ng-model="data.layers.albedo_data[$index].texture_file">
+                <option ng-repeat="albedo_texture in resources.albedo_textures" 
+                        value="{{albedo_texture}}"
+                        ng-selected="albedo_texture == data.layers.albedo_data[$index].texture_file">{{albedo_texture}}</option>
+              </select>
+            </div>
+            <div class="col-xs-5">
+              <select class="form-control" ng-model="data.layers.normal_data[$index].texture_file">
+                <option ng-repeat="normal_texture in resources.normal_textures" 
+                        value="{{normal_texture}}"
+                        ng-selected="normal_texture == data.layers.normal_data[$index].texture_file">{{normal_texture}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-2"><h6>Layer 9</h6></div>
+            <div class="col-xs-5">
+              <select class="form-control" ng-model="data.layers.albedo_data[9].texture_file">
+                <option ng-repeat="albedo_texture in resources.albedo_textures" 
+                        value="{{albedo_texture}}"
+                        ng-selected="albedo_texture == data.layers.albedo_data[9].texture_file">{{albedo_texture}}</option>
+              </select>
+            </div>
+            <div class="col-xs-5"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <span class="pull-left">Any arbitrary combination of textures can be blended together, but typically only a single texture is used except at boundaries between the textures (eg sandy beach transitioning to grassy plain).</span>
+  <button type="button" class="btn btn-default pull-right" ng-click="accept()">OK</button>
+</div>

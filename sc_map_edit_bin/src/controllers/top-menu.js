@@ -44,7 +44,16 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
     dialogs.error('Metadata','Not implemented.');
   };
   $scope.edit_textures = function() {
-    dialogs.error('Textures','Not implemented.');
+    let dlg = dialogs.create("templates/dialogs/configure-textures.html",
+                             "configure-textures",
+                             {
+                               textures: editor_state.map.textures,
+                               layers: editor_state.map.layers
+                             },
+                             modal_dlg_opts);
+
+    dlg.result.then(textures => {
+    });
   };
   $scope.edit_water = function() {
     dialogs.error('Water','Not implemented.');
