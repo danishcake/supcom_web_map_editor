@@ -82,19 +82,18 @@
             <div class="col-xs-5"><h6>Normal-map</h6></div>
           </div>
           <div class="row" ng-repeat="layer in data.layers.normal_data track by $index">
+            <!-- Note that there are always 9 normal layers and 10 albedo layers -->
             <div class="col-xs-2"><h6>Layer {{$index}}</h6></div>
             <div class="col-xs-5">
               <select class="form-control" ng-model="data.layers.albedo_data[$index].texture_file">
-                <option ng-repeat="albedo_texture in resources.albedo_textures" 
-                        value="{{albedo_texture}}"
-                        ng-selected="albedo_texture == data.layers.albedo_data[$index].texture_file">{{albedo_texture}}</option>
+                <option ng-repeat ="albedo_texture in resources.albedo_textures"
+                        selected = "albedo_texture == data.layers.albedo_data[$index].texture_file ? 'selected': ''">{{albedo_texture}}</option>
               </select>
             </div>
             <div class="col-xs-5">
               <select class="form-control" ng-model="data.layers.normal_data[$index].texture_file">
-                <option ng-repeat="normal_texture in resources.normal_textures" 
-                        value="{{normal_texture}}"
-                        ng-selected="normal_texture == data.layers.normal_data[$index].texture_file">{{normal_texture}}</option>
+                <option ng-repeat ="normal_texture in resources.normal_textures"
+                        selected = "normal_texture == data.layers.normal_data[$index].texture_file ? 'selected': ''">{{normal_texture}}</option>
               </select>
             </div>
           </div>
@@ -102,9 +101,8 @@
             <div class="col-xs-2"><h6>Layer 9</h6></div>
             <div class="col-xs-5">
               <select class="form-control" ng-model="data.layers.albedo_data[9].texture_file">
-                <option ng-repeat="albedo_texture in resources.albedo_textures" 
-                        value="{{albedo_texture}}"
-                        ng-selected="albedo_texture == data.layers.albedo_data[9].texture_file">{{albedo_texture}}</option>
+                <option ng-repeat ="albedo_texture in resources.albedo_textures"
+                        selected = "albedo_texture == data.layers.albedo_data[$index].texture_file ? 'selected': ''">{{albedo_texture}}</option>
               </select>
             </div>
             <div class="col-xs-5"></div>

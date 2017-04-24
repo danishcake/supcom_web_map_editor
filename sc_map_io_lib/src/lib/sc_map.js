@@ -241,10 +241,14 @@ class sc_map_textures {
     this.__environment_cubemaps = [];
   }
 
-  get terrain_shader() { return this.__terrain_shader; }
-  get background_texture_path() { return this.__background_texture_path; }
-  get sky_cubemap_texture_path() { return this.__sky_cubemap_texture_path; }
-  get environment_cubemaps() { return this.__environment_cubemaps; }
+  get terrain_shader()                { return this.__terrain_shader; }
+  set terrain_shader(value)           { this.__terrain_shader = value; }
+  get background_texture_path()       { return this.__background_texture_path; }
+  set background_texture_path(value)  { this.__background_texture_path = value; }
+  get sky_cubemap_texture_path()      { return this.__sky_cubemap_texture_path; }
+  set sky_cubemap_texture_path(value) { this.__sky_cubemap_texture_path = value; }
+  get environment_cubemaps()          { return this.__environment_cubemaps; }
+  set environment_cubemaps(value)     { this.__environment_cubemaps = value; }
 
   load(input) {
     let null_byte = input.readByte(); // Random null byte
@@ -775,8 +779,10 @@ class sc_map_layer {
     this.__texture_scale = texture_scale;
   }
 
-  get texture_file() { return this.__texture_file; }
-  get texture_scale() { return this.__texture_scale; }
+  get texture_file()       { return this.__texture_file; }
+  set texture_file(value)  { this.__texture_file = value; }
+  get texture_scale()      { return this.__texture_scale; }
+  set texture_scale(value) { this.__texture_scale = value; }
 
   load(input) {
     let texture_file = input.readCString();

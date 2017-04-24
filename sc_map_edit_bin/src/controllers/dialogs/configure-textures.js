@@ -50,10 +50,9 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-textures",
         terrain_shader: "TTerrain",
         background_texture_path: "/textures/environment/defaultbackground.dds",
         sky_cubemap_texture_path: "/textures/environment/defaultskycube.dds",
-        environment_cubemaps: {
-          name: "<default>",
-          file: "/textures/environment/defaultenvcube.dds"
-        }
+        environment_cubemaps: [
+          { name: "<default>", file: "/textures/environment/defaultenvcube.dds" }
+        ]
       },
       albedo_layers: [
         {scale: 10,  texture_file: "/env/evergreen/layers/rockmed_albedo.dds"},
@@ -88,6 +87,9 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-textures",
 
 
   $scope.accept = function() {
-    $uibModalInstance.close($scope.data.textures, $scope.data.layers);
+    $uibModalInstance.close({
+      textures: $scope.data.textures,
+      layers: $scope.data.layers
+    });
   };
 }]);

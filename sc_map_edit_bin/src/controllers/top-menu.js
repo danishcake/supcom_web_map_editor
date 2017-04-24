@@ -52,8 +52,30 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
                              },
                              modal_dlg_opts);
 
-    dlg.result.then(textures => {
-    });
+    dlg.result.then((result) => {
+      const textures = result.textures;
+      const layers = result.layers;
+
+      // Persist changes made to textures
+      editor_state.map.textures.terrain_shader           = textures.terrain_shader;
+      editor_state.map.textures.background_texture_path  = textures.background_texture_path;
+      editor_state.map.textures.sky_cubemap_texture_path = textures.sky_cubemap_texture_path;
+      editor_state.map.textures.environment_cubemaps.length = 0;
+      _.each(textures.environment_cubemaps, environment_cubemap => {
+        editor_state.map.textures.environment_cubemaps.push(environment_cubemap);
+      });
+
+      // Persist changes made to layers
+      _.each(layers.normal_data, (layer, index) => {
+        editor_state.map.layers.normal_data[index].texture_file  = layer.texture_file;
+        editor_state.map.layers.normal_data[index].texture_scale = layer.texture_scale;
+      });
+      _.each(layers.albedo_data, (layer, index) => {
+        editor_state.map.layers.albedo_data[index].texture_file  = layer.texture_file;
+        editor_state.map.layers.albedo_data[index].texture_scale = layer.texture_scale;
+      });
+    },
+    () => {});
   };
   $scope.edit_water = function() {
     dialogs.error('Water','Not implemented.');
