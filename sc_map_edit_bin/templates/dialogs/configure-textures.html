@@ -17,7 +17,7 @@
               <option ng-repeat="preset in presets" value="{{preset.name}}" ng-selected="preset.name == data.selected_preset">{{preset.name}}</option>
             </select>
             <span class="input-group-btn">
-              <button class="btn btn-default" type="button" ng-disabled="data.selected_preset == null">Use</button>
+              <button class="btn btn-default" type="button" ng-disabled="data.selected_preset == null" ng-click="use_preset()">Use</button>
             </span>
           </div>
         </div>
