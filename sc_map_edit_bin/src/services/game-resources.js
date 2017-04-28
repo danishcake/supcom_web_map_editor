@@ -19,8 +19,7 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
 
   service.loaded = false;
   service.callbacks = {
-    on_loaded: [],
-    on_progress: []
+    on_loaded: []
   };
 
   // Are there other shaders? I don;t think so! I guess you could set LowFidelityTerrain? The cartographic Terrain_Stage0/1?
@@ -169,13 +168,6 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Wet sand",    tileset: "Desert", value: "/env/Desert/Layers/Des_Sandwet_normal.dds",   url: ""},
   ];
 
-  /**
-   * Subscribe for updates to loading progress
-   * @param {function} callback Arguments (string: description, number: progress_fraction)
-   */
-  service.on_progress = function(callback) {
-    service.callbacks.on_progress.push(callback);
-  };
 
   /**
    * Subscribe for a call indicating all resources are loaded.
@@ -190,12 +182,6 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     }
   };
 
-  /**
-   * Callback all progress subscribers
-   */
-  service.dispatch_on_progress = function(message, fraction) {
-    _.each(service.callbacks.on_progress, callback => callback(message, fraction));
-  };
 
   /**
    * Callback all loaded subscribers.
@@ -229,7 +215,9 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
   };
 
   // Start loading
-  const download_resources = function() {
+  service.load_resources = _.once(function(progress_callback, completion_callback) {
+    service.on_loaded(completion_callback);
+    
     let total_work = service.backgrounds.length +
                      service.sky_cubemaps.length +
                      service.environment_cubemaps.length +
@@ -238,7 +226,7 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
 
     const report_progress = function(description) {
       work_done++;
-      service.dispatch_on_progress(description, work_done / total_work);
+      progress_callback(description, work_done / total_work);
     };
 
     async.series([
@@ -253,9 +241,7 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
         service.dispatch_on_loaded();
       }
     });
-  };
-
-  download_resources();
+  });
 
   return service;
 }]);

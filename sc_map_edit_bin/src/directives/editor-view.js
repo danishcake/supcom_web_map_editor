@@ -263,7 +263,10 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
                       modal_dlg_opts);
 
       // Wait for loading to complete before we start doing anything at all
-      game_resources.on_loaded((error) => {
+      game_resources.load_resources((message, progress) => {
+        $rootScope.$broadcast("dialogs.progress.progress", { message: message, progress: progress});
+      },
+      (error) => {
         if (error) {
           $rootScope.$broadcast("dialogs.progress.error", { message: error });
         } else {
@@ -272,11 +275,6 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
           editor_state.on_new_map(update_map);
         }
       });
-
-      game_resources.on_progress((message, progress) => {
-        $rootScope.$broadcast("dialogs.progress.progress", { message: message, progress: progress});
-      });
-
 
       // Store the editor state so we can direct tool events to it
       scope.editor_state = editor_state;
