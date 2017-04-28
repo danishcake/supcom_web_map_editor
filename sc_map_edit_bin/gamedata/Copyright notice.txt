@@ -1,0 +1,7 @@
+These files are extracted from Supreme Commander Forged Alliance and are therefore on somewhat dodgy copyright ground.
+
+I reserve no rights to these images, and note that they:
+1. Have been heavily downsampled
+2. Are required for the editor to actually work
+
+The copyright to these images remain the property of the original publisher

@@ -1,4 +1,4 @@
-angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_state", function(editor_state) {
+angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_state", "game_resources", "dialogs", "$rootScope", function(editor_state, game_resources, dialogs, $rootScope) {
 
   /**
    * Rendering callback. Draws the scene and schedules a redraw
@@ -97,6 +97,14 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     scope.camera = new webgl_camera(scope.gl,
                                     [editor_state.map.heightmap.width, editor_state.map.heightmap.height],
                                     [scope.gl.canvas.width, scope.gl.canvas.height]);
+  }
+
+
+  /**
+   * Creates a web_gl camera as a placeholder until a real one can be loaded later
+   */
+  let initialiseDummyCamera = function(scope) {
+    scope.camera = new webgl_camera(scope.gl, [256, 256], [100, 100]);
   }
 
 
@@ -224,6 +232,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
 
       initialiseRenderScheduleFn(scope);
       initialiseWebGl(scope, canvas);
+      initialiseDummyCamera(scope);
 
       /**
        * Register for map changes. When it does:
@@ -244,8 +253,30 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
         });
       };
 
-      editor_state.on_new_map(update_map);
-      update_map();
+      // Show progress until resources are loaded
+      dialogs.create("templates/dialogs/progress.html",
+                      "progress",
+                      {
+                        title: "Loading resources",
+                        message: "Loading resources"
+                      },
+                      modal_dlg_opts);
+
+      // Wait for loading to complete before we start doing anything at all
+      game_resources.on_loaded((error) => {
+        if (error) {
+          $rootScope.$broadcast("dialogs.progress.error", { message: error });
+        } else {
+          $rootScope.$broadcast("dialogs.progress.complete");
+          update_map();
+          editor_state.on_new_map(update_map);
+        }
+      });
+
+      game_resources.on_progress((message, progress) => {
+        $rootScope.$broadcast("dialogs.progress.progress", { message: message, progress: progress});
+      });
+
 
       // Store the editor state so we can direct tool events to it
       scope.editor_state = editor_state;

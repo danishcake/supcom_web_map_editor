@@ -12,6 +12,7 @@
                     <File name="sc_map_edit_bin\src\controllers\dialogs\save-progress.js" />
                     <File name="sc_map_edit_bin\src\controllers\dialogs\configure-forces.js" />
                     <File name="sc_map_edit_bin\src\controllers\dialogs\configure-textures.js" />
+                    <File name="sc_map_edit_bin\src\controllers\dialogs\progress.js" />
                 </Folder>
                 <File name="sc_map_edit_bin\src\controllers\editor-menu.js" />
                 <File name="sc_map_edit_bin\src\controllers\editor-view.js" />
@@ -25,6 +26,7 @@
             </Folder>
             <Folder name="services">
                 <File name="sc_map_edit_bin\src\services\editor-state.js" />
+                <File name="sc_map_edit_bin\src\services\game-resources.js" />
             </Folder>
             <Folder name="webgl">
                 <File name="sc_map_edit_bin\src\webgl\camera.js" />
@@ -42,6 +44,7 @@
                 <File name="sc_map_edit_bin\templates\dialogs\save-progress.html" />
                 <File name="sc_map_edit_bin\templates\dialogs\configure-forces.html" />
                 <File name="sc_map_edit_bin\templates\dialogs\configure-textures.html" />
+                <File name="sc_map_edit_bin\templates\dialogs\progress.html" />
             </Folder>
             <File name="sc_map_edit_bin\templates\editor-menu.html" />
             <File name="sc_map_edit_bin\templates\editor-view.html" />
