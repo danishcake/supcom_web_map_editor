@@ -1,5 +1,5 @@
 angular.module('sc_map_edit_bin.controllers').controller("configure-textures",
-["$scope", "$uibModalInstance", "dialogs", "data", function($scope, $uibModalInstance, dialogs, data) {
+["$scope", "$uibModalInstance", "dialogs", "game_resources", "data", function($scope, $uibModalInstance, dialogs, game_resources, data) {
 
   /**
    * Textures contains the basic common textures and shaders
@@ -11,32 +11,7 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-textures",
     selected_preset: null,
   };
 
-
-  // TODO: Move this stuff to a service
-  $scope.resources = {
-    terrain_shaders: ["TTerrain"],
-    background_textures: ["/textures/environment/defaultbackground.dds"],
-    sky_cubemap_textures: ["/textures/environment/defaultskycube.dds"],
-    environment_cubemaps: [
-      { name: "<default>", file: "/textures/environment/defaultenvcube.dds" }
-    ],
-    albedo_textures: [
-      "",
-      "/env/evergreen/layers/macrotexture000_albedo.dds",
-      "/env/evergreen/layers/rockmed_albedo.dds",
-      "/env/evergreen2/layers/eg_grass001_albedo.dds",
-      "/env/evergreen2/layers/eg_rock_albedo.dds",
-      "/env/swamp/layers/sw_sphagnum_03_albedo.dds",
-    ],
-    normal_textures: [
-      "",
-      "/env/evergreen/layers/SandLight_normals.dds",
-      "/env/evergreen/layers/grass001_normals.dds",
-      "/env/evergreen/layers/Dirt001_normals.dds",
-      "/env/evergreen/layers/RockMed_normals.dds",
-      "/env/evergreen/layers/snow001_normals.dds",
-    ],
-  };
+  $scope.game_resources = game_resources;
 
 
   /**
