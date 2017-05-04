@@ -32,7 +32,7 @@
         </div>
         <div class="panel-body">
           <div class="row">
-            <div class="col-lg-4"><h6>Terrain shader</h6></div>
+            <div class="col-lg-3"><h6>Terrain shader</h6></div>
             <div class="col-lg-8">
               <select class="form-control" ng-model="data.textures.terrain_shader">
                 <option ng-repeat="terrain_shader in game_resources.shaders"
@@ -45,8 +45,8 @@
           </div>
 
           <div class="row">
-            <div class="col-lg-4"><h6>Background texture</h6></div>
-            <div class="col-lg-8">
+            <div class="col-lg-3"><h6>Background texture</h6></div>
+            <div class="col-lg-7">
               <select class="form-control" ng-model="data.textures.background_texture_path">
                 <option ng-repeat="background_texture in game_resources.backgrounds"
                         value="{{background_texture.value}}"
@@ -55,11 +55,14 @@
                 </option>
               </select>
             </div>
+            <div class="col-lg-2">
+              <img ng-src="{{game_resources.img_url_lookup(data.textures.background_texture_path)}}"/>
+            </div>
           </div>
 
           <div class="row">
-            <div class="col-lg-4"><h6>Sky cubemap texture</h6></div>
-            <div class="col-lg-8">
+            <div class="col-lg-3"><h6>Sky cubemap texture</h6></div>
+            <div class="col-lg-7">
               <select class="form-control" ng-model="data.textures.sky_cubemap_texture_path">
                 <option ng-repeat="sky_cubemap_texture in game_resources.sky_cubemaps"
                         value="{{sky_cubemap_texture.value}}"
@@ -68,13 +71,19 @@
                 </option>
               </select>
             </div>
+            <div class="col-lg-2">
+              <img ng-src="{{game_resources.img_url_lookup(data.textures.sky_cubemap_texture_path)}}"/>
+            </div>
           </div>
 
           <div class="row">
             <div class="col-lg-4"><h6>Environment cubemaps</h6></div>
             <div class="col-lg-8">
               <p>TODO: Implement editing</p>
-              <p ng-repeat="environment_cubemap in data.textures.environment_cubemaps">{{environment_cubemap.name}}:{{environment_cubemap.file}}</p>
+              <p ng-repeat="environment_cubemap in data.textures.environment_cubemaps">
+                {{environment_cubemap.name}}:{{environment_cubemap.file}}
+                <img ng-src="{{game_resources.img_url_lookup(environment_cubemap.file)}}"/>
+              </p>
             </div>
           </div>
         </div>
@@ -96,7 +105,7 @@
           <div class="row" ng-repeat="layer in data.layers.normal_data track by $index">
             <!-- Note that there are always 9 normal layers and 10 albedo layers -->
             <div class="col-xs-2"><h6>Layer {{$index}}</h6></div>
-            <div class="col-xs-5">
+            <div class="col-xs-4">
               <select class="form-control" ng-model="data.layers.albedo_data[$index].texture_file">
                 <option ng-repeat = "albedo_texture in game_resources.albedo_textures"
                         value     = "{{albedo_texture.value}}"
@@ -104,6 +113,9 @@
                   {{albedo_texture.name}}
                 </option>
               </select>
+            </div>
+            <div class="col-xs-1">
+              <img ng-src="{{game_resources.img_url_lookup(data.layers.albedo_data[$index].texture_file)}}"/>
             </div>
             <div class="col-xs-5">
               <select class="form-control" ng-model="data.layers.normal_data[$index].texture_file">
@@ -117,7 +129,7 @@
           </div>
           <div class="row">
             <div class="col-xs-2"><h6>Layer 9</h6></div>
-            <div class="col-xs-5">
+            <div class="col-xs-4">
               <select class="form-control" ng-model="data.layers.albedo_data[9].texture_file">
                 <option ng-repeat = "albedo_texture in game_resources.albedo_textures"
                         value     = "{{albedo_texture.value}}"
@@ -125,6 +137,9 @@
                   {{albedo_texture.name}}
                 </option>
               </select>
+            </div>
+            <div class="col-xs-1">
+              <img ng-src="{{game_resources.img_url_lookup(data.layers.albedo_data[$index].texture_file)}}"/>
             </div>
             <div class="col-xs-5"></div>
           </div>

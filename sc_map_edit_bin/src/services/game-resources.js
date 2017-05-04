@@ -229,6 +229,33 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
 
 
   /**
+   * Searches through the available textures for the first with a matching value
+   * and returns the image URL, or "" if not found
+   */
+  service.img_url_lookup = function(img_value) {
+    const texture_sets = [
+      service.backgrounds,
+      service.sky_cubemaps,
+      service.albedo_textures,
+      service.markers
+    ];
+
+    let matching_texture = _.chain(texture_sets)
+      .flatten()
+      .findWhere({value: img_value})
+      .value();
+
+    if (matching_texture) {
+      return matching_texture.img.src;
+    } else {
+      return "";
+    }
+  };
+
+
+
+
+  /**
    * Build webgl textures from a set of textures
    */
   const build_webgl_textures = function(texture_set, gl, progress_cb, done_cb) {
