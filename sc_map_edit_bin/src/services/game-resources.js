@@ -154,7 +154,21 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Medium sand",   tileset: "Desert", value: "/env/Desert/Layers/Des_SandMed_albedo.dds"},
     {name: "Medium sand 1", tileset: "Desert", value: "/env/Desert/Layers/Des_SandMed01_albedo.dds"},
     {name: "Medium sand 2", tileset: "Desert", value: "/env/Desert/Layers/Des_SandMed02_albedo.dds"},
-    {name: "Wet sand",      tileset: "Desert", value: "/env/Desert/Layers/Des_Sandwet_albedo.dds"}
+    {name: "Wet sand",      tileset: "Desert", value: "/env/Desert/Layers/Des_Sandwet_albedo.dds"},
+
+    // Evergreen tileset
+    {name: "Dirt 1",         tileset: "Evergreen", value: "/env/Evergreen/layers/Dirt001_albedo.dds"},
+    {name: "Grass 0",        tileset: "Evergreen", value: "/env/Evergreen/layers/grass000_albedo.dds"},
+    {name: "Grass 1",        tileset: "Evergreen", value: "/env/Evergreen/layers/grass001_albedo.dds"},
+    {name: "Macrotexture 0", tileset: "Evergreen", value: "/env/Evergreen/layers/macrotexture000_albedo.dds"},
+    {name: "Macrotexture 1", tileset: "Evergreen", value: "/env/Evergreen/layers/macrotexture001_albedo.dds"},
+    {name: "Light rock",     tileset: "Evergreen", value: "/env/Evergreen/layers/RockLight_albedo.dds"},
+    {name: "Medium rock",    tileset: "Evergreen", value: "/env/Evergreen/layers/RockMed_albedo.dds"},
+    {name: "Light sand",     tileset: "Evergreen", value: "/env/Evergreen/layers/SandLight_albedo.dds"},
+    {name: "Light sand 2",   tileset: "Evergreen", value: "/env/Evergreen/layers/SandLight002_albedo.dds"},
+    {name: "Sand rock",      tileset: "Evergreen", value: "/env/Evergreen/layers/SandRock_albedo.dds"},
+    {name: "Sand wet",       tileset: "Evergreen", value: "/env/Evergreen/layers/Sandwet_albedo.dds"},
+    {name: "Snow",           tileset: "Evergreen", value: "/env/Evergreen/layers/snow001_albedo.dds"},
   ];
 
   service.normal_textures = [
@@ -169,6 +183,18 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Light sand",  tileset: "Desert", value: "/env/Desert/Layers/Des_sandLight_normal.dds"},
     {name: "Medium sand", tileset: "Desert", value: "/env/Desert/Layers/Des_SandMed_normal.dds"},
     {name: "Wet sand",    tileset: "Desert", value: "/env/Desert/Layers/Des_Sandwet_normal.dds"},
+
+    // Evergreen tileset
+    {name: "Dirt 1",       tileset: "Evergreen", value: "Dirt001_normals.dds"},
+    {name: "Grass 0",      tileset: "Evergreen", value: "grass000_normals.dds"},
+    {name: "Grass 1",      tileset: "Evergreen", value: "grass001_normals.dds"},
+    {name: "Light rock",   tileset: "Evergreen", value: "RockLight_normals.dds"},
+    {name: "Medium rock",  tileset: "Evergreen", value: "RockMed_normals.dds"},
+    {name: "Light sand",   tileset: "Evergreen", value: "SandLight_normals.dds"},
+    {name: "Light sand 2", tileset: "Evergreen", value: "SandLight002_normals.dds"},
+    {name: "Sand rock",    tileset: "Evergreen", value: "SandRock_normals.dds"},
+    {name: "Sand wet",     tileset: "Evergreen", value: "Sandwet_normals.dds"},
+    {name: "Snow",         tileset: "Evergreen", value: "snow001_normals.dds"},
   ];
 
 
