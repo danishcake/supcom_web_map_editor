@@ -773,14 +773,14 @@ class sc_map_water {
 /**
  * Layer entry
  */
-class sc_map_layer {
+export class sc_map_layer {
   constructor(texture_file, texture_scale) {
-    this.__texture_file = texture_file;
+    this.__texture_file = (texture_file || "").toLowerCase();
     this.__texture_scale = texture_scale;
   }
 
   get texture_file()       { return this.__texture_file; }
-  set texture_file(value)  { this.__texture_file = value; }
+  set texture_file(value)  { this.__texture_file = (value || "").toLowerCase(); }
   get texture_scale()      { return this.__texture_scale; }
   set texture_scale(value) { this.__texture_scale = value; }
 

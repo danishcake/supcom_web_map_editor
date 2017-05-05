@@ -1,4 +1,5 @@
 import { sc } from '../lib/sc';
+import { sc_map_layer } from '../lib/sc_map';
 const assert = require('chai').assert;
 const fs = require('fs');
 const ByteBuffer = require('bytebuffer');
@@ -455,10 +456,10 @@ describe('sc_map', function() {
       assert.closeTo(map.layers.albedo_data[9].texture_scale, 128.0, 0.001);
 
 
-      assert.equal(map.layers.normal_data[0].texture_file, "/env/evergreen/layers/SandLight_normals.dds");
+      assert.equal(map.layers.normal_data[0].texture_file, "/env/evergreen/layers/sandlight_normals.dds");
       assert.equal(map.layers.normal_data[1].texture_file, "/env/evergreen/layers/grass001_normals.dds");
-      assert.equal(map.layers.normal_data[2].texture_file, "/env/evergreen/layers/Dirt001_normals.dds");
-      assert.equal(map.layers.normal_data[3].texture_file, "/env/evergreen/layers/RockMed_normals.dds");
+      assert.equal(map.layers.normal_data[2].texture_file, "/env/evergreen/layers/dirt001_normals.dds");
+      assert.equal(map.layers.normal_data[3].texture_file, "/env/evergreen/layers/rockmed_normals.dds");
       assert.equal(map.layers.normal_data[4].texture_file, "/env/evergreen/layers/snow001_normals.dds");
       assert.equal(map.layers.normal_data[5].texture_file, "");
       assert.equal(map.layers.normal_data[6].texture_file, "");
@@ -473,6 +474,18 @@ describe('sc_map', function() {
       assert.closeTo(map.layers.normal_data[6].texture_scale, 4.0, 0.001);
       assert.closeTo(map.layers.normal_data[7].texture_scale, 4.0, 0.001);
       assert.closeTo(map.layers.normal_data[8].texture_scale, 4.0, 0.001);
+    });
+
+    it('should normalise layer paths', function() {
+      /* Textures are case insensitive on the filesystem, but not in the editor UI!
+       * Furthermore the original game resources uses a weird mix of cases. To simplify
+       * this I'm just going to normalise all paths to lowercase in constructors and setters
+       */
+       let layer = new sc_map_layer("PathWithMixedCase", 1);
+       assert.equal("pathwithmixedcase", layer.texture_file);
+
+       layer.texture_file = "IReallyWantUppercase";
+       assert.equal("ireallywantuppercase", layer.texture_file); // Denied :)
     });
 
     it('should create customer layers if specified', function() {
@@ -778,16 +791,5 @@ describe('sc_map', function() {
       // TODO: Check props are serialised right!
       assert.equal(this.dest_map.props.props.length, this.src_map.props.props.length);
     });
-  });
-
-  describe('zip loading', function() {
-    it('should load scripts and scmap from zipfile', function() {
-    });
-
-    it('should load scenario first, and use that to determine other filenames', function() {
-    });
-  });
-
-  describe('zip saving', function() {
   });
 });
