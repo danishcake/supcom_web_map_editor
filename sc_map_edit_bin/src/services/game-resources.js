@@ -223,6 +223,39 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Wet Rock 1",   tileset: "Common",      url: "/env/Common/layers/WetRock001_albedo.png"},
     {name: "Wet Rock 2",   tileset: "Common",      url: "/env/Common/layers/WetRock002_albedo.png"},
 
+    // Crystalline
+    {name: "Crystalline 1-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_01_01_albedo.png"},
+    {name: "Crystalline 2-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_02_01_albedo.png"},
+    {name: "Crystalline 3-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_03_01_albedo.png"},
+    {name: "Crystalline 4-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_04_01_albedo.png"},
+    {name: "Crystalline 5-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_05_01_albedo.png"},
+    {name: "Crystalline 6-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_06_01_albedo.png"},
+    {name: "Crystalline 7-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_07_01_albedo.png"},
+    {name: "Crystalline 7-1b copy", tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_07_01b_albedo copy.png"}, // Derp
+    {name: "Crystalline 7-1b",      tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_07_01b_albedo.png"},
+    {name: "Crystalline 8-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_08_01_albedo.png"},
+    {name: "Crystalline 8-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_09_01_albedo.png"},
+    {name: "Crystalline rock 1",    tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_Rock001_albedo.png"},
+    {name: "Crystalline rock 1b",   tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_Rock001b_albedo.png"},
+    {name: "Crystalline rock 2b",   tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_Rock002b_albedo.png"},
+    {name: "Crystalline rock 4",    tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_Rock004_albedo.png"},
+    {name: "Crystalline rock 5",    tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_Rock05_albedo.png"},
+    {name: "Crystalline wet sand",  tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_Sandwet_albedo.png"},
+    {name: "Crystalline rock 1c",   tileset: "Crystalline", url: "/env/Crystalline/layers/Cryst_Rock01_albedo.png"},
+    {name: "Crystalline 9",         tileset: "Crystalline", url: "/env/Crystalline/layers/Cryst009_albedo.png"},
+    {name: "Crystalline 10",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cryst010_albedo.png"},
+    {name: "Crystalline 11",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cryst011_albedo.png"},
+    {name: "Crystalline 12",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cryst012_albedo.png"},
+    {name: "Crystalline 13",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cryst013_albedo.png"},
+    {name: "Crystalwerk 1",         tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk01_albedo.png"},
+    {name: "Crystalwerk 2",         tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk02_albedo.png"},
+    {name: "Crystalwerk 2b",        tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk02b_albedo.png"},
+    {name: "Crystalwerk 3",         tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk03_albedo.png"},
+    {name: "Crystalwerk 4",         tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk04_albedo.png"},
+    {name: "Crystalwerk 4b",        tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk04_b_albedo.png"},
+    {name: "Crystalwerk 5",         tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk05_albedo.png"},
+    {name: "Crystalwerk 6",         tileset: "Crystalline", url: "/env/Crystalline/layers/CrystalWerk06_albedo.png"},
+    {name: "Crystalwerk 7",         tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk07_albedo.png"},
   ];
 
   service.normal_textures = [
@@ -267,6 +300,27 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
 
     // Common tileset
     {name: "None",         tileset: "Common",      url: "/env/Common/layers/None_normal.png"},
+
+    // Crystalline
+    {name: "Crystalline 2-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_02_01_normal.png"},
+    {name: "Crystalline 1-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_01_01_normal.png"},
+    {name: "Crystalline 3-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_03_01_normal.png"},
+    {name: "Crystalline 4-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_04_01_normal.png"},
+    {name: "Crystalline 5-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_05_01_normal.png"},
+    {name: "Crystalline 6-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_06_01_normal.png"},
+    {name: "Crystalline 7-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_07_01_normal.png"},
+    {name: "Crystalline 7-1b",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_07_01b_normal.png"},
+    {name: "Crystalline 8-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_08_01_normal.png"},
+    {name: "Crystalline 9-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_09_01_normal.png"},
+    {name: "Crystalline rock 2b",    tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_Rock002b_normal.png"},
+    {name: "Crystalline light sand", tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_sandLight_normal.png"},
+    {name: "Crystalline rock 1",     tileset: "Crystalline", url: "/env/Crystalline/layers/Cryst_Rock01_normal.png"},
+    {name: "Crystalwerk 2",          tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk02_normal.png"},
+    {name: "Crystalwerk 2b",         tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk02b_normal.png"},
+    {name: "Crystalwerk 4",          tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk04_normals.png"},
+    {name: "Crystalwerk 5",          tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk05_normal.png"},
+    {name: "Crystalwerk 6",          tileset: "Crystalline", url: "/env/Crystalline/layers/CrystalWerk06_normal.png"},
+    {name: "Crystalwerk 7",          tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk07_normal.png"},
   ];
 
 
