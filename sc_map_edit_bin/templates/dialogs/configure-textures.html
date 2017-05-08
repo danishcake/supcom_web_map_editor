@@ -110,7 +110,7 @@
                 <option ng-repeat = "albedo_texture in game_resources.albedo_textures"
                         value     = "{{albedo_texture.value}}"
                         selected  = "{{albedo_texture.value == data.layers.albedo_data[$index].texture_file ? 'selected' : ''}}">
-                  {{albedo_texture.name}}
+                  {{albedo_texture.tileset}}/{{albedo_texture.name}}
                 </option>
               </select>
             </div>
@@ -122,7 +122,7 @@
                 <option ng-repeat = "normal_texture in game_resources.normal_textures"
                         value     = "{{normal_texture.value}}"
                         selected  = "{{normal_texture.value == data.layers.normal_data[$index].texture_file ? 'selected': ''}}">
-                  {{normal_texture.name}}
+                  {{normal_texture.tileset}}/{{normal_texture.name}}
                 </option>
               </select>
             </div>
@@ -133,13 +133,13 @@
               <select class="form-control" ng-model="data.layers.albedo_data[9].texture_file">
                 <option ng-repeat = "albedo_texture in game_resources.albedo_textures"
                         value     = "{{albedo_texture.value}}"
-                        selected  = "{{albedo_texture.value == data.layers.albedo_data[$index].texture_file ? 'selected': ''}}">
-                  {{albedo_texture.name}}
+                        selected  = "{{albedo_texture.value == data.layers.albedo_data[9].texture_file ? 'selected': ''}}">
+                  {{albedo_texture.tileset}}/{{albedo_texture.name}}
                 </option>
               </select>
             </div>
             <div class="col-xs-1">
-              <img ng-src="{{game_resources.img_url_lookup(data.layers.albedo_data[$index].texture_file)}}"/>
+              <img ng-src="{{game_resources.img_url_lookup(data.layers.albedo_data[9].texture_file)}}"/>
             </div>
             <div class="col-xs-5"></div>
           </div>
