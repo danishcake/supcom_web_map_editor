@@ -218,6 +218,11 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Transition 2", tileset: "Evergreen 2", url: "/env/Evergreen2/Layers/EvTrans02_albedo.png"},
     {name: "Transition 3", tileset: "Evergreen 2", url: "/env/Evergreen2/Layers/EvTrans03_albedo.png"},
 
+    // Common tileset
+    {name: "None",         tileset: "Common",      url: "/env/Common/layers/None_albedo.png"},
+    {name: "Wet Rock 1",   tileset: "Common",      url: "/env/Common/layers/WetRock001_albedo.png"},
+    {name: "Wet Rock 2",   tileset: "Common",      url: "/env/Common/layers/WetRock002_albedo.png"},
+
   ];
 
   service.normal_textures = [
@@ -259,6 +264,9 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Gravel",       tileset: "Evergreen 2", url: "/env/Evergreen2/Layers/EG_Gravel_normal.png"},
     {name: "Grass 1",      tileset: "Evergreen 2", url: "/env/Evergreen2/Layers/EG_Grass001_normal.png"},
     {name: "Grass 2",      tileset: "Evergreen 2", url: "/env/Evergreen2/Layers/EG_Grass002_normal.png"},
+
+    // Common tileset
+    {name: "None",         tileset: "Common",      url: "/env/Common/layers/None_normal.png"},
   ];
 
 
