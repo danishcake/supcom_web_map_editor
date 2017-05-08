@@ -294,34 +294,6 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
 
 
   /**
-   * Download a set of textures
-   */
-  const download_texture_set = function(texture_set, progress_cb, done_cb) {
-    let loaded_image_count = 0;
-
-    for (let texture of texture_set) {
-      let img = new Image();
-      img.onload = () => {
-        loaded_image_count++;
-        if (loaded_image_count === texture_set.length) {
-          // Report completion
-          done_cb(null);
-        } else {
-          // Report progress
-          progress_cb(`Downloaded ${texture.value}`);
-        }
-      };
-      // TODO: Load errors
-      img.src = `gamedata${texture.url}`;
-      texture.img = img;
-
-      // Store the value that will be used in serialisation
-      texture.value = texture.url.toLowerCase().replace(".png", ".dds");
-    }
-  };
-
-
-  /**
    * Searches through the available textures for the first with a matching value
    * and returns the image URL, or "" if not found
    */
@@ -346,6 +318,43 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
   };
 
 
+  /**
+   * The texture URL matches the Supreme Commander gamedata structure,
+   * but filenames in the serialised maps are lowercase.
+   * This does not report progress as it should be more or less free
+   */
+  const normalise_texture_set = function(texture_set, done_cb) {
+    for (let texture of texture_set) {
+      //
+      texture.value = texture.url.toLowerCase().replace(".png", ".dds");
+    }
+    done_cb();
+  };
+
+
+  /**
+   * Download a set of textures
+   */
+  const download_texture_set = function(texture_set, progress_cb, done_cb) {
+    let loaded_image_count = 0;
+
+    for (let texture of texture_set) {
+      let img = new Image();
+      img.onload = () => {
+        loaded_image_count++;
+        if (loaded_image_count === texture_set.length) {
+          // Report completion
+          done_cb(null);
+        } else {
+          // Report progress
+          progress_cb(`Downloaded ${texture.value}`);
+        }
+      };
+      // TODO: Load errors
+      img.src = `gamedata${texture.url}`;
+      texture.img = img;
+    }
+  };
 
 
   /**
@@ -396,11 +405,16 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
   service.load_resources = _.once(function(gl, progress_callback, completion_callback) {
     service.on_loaded(completion_callback);
 
-    let total_work = service.backgrounds.length +
-                     service.sky_cubemaps.length +
-                     service.environment_cubemaps.length +
-                     service.albedo_textures.length * 2 +
-                     service.markers.length * 2;
+    /**
+     * Allow a frame or so for progress to be updated in the UI via broadcast.
+     * Without this the progress broadcasts aren't handled before loading finished (locally)
+     */
+    const intra_group_gap = 100;
+    const total_work = service.backgrounds.length +
+                       service.sky_cubemaps.length +
+                       service.environment_cubemaps.length +
+                       service.albedo_textures.length * 2 +
+                       service.markers.length * 2;
     let work_done = 0;
 
     const report_progress = function(description) {
@@ -409,12 +423,23 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     };
 
     async.series([
-      cb => download_texture_set(service.backgrounds,          report_progress, cb),
-      cb => download_texture_set(service.sky_cubemaps,         report_progress, cb),
-      cb => download_texture_set(service.environment_cubemaps, report_progress, cb),
-      cb => download_texture_set(service.albedo_textures,      report_progress, cb),
+      cb => normalise_texture_set(service.backgrounds,          cb),
+      cb => normalise_texture_set(service.sky_cubemaps,         cb),
+      cb => normalise_texture_set(service.environment_cubemaps, cb),
+      cb => normalise_texture_set(service.albedo_textures,      cb),
+      cb => normalise_texture_set(service.normal_textures,      cb),
+      cb => download_texture_set(service.backgrounds,          report_progress,     cb),
+      cb => $timeout(cb, intra_group_gap),
+      cb => download_texture_set(service.sky_cubemaps,         report_progress,     cb),
+      cb => $timeout(cb, intra_group_gap),
+      cb => download_texture_set(service.environment_cubemaps, report_progress,     cb),
+      cb => $timeout(cb, intra_group_gap),
+      cb => download_texture_set(service.albedo_textures,      report_progress,     cb),
+      cb => $timeout(cb, intra_group_gap),
       cb => build_webgl_textures(service.albedo_textures,      gl, report_progress, cb),
-      cb => download_texture_set(service.markers,              report_progress, cb),
+      cb => $timeout(cb, intra_group_gap),
+      cb => download_texture_set(service.markers,              report_progress,     cb),
+      cb => $timeout(cb, intra_group_gap),
       cb => build_webgl_textures(service.markers,              gl, report_progress, cb),
     ], (err) => {
       if (err) {

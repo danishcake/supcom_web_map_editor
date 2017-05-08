@@ -43,10 +43,10 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-textures",
           {scale: 128, texture_file: "/env/evergreen/layers/macrotexture000_albedo.dds"}
         ],
         normal_data: [
-          {scale: 1, texture_file: "/env/evergreen/layers/SandLight_normals.dds"},
+          {scale: 1, texture_file: "/env/evergreen/layers/sandlight_normals.dds"},
           {scale: 1, texture_file: "/env/evergreen/layers/grass001_normals.dds"},
-          {scale: 1, texture_file: "/env/evergreen/layers/Dirt001_normals.dds"},
-          {scale: 1, texture_file: "/env/evergreen/layers/RockMed_normals.dds"},
+          {scale: 1, texture_file: "/env/evergreen/layers/dirt001_normals.dds"},
+          {scale: 1, texture_file: "/env/evergreen/layers/rockmed_normals.dds"},
           {scale: 1, texture_file: "/env/evergreen/layers/snow001_normals.dds"},
           {scale: 1, texture_file: ""},
           {scale: 1, texture_file: ""},

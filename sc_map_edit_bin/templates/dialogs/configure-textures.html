@@ -35,9 +35,9 @@
             <div class="col-lg-3"><h6>Terrain shader</h6></div>
             <div class="col-lg-8">
               <select class="form-control" ng-model="data.textures.terrain_shader">
-                <option ng-repeat="terrain_shader in game_resources.shaders"
-                        value="{{terrain_shader.value}}"
-                        ng-selected="terrain_shader.value == data.textures.terrain_shader">
+                <option ng-repeat = "terrain_shader in game_resources.shaders"
+                        value     = "{{terrain_shader.value}}"
+                        selected  = "{{terrain_shader.value == data.textures.terrain_shader ? 'selected' : ''}}">
                   {{terrain_shader.name}}
                 </option>
               </select>
@@ -48,9 +48,9 @@
             <div class="col-lg-3"><h6>Background texture</h6></div>
             <div class="col-lg-7">
               <select class="form-control" ng-model="data.textures.background_texture_path">
-                <option ng-repeat="background_texture in game_resources.backgrounds"
-                        value="{{background_texture.value}}"
-                        ng-selected="background_texture.value == data.textures.background_texture_path">
+                <option ng-repeat = "background_texture in game_resources.backgrounds"
+                        value     = "{{background_texture.value}}"
+                        selected  = "{{background_texture.value == data.textures.background_texture_path ? 'selected' : ''}}">
                   {{background_texture.name}}
                 </option>
               </select>
@@ -64,9 +64,9 @@
             <div class="col-lg-3"><h6>Sky cubemap texture</h6></div>
             <div class="col-lg-7">
               <select class="form-control" ng-model="data.textures.sky_cubemap_texture_path">
-                <option ng-repeat="sky_cubemap_texture in game_resources.sky_cubemaps"
-                        value="{{sky_cubemap_texture.value}}"
-                        ng-selected="sky_cubemap_texture.value == data.textures.sky_cubemap_texture_path">
+                <option ng-repeat = "sky_cubemap_texture in game_resources.sky_cubemaps"
+                        value     = "{{sky_cubemap_texture.value}}"
+                        selected  = "{{sky_cubemap_texture.value == data.textures.sky_cubemap_texture_path ? 'selected' : ''}}">
                   {{sky_cubemap_texture.name}}
                 </option>
               </select>
