@@ -256,6 +256,17 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Crystalwerk 5",         tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk05_albedo.png"},
     {name: "Crystalwerk 6",         tileset: "Crystalline", url: "/env/Crystalline/layers/CrystalWerk06_albedo.png"},
     {name: "Crystalwerk 7",         tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk07_albedo.png"},
+
+    // Geothermal
+    {name: "Ashley",        tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_Ashley_01_albedo.png"},
+    {name: "Dirt 1",        tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_Dirt_01_albedo.png"},
+    {name: "Dark lava 1",   tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_LavaDk_01_albedo.png"},
+    {name: "Light lava 1",  tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_LavaLt_01_albedo.png"},
+    {name: "Medium lava 1", tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_LavaMd_01_albedo.png"},
+    {name: "Medium lava 2", tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_LavaMd_02_albedo.png"},
+    {name: "Medium lava 3", tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_LavaMd_03_albedo.png"},
+    {name: "Rock 1",        tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_Rock001_albedo.png"},
+    {name: "Rock 2",        tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_Rock002_albedo.png"},
   ];
 
   service.normal_textures = [
@@ -321,6 +332,10 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Crystalwerk 5",          tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk05_normal.png"},
     {name: "Crystalwerk 6",          tileset: "Crystalline", url: "/env/Crystalline/layers/CrystalWerk06_normal.png"},
     {name: "Crystalwerk 7",          tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk07_normal.png"},
+
+    // Geothermal
+    {name: "Dark lava 1", tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_LavaDk_01_normals.png"},
+    {name: "Nun",         tileset: "Geothermal", url: "/env/Geothermal/layers/Nun_normal.png"},
   ];
 
 
