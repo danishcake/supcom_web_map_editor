@@ -297,6 +297,25 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Macrotexture 0c", tileset: "Lava", url: "/env/Lava/Layers/macrotexture000_albedo.png"},
     {name: "Macrotexture 2",  tileset: "Lava", url: "/env/Lava/Layers/macrotexture002_albedo.png"},
     {name: "Macrotexture 2b", tileset: "Lava", url: "/env/Lava/Layers/macrotexture002b_albedo.png"},
+
+    // Paradise tileset
+    {name: "Dirt 0",         tileset: "Paradise", url: "/env/paradise/layers/dirt000_albedo.png"},
+    {name: "Dirt 1",         tileset: "Paradise", url: "/env/paradise/layers/dirt001_albedo.png"},
+    {name: "Grass 0",        tileset: "Paradise", url: "/env/paradise/layers/grass000_albedo.png"},
+    {name: "Grass 1",        tileset: "Paradise", url: "/env/paradise/layers/grass001_albedo.png"},
+    {name: "Grass 2",        tileset: "Paradise", url: "/env/paradise/layers/grass002_albedo.png"},
+    {name: "Grass jung",     tileset: "Paradise", url: "/env/paradise/layers/GrassJung_albedo.png"},
+    {name: "Ice 1",          tileset: "Paradise", url: "/env/paradise/layers/Ice001_albedo.png"},
+    {name: "Ice 2",          tileset: "Paradise", url: "/env/paradise/layers/Ice002_albedo.png"},
+    {name: "Lava rock",      tileset: "Paradise", url: "/env/paradise/layers/LavaRock_albedo.png"},
+    {name: "Macrotexture 0", tileset: "Paradise", url: "/env/paradise/layers/macrotexture000_albedo.png"},
+    {name: "Macrotexture 1", tileset: "Paradise", url: "/env/paradise/layers/macrotexture001_albedo.png"},
+    {name: "Rock 1",         tileset: "Paradise", url: "/env/paradise/layers/Rock001_albedo.png"},
+    {name: "Sand 0",         tileset: "Paradise", url: "/env/paradise/layers/sand000_albedo.png"},
+    {name: "Sand 1",         tileset: "Paradise", url: "/env/paradise/layers/sand001_albedo.png"},
+    {name: "Light sand",     tileset: "Paradise", url: "/env/paradise/layers/SandLight002.png"},
+    {name: "Medium sand",    tileset: "Paradise", url: "/env/paradise/layers/SandMed_albedo.png"},
+    {name: "Snow 1",         tileset: "Paradise", url: "/env/paradise/layers/snow001_albedo.png"},
   ];
 
   service.normal_textures = [
@@ -376,6 +395,17 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Tech wiers", tileset: "Lava", url: "/env/Lava/Layers/LAV_TECH_WIERS_normal.png"},
     {name: "Rock 9",     tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock09_nornals.png"}, // NORNALS :p
     {name: "Rock 10",    tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock10_nornals.png"},
+
+    // Paradise tileset
+    {name: "Dirt 0",      tileset: "Paradise", url: "/env/paradise/layers/dirt000_normals.png"},
+    {name: "Grass 0",     tileset: "Paradise", url: "/env/paradise/layers/grass000_normals.png"},
+    {name: "Grass 1",     tileset: "Paradise", url: "/env/paradise/layers/grass001_normals.png"},
+    {name: "Ice 1",       tileset: "Paradise", url: "/env/paradise/layers/Ice001_normals.png"},
+    {name: "Ice 2",       tileset: "Paradise", url: "/env/paradise/layers/Ice002_normals.png"},
+    {name: "Rock 1",      tileset: "Paradise", url: "/env/paradise/layers/Rock001_normals.png"},
+    {name: "Sand 0",      tileset: "Paradise", url: "/env/paradise/layers/sand000_normals.png"},
+    {name: "Medium sand", tileset: "Paradise", url: "/env/paradise/layers/SandMed_normals.png"},
+    {name: "Snow 1",      tileset: "Paradise", url: "/env/paradise/layers/snow001_normals.png"},
   ];
 
 
