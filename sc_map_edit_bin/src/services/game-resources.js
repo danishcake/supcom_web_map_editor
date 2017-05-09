@@ -316,6 +316,26 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Light sand",     tileset: "Paradise", url: "/env/paradise/layers/SandLight002.png"},
     {name: "Medium sand",    tileset: "Paradise", url: "/env/paradise/layers/SandMed_albedo.png"},
     {name: "Snow 1",         tileset: "Paradise", url: "/env/paradise/layers/snow001_albedo.png"},
+
+    // Red Barrens tileset
+    {name: "Macrotexture 1", tileset: "Red Barrens", url: "/env/Red Barrens/Layers/macrotexture001_albedo.png"},
+    {name: "Cracked",        tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Cracked_albedo.png"},
+    {name: "Cracked 2",      tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Cracked02_albedo.png"},
+    {name: "Gravel 1",       tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_gravel01_albedo.png"},
+    {name: "Red mud",        tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_RedMud_albedo.png"},
+    {name: "Rock",           tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock_albedo.png"},
+    {name: "Rock 2",         tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock02_albedo.png"},
+    {name: "Rock 3",         tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock03_albedo.png"},
+    {name: "Rock 4",         tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock04_albedo.png"},
+    {name: "Rock 6",         tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock06_albedo.png"},
+    {name: "Rock 7",         tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock07_albedo.png"},
+    {name: "Rock 8",         tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock08_albedo.png"},
+    {name: "Rock 9",         tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock09_albedo.png"},
+    {name: "Sand",           tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Sand_albedo.png"},
+    {name: "Wet sand",       tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Sandwet.png"},
+    {name: "Wet sand 1",     tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Sandwet01_albedo.png"},
+    {name: "Wet sand 2",     tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Sandwet_albedo.png"},
+
   ];
 
   service.normal_textures = [
@@ -406,6 +426,17 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Sand 0",      tileset: "Paradise", url: "/env/paradise/layers/sand000_normals.png"},
     {name: "Medium sand", tileset: "Paradise", url: "/env/paradise/layers/SandMed_normals.png"},
     {name: "Snow 1",      tileset: "Paradise", url: "/env/paradise/layers/snow001_normals.png"},
+
+    // Red Barrens tileset
+    {name: "Cracked",   tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Cracked_normal.png"},
+    {name: "Cracked 2", tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Cracked02_normal.png"},
+    {name: "None",      tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_None_Normal.png"},
+    {name: "Red mud",   tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_RedMud_normal.png"},
+    {name: "Rock",      tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock_normal.png"},
+    {name: "Rock 6",    tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock06_normal.png"},
+    {name: "Rock 9",    tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock09_normal.png"},
+    {name: "Sand",      tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Sand_normal.png"},
+    {name: "Wet sand",  tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Sandwet_normal.png"},
   ];
 
 
