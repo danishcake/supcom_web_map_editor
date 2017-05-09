@@ -223,7 +223,7 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Wet Rock 1",   tileset: "Common",      url: "/env/Common/layers/WetRock001_albedo.png"},
     {name: "Wet Rock 2",   tileset: "Common",      url: "/env/Common/layers/WetRock002_albedo.png"},
 
-    // Crystalline
+    // Crystalline tilset
     {name: "Crystalline 1-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_01_01_albedo.png"},
     {name: "Crystalline 2-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_02_01_albedo.png"},
     {name: "Crystalline 3-1",       tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_03_01_albedo.png"},
@@ -257,7 +257,7 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Crystalwerk 6",         tileset: "Crystalline", url: "/env/Crystalline/layers/CrystalWerk06_albedo.png"},
     {name: "Crystalwerk 7",         tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk07_albedo.png"},
 
-    // Geothermal
+    // Geothermal tilset
     {name: "Ashley",        tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_Ashley_01_albedo.png"},
     {name: "Dirt 1",        tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_Dirt_01_albedo.png"},
     {name: "Dark lava 1",   tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_LavaDk_01_albedo.png"},
@@ -267,6 +267,36 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Medium lava 3", tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_LavaMd_03_albedo.png"},
     {name: "Rock 1",        tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_Rock001_albedo.png"},
     {name: "Rock 2",        tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_Rock002_albedo.png"},
+
+    // Lava tileset
+    {name: "Cracked",         tileset: "Lava", url: "/env/Lava/Layers/LAV_Cracked_albedo.png"},
+    {name: "Cracked 2",       tileset: "Lava", url: "/env/Lava/Layers/Lav_Cracked02_albedo.png"},
+    {name: "Cracked 2b",      tileset: "Lava", url: "/env/Lava/Layers/Lav_Cracked02b_albedo.png"},
+    {name: "Gravel",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Gravel_albedo.png"},
+    {name: "Lava 1",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Lava01_albedo.png"},
+    {name: "Lava 2",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Lava02_albedo.png"},
+    {name: "Macrotexture 0",  tileset: "Lava", url: "/env/Lava/Layers/LAV_macrotexture000_albedo.png"},
+    {name: "Macrotexture 0b", tileset: "Lava", url: "/env/Lava/Layers/LAV_macrotexture000b_albedo.png"},
+    {name: "Ribbon",          tileset: "Lava", url: "/env/Lava/Layers/Lav_Ribbon_albedo.png"},
+    {name: "Ribbon 1",        tileset: "Lava", url: "/env/Lava/Layers/LAV_Ribbon01_albedo.png"},
+    {name: "Rock 1",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock01_albedo.png"},
+    {name: "Rock 2",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock02_albedo.png"},
+    {name: "Rock 2b",         tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock02b_albedo.png"},
+    {name: "Rock 3",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock03_albedo.png"},
+    {name: "Rock 3b",         tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock03b_albedo.png"},
+    {name: "Rock 4",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock04_albedo.png"},
+    {name: "Rock 5",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock05_albedo.png"},
+    {name: "Rock 6",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock06_albedo.png"},
+    {name: "Rock 7",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock07_albedo.png"},
+    {name: "Rock 7b",         tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock07b_albedo.png"},
+    {name: "Rock 8",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock08_albedo.png"},
+    {name: "Rock 9",          tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock09_albedo.png"},
+    {name: "Rock 9b",         tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock09b_albedo.png"},
+    {name: "Rock 10",         tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock10_albedo.png"},
+    {name: "Tech wiers",      tileset: "Lava", url: "/env/Lava/Layers/LAV_TECH_WIERS_albedo.png"},
+    {name: "Macrotexture 0c", tileset: "Lava", url: "/env/Lava/Layers/macrotexture000_albedo.png"},
+    {name: "Macrotexture 2",  tileset: "Lava", url: "/env/Lava/Layers/macrotexture002_albedo.png"},
+    {name: "Macrotexture 2b", tileset: "Lava", url: "/env/Lava/Layers/macrotexture002b_albedo.png"},
   ];
 
   service.normal_textures = [
@@ -312,7 +342,7 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     // Common tileset
     {name: "None",         tileset: "Common",      url: "/env/Common/layers/None_normal.png"},
 
-    // Crystalline
+    // Crystalline tileset
     {name: "Crystalline 2-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_02_01_normal.png"},
     {name: "Crystalline 1-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_01_01_normal.png"},
     {name: "Crystalline 3-1",        tileset: "Crystalline", url: "/env/Crystalline/layers/Cr_03_01_normal.png"},
@@ -333,9 +363,19 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Crystalwerk 6",          tileset: "Crystalline", url: "/env/Crystalline/layers/CrystalWerk06_normal.png"},
     {name: "Crystalwerk 7",          tileset: "Crystalline", url: "/env/Crystalline/layers/crystalWerk07_normal.png"},
 
-    // Geothermal
+    // Geothermal tileset
     {name: "Dark lava 1", tileset: "Geothermal", url: "/env/Geothermal/layers/Geo_LavaDk_01_normals.png"},
     {name: "Nun",         tileset: "Geothermal", url: "/env/Geothermal/layers/Nun_normal.png"},
+
+    // Lava tileset
+    {name: "Cracked 2",  tileset: "Lava", url: "/env/Lava/Layers/Lav_Cracked02_normals.png"},
+    {name: "Gravel",     tileset: "Lava", url: "/env/Lava/Layers/LAV_Gravel_normals.png"},
+    {name: "Ribbon",     tileset: "Lava", url: "/env/Lava/Layers/Lav_Ribbon_normals.png"},
+    {name: "Rock 1",     tileset: "Lava", url: "/env/Lava/Layers/Lav_Rock01_normals.png"},
+    {name: "Rock 4",     tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock04_normals.png"},
+    {name: "Tech wiers", tileset: "Lava", url: "/env/Lava/Layers/LAV_TECH_WIERS_normal.png"},
+    {name: "Rock 9",     tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock09_nornals.png"}, // NORNALS :p
+    {name: "Rock 10",    tileset: "Lava", url: "/env/Lava/Layers/LAV_Rock10_nornals.png"},
   ];
 
 
