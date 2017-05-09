@@ -336,6 +336,26 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Wet sand 1",     tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Sandwet01_albedo.png"},
     {name: "Wet sand 2",     tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Sandwet_albedo.png"},
 
+    // Swamp tileset
+    {name: "Creepers",   tileset: "Swamp", url: "/env/Swamp/layers/Sw_Creeper_01_albedo.png"},
+    {name: "Ferns 1",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Ferns_01_albedo.png"},
+    {name: "Ferns 2",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Ferns_02_albedo.png"},
+    {name: "Grass 1",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Grass_01_albedo.png"},
+    {name: "Grass 2",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Grass_02_albedo.png"},
+    {name: "Grass 3",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Grass_03_albedo.png"},
+    {name: "Mossy",      tileset: "Swamp", url: "/env/Swamp/layers/Sw_Mossy_01_albedo.png"},
+    {name: "Mudder 1",   tileset: "Swamp", url: "/env/Swamp/layers/Sw_Mudder_01_albedo.png"},
+    {name: "Mudder 2",   tileset: "Swamp", url: "/env/Swamp/layers/Sw_Mudder_02_albedo.png"},
+    {name: "Mudder 3",   tileset: "Swamp", url: "/env/Swamp/layers/Sw_Mudder_03_albedo.png"},
+    {name: "Mudder 4",   tileset: "Swamp", url: "/env/Swamp/layers/Sw_Mudder_04_albedo.png"},
+    {name: "Rocky 1",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Rocky_01_albedo.png"},
+    {name: "Rocky 2",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Rocky_02_albedo.png"},
+    {name: "Rocky 3",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Rocky_03_albedo.png"},
+    {name: "Sphagnum 1", tileset: "Swamp", url: "/env/Swamp/layers/Sw_Sphagnum_01_albedo.png"},
+    {name: "Sphagnum 2", tileset: "Swamp", url: "/env/Swamp/layers/Sw_Sphagnum_02_albedo.png"},
+    {name: "Sphagnum 3", tileset: "Swamp", url: "/env/Swamp/layers/Sw_Sphagnum_03_albedo.png"},
+
+
   ];
 
   service.normal_textures = [
@@ -437,6 +457,13 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Rock 9",    tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Rock09_normal.png"},
     {name: "Sand",      tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Sand_normal.png"},
     {name: "Wet sand",  tileset: "Red Barrens", url: "/env/Red Barrens/Layers/RB_Sandwet_normal.png"},
+
+    // Swamp tileset
+    {name: "Nun",        tileset: "Swamp", url: "/env/Swamp/layers/Nun_normal.png"},
+    {name: "Grass 3",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Grass_03_normals.png"},
+    {name: "Mudder 3",   tileset: "Swamp", url: "/env/Swamp/layers/Sw_Mudder_03_normals.png"},
+    {name: "Rocky 1",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Rocky_01_normals.png"},
+    {name: "Sphagnum 2", tileset: "Swamp", url: "/env/Swamp/layers/Sw_Sphagnum_02_normals.png"},
   ];
 
 
