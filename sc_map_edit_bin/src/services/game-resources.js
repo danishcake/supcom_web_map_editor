@@ -420,7 +420,8 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Transition 4", tileset: "Tundra", url: "/env/Tundra/Layers/TundraTrans004_albedo.png"},
     {name: "Transition b", tileset: "Tundra", url: "/env/Tundra/Layers/TundraTrans004b_albedo.png"},
 
-
+    // Utility tileset
+    {name: "Farms 1", tileset: "Utility", url: "/env/Utility/Layers/farms001_albedo.png"},
   ];
 
   service.normal_textures = [
@@ -557,6 +558,9 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Snow 3",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Snow03_normal.png"},
     {name: "Snow 4",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Snow04_normal.png"},
     {name: "Transition 4", tileset: "Tundra", url: "/env/Tundra/Layers/TundraTrans004_normal.png"},
+
+    // Utiliy tileset
+    {name: "Farms 1", tileset: "Utility", url: "/env/Utility/Layers/farms001_normals.png"},
   ];
 
 
