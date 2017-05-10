@@ -355,7 +355,45 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Sphagnum 2", tileset: "Swamp", url: "/env/Swamp/layers/Sw_Sphagnum_02_albedo.png"},
     {name: "Sphagnum 3", tileset: "Swamp", url: "/env/Swamp/layers/Sw_Sphagnum_03_albedo.png"},
 
-
+    // Tropical tileset
+    {name: "Dry sand 1",    tileset: "Tropical", url: "/env/Tropical/Layers/DrySand001_albedo.png"},
+    {name: "Dry sand 2",    tileset: "Tropical", url: "/env/Tropical/Layers/DrySand002_albedo.png"},
+    {name: "Coral",         tileset: "Tropical", url: "/env/Tropical/Layers/Tr_Coral_albedo.png"},
+    {name: "Grass hills",   tileset: "Tropical", url: "/env/Tropical/Layers/Tr_GrassHills_albedo.png"},
+    {name: "Ground 0",      tileset: "Tropical", url: "/env/Tropical/Layers/Tr_ground001_albedo.png"},
+    {name: "Coral reef",    tileset: "Tropical", url: "/env/Tropical/Layers/Tr_Reef_Coral_albedo.png"},
+    {name: "Coral reef 2",  tileset: "Tropical", url: "/env/Tropical/Layers/Tr_Reef_Coral2_albedo.png"},
+    {name: "Rock wall 1",   tileset: "Tropical", url: "/env/Tropical/Layers/Tr_RockWall001.png"},
+    {name: "Rock",          tileset: "Tropical", url: "/env/Tropical/Layers/Trop_Rock_albedo.png"},
+    {name: "Rock 2b",       tileset: "Tropical", url: "/env/Tropical/Layers/TrRock002b_albedo.png"},
+    {name: "Rock 3",        tileset: "Tropical", url: "/env/Tropical/Layers/TrRock003_albedo.png"},
+    {name: "Rock 5",        tileset: "Tropical", url: "/env/Tropical/Layers/TrRock005_albedo.png"},
+    {name: "Rock 6",        tileset: "Tropical", url: "/env/Tropical/Layers/TrRock006_albedo.png"},
+    {name: "Rock 7",        tileset: "Tropical", url: "/env/Tropical/Layers/TrRock007_albedo.png"},
+    {name: "Moss bush",     tileset: "Tropical", url: "/env/Tropical/Layers/TrBush_moss_albedo.png"},
+    {name: "Bushy 1",       tileset: "Tropical", url: "/env/Tropical/Layers/TrBushy001_albedo.png"},
+    {name: "Grass 1",       tileset: "Tropical", url: "/env/Tropical/Layers/Trop_Grass_albedo.png"},
+    {name: "Grass 2",       tileset: "Tropical", url: "/env/Tropical/Layers/TrGrass002_albedo.png"},
+    {name: "Grass 3",       tileset: "Tropical", url: "/env/Tropical/Layers/TrGrass003_albedo.png"},
+    {name: "Grass 4",       tileset: "Tropical", url: "/env/Tropical/Layers/TrGrass004_albedo.png"},
+    {name: "Grass 5",       tileset: "Tropical", url: "/env/Tropical/Layers/TrGrass005_albedo.png"},
+    {name: "Grass 6",       tileset: "Tropical", url: "/env/Tropical/Layers/TrGrass006_albedo.png"},
+    {name: "Grass 7",       tileset: "Tropical", url: "/env/Tropical/Layers/TrGrass007_albedo.png"},
+    {name: "Grass jung",    tileset: "Tropical", url: "/env/Tropical/Layers/Trop_GrassJung_albedo.png"},
+    {name: "Dirt",          tileset: "Tropical", url: "/env/Tropical/Layers/Trop_Dirt_albedo.png"},
+    {name: "Rock 2",        tileset: "Tropical", url: "/env/Tropical/Layers/TrRock002_albedo.png"},
+    {name: "Sand 1",        tileset: "Tropical", url: "/env/Tropical/Layers/Trop_Sand01_albedo.png"},
+    {name: "Sand 1b",       tileset: "Tropical", url: "/env/Tropical/Layers/Trop_Sand.png"},
+    {name: "Sand 2",        tileset: "Tropical", url: "/env/Tropical/Layers/Trop_Sand_albedo.png"},
+    {name: "Raw ground",    tileset: "Tropical", url: "/env/Tropical/Layers/TrRawGround01_albedo.png"},
+    {name: "Transition 1",  tileset: "Tropical", url: "/env/Tropical/Layers/TrTrans001_albedo.png"},
+    {name: "Transition 2",  tileset: "Tropical", url: "/env/Tropical/Layers/TrTrans002_albedo.png"},
+    {name: "Transition 3",  tileset: "Tropical", url: "/env/Tropical/Layers/TrTrans003_albedo.png"},
+    {name: "Transition 4",  tileset: "Tropical", url: "/env/Tropical/Layers/TrTrans004_albedo.png"},
+    {name: "Transition 5",  tileset: "Tropical", url: "/env/Tropical/Layers/TrTrans005_albedo.png"},
+    {name: "Wet sand 1",    tileset: "Tropical", url: "/env/Tropical/Layers/WetSand001_albedo.png"},
+    {name: "Wet sand 2",    tileset: "Tropical", url: "/env/Tropical/Layers/WetSand002_albedo.png"},
+    {name: "Wet sand 2b",   tileset: "Tropical", url: "/env/Tropical/Layers/WetSand002b_albedo.png"},
   ];
 
   service.normal_textures = [
@@ -464,6 +502,18 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Mudder 3",   tileset: "Swamp", url: "/env/Swamp/layers/Sw_Mudder_03_normals.png"},
     {name: "Rocky 1",    tileset: "Swamp", url: "/env/Swamp/layers/Sw_Rocky_01_normals.png"},
     {name: "Sphagnum 2", tileset: "Swamp", url: "/env/Swamp/layers/Sw_Sphagnum_02_normals.png"},
+
+    // Tropical tileset
+    {name: "Dry sand 1",   tileset: "Tropical", url: "/env/Tropical/Layers/DrySand001_normals.png"},
+    {name: "Grass hills",  tileset: "Tropical", url: "/env/Tropical/Layers/Tr_GrassHills_normal.png"},
+    {name: "Coral reef",   tileset: "Tropical", url: "/env/Tropical/Layers/Tr_Reef_Coral_normal.png"},
+    {name: "Mossy bush",   tileset: "Tropical", url: "/env/Tropical/Layers/TrBush_moss_Normal.png"},
+    {name: "Grass jung",   tileset: "Tropical", url: "/env/Tropical/Layers/Trop_GrassJung_normal.png"},
+    {name: "None",         tileset: "Tropical", url: "/env/Tropical/Layers/Trop_None_Normal.png"},
+    {name: "Rock",         tileset: "Tropical", url: "/env/Tropical/Layers/Trop_Rock_Normal.png"},
+    {name: "Sand",         tileset: "Tropical", url: "/env/Tropical/Layers/Trop_Sand_normal.png"},
+    {name: "Rock 6",       tileset: "Tropical", url: "/env/Tropical/Layers/TrRock006_normal.png"},
+    {name: "Transition 2", tileset: "Tropical", url: "/env/Tropical/Layers/TrTrans002_Normal.png"},
   ];
 
 
