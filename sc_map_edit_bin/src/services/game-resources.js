@@ -394,6 +394,33 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Wet sand 1",    tileset: "Tropical", url: "/env/Tropical/Layers/WetSand001_albedo.png"},
     {name: "Wet sand 2",    tileset: "Tropical", url: "/env/Tropical/Layers/WetSand002_albedo.png"},
     {name: "Wet sand 2b",   tileset: "Tropical", url: "/env/Tropical/Layers/WetSand002b_albedo.png"},
+
+    // Tundra tileset
+    {name: "Dirt 1",       tileset: "Tundra", url: "/env/Tundra/Layers/_TundraDirt001_albedo.png"},
+    {name: "Macro ice",    tileset: "Tundra", url: "/env/Tundra/Layers/MacroIce_albedo.png"},
+    {name: "Grass",        tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Grass_albedo.png"},
+    {name: "Gravil",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_gravil_albedo.png"},
+    {name: "Ice 1",        tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Ice001_albedo.png"},
+    {name: "Ice 2",        tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Ice002_albedo.png"},
+    {name: "Ice 3",        tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Ice003_albedo.png"},
+    {name: "Ice 3b",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Ice003b_albedo.png"},
+    {name: "Ice 4",        tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Ice004_albedo.png"},
+    {name: "Ice 4a",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_ice004a_albedo.png"},
+    {name: "Ice 5",        tileset: "Tundra", url: "/env/Tundra/Layers/Tund_ice005_albedo.png"},
+    {name: "Ice 6",        tileset: "Tundra", url: "/env/Tundra/Layers/Tund_ice006_albedo.png"},
+    {name: "Ice rock",     tileset: "Tundra", url: "/env/Tundra/Layers/Tund_iceRock_albedo.png"},
+    {name: "Melt 1",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_melt001_albedo.png"},
+    {name: "Melt 2",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_melt002_albedo.png"},
+    {name: "Melt 3",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_melt003_albedo.png"},
+    {name: "Rock",         tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Rock_albedo.png"},
+    {name: "Rock 2",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Rock02_albedo.png"},
+    {name: "Rock 3",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Rock03_albedo.png"},
+    {name: "Light sand",   tileset: "Tundra", url: "/env/Tundra/Layers/Tund_sandLight2_albedo.png"},
+    {name: "Snow",         tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Snow_albedo.png"},
+    {name: "Transition 4", tileset: "Tundra", url: "/env/Tundra/Layers/TundraTrans004_albedo.png"},
+    {name: "Transition b", tileset: "Tundra", url: "/env/Tundra/Layers/TundraTrans004b_albedo.png"},
+
+
   ];
 
   service.normal_textures = [
@@ -514,6 +541,22 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Sand",         tileset: "Tropical", url: "/env/Tropical/Layers/Trop_Sand_normal.png"},
     {name: "Rock 6",       tileset: "Tropical", url: "/env/Tropical/Layers/TrRock006_normal.png"},
     {name: "Transition 2", tileset: "Tropical", url: "/env/Tropical/Layers/TrTrans002_Normal.png"},
+
+    // Tundra tileset
+    {name: "Ice 3",        tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Ice003_normal.png"},
+    {name: "None",         tileset: "Tundra", url: "/env/Tundra/Layers/Tund_None_Normal.png"},
+    {name: "Rock",         tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Rock_normal.png"},
+    {name: "Rock 2",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Rock02_normal.png"},
+    {name: "Dark sand",    tileset: "Tundra", url: "/env/Tundra/Layers/Tund_SandDark_normal.png"},
+    {name: "Light sand",   tileset: "Tundra", url: "/env/Tundra/Layers/Tund_sandLight_normal.png"},
+    {name: "Light sand 2", tileset: "Tundra", url: "/env/Tundra/Layers/Tund_sandLight2_normal.png"},
+    {name: "Medium sand",  tileset: "Tundra", url: "/env/Tundra/Layers/Tund_SandMed_normal.png"},
+    {name: "Wet sand",     tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Sandwet_normal.png"},
+    {name: "Snow",         tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Snow_normal.png"},
+    {name: "Snow 2",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Snow02_normal.png"},
+    {name: "Snow 3",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Snow03_normal.png"},
+    {name: "Snow 4",       tileset: "Tundra", url: "/env/Tundra/Layers/Tund_Snow04_normal.png"},
+    {name: "Transition 4", tileset: "Tundra", url: "/env/Tundra/Layers/TundraTrans004_normal.png"},
   ];
 
 
