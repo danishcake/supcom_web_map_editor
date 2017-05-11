@@ -139,6 +139,10 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
   ];
 
   service.albedo_textures = [
+    // Special unused texture slot.
+    // The value is set manually to blank and will not be overriden
+    {name: "Unused",        tileset: "Unused", url: "/editor_icons/Unused_texture.png", value: ""},
+
     // Desert tileset
     {name: "Gravel",        tileset: "Desert", url: "/env/Desert/Layers/Des_Gravel_albedo.png"},
     {name: "Gravel 1",      tileset: "Desert", url: "/env/Desert/Layers/Des_Gravel01_albedo.png"},
@@ -424,7 +428,13 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     {name: "Farms 1", tileset: "Utility", url: "/env/Utility/Layers/farms001_albedo.png"},
   ];
 
+  // Note the URLs are not actually downloaded, and images are only specified
+  // thus so that the name normalisation can be reused.
   service.normal_textures = [
+    // Special unused texture slot.
+    // The value is set manually to blank and will not be overriden
+    {name: "Unused",      tileset: "Unused", url: "/editor_icons/Unused_texture.png", value: ""},
+
     // Desert tileset
     {name: "Gravel",      tileset: "Desert", url: "/env/Desert/Layers/Des_Gravel_normal.png"},
     {name: "None",        tileset: "Desert", url: "/env/Desert/Layers/Des_None_Normal.png"},
@@ -627,8 +637,9 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
    */
   const normalise_texture_set = function(texture_set, done_cb) {
     for (let texture of texture_set) {
-      //
-      texture.value = texture.url.toLowerCase().replace(".png", ".dds");
+      if (!texture.hasOwnProperty("value")) {
+        texture.value = texture.url.toLowerCase().replace(".png", ".dds");
+      }
     }
     done_cb();
   };
