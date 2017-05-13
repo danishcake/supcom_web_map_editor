@@ -5,6 +5,12 @@
     <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'texture'" uib-tooltip="Texture tools" tooltip-placement="right"><span class="glyphicon glyphicon-tint"></span></label>
     <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'marker'" uib-tooltip="Markers" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
   </div>
+  
+  <!-- Symmetry -->
+  <div class="btn-group-vertical">
+    <label uib-popover-template="'templates/popovers/symmetry.html'" popover-title="Symmetry" popover-placement="right" popover-trigger="outsideClick" class="btn btn-default">X</label>
+  </div>
+
 
   <!-- Tool size -->
   <div class="btn-group-vertical" ng-show="tool.category === 'heightmap' || tool.category === 'texture'">

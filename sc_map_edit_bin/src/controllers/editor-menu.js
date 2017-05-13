@@ -13,14 +13,15 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
       type: 'select'
     },
     size: 10,
-    strength: 10
+    strength: 10,
+    symmetry: 'none'
   };
 
-  $scope.increase_tool_size = function() { Math.max($scope.tool.size++,   0); };
-  $scope.decrease_tool_size = function() { Math.min($scope.tool.size--, 100); };
+  $scope.increase_tool_size = () => $scope.tool.size = Math.min($scope.tool.size + 1, 100);
+  $scope.decrease_tool_size = () => $scope.tool.size = Math.max($scope.tool.size - 1,   0);
 
-  $scope.increase_tool_strength = function() { Math.max($scope.tool.strength++,   1); };
-  $scope.decrease_tool_strength = function() { Math.min($scope.tool.strength--, 100); };
+  $scope.increase_tool_strength = () => $scope.tool.strength = Math.min($scope.tool.strength + 1, 100);
+  $scope.decrease_tool_strength = () => $scope.tool.strength = Math.max($scope.tool.strength - 1,   1);
 
   // On any change to the tool variables rebuild the tool
   $scope.$watch('tool', () => { editor_state.build_tool($scope.tool); }, true);
