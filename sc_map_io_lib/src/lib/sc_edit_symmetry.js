@@ -7,6 +7,12 @@
 
 import {sc_rect} from "./sc_rect"
 
+/**
+ * Symmetry class. Subclasses should implement
+ *
+ * __get_primary_pixel_impl: Returns the primary pixel given any pixel
+ * __get_secondary_pixels_impl: Returns array of secondary pixels if provided a primary pixel
+ */
 class sc_edit_symmetry_base {
   /**
    * Get the primary pixel from any pixel inside size
@@ -37,24 +43,6 @@ class sc_edit_symmetry_base {
 
     return this.__get_secondary_pixels_impl(point, size);
   }
-
-
-  /**
-   * Subclass implementation of get_primary_pixel.
-   * Override this in the subclass.
-   */
-  __get_primary_pixel_impl(point, size) {
-    return point;
-  }
-
-
-  /**
-   * Subclass implementation of get_secondary_pixels.
-   * Override this in the subclass.
-   */
-  __get_secondary_pixels_impl(point, size) {
-    return [];
-  }
 }
 
 /**
@@ -62,7 +50,28 @@ class sc_edit_symmetry_base {
  * This is just a typedef to base, as it already behaves correctly for no symmetry
  */
 class sc_edit_symmetry_none extends sc_edit_symmetry_base {
+  /**
+   * Get the primary pixel from any pixel inside size.
+   * This is always the input pixel
+   * @param {number[2]} point Position on map
+   * @param {number[2]} size Size of map
+   * @returns The primary pixel
+   */
+  __get_primary_pixel_impl(point, size) {
+    return point;
+  }
 
+
+  /**
+   * Get the secondary pixels corresponding to any primary pixel.
+   * There are not secondary pixels
+   * @param {number[2]} point Position on map
+   * @param {number[2]} size Size of map
+   * @returns The secondary pixels
+   */
+  __get_secondary_pixels_impl(point, size) {
+    return [];
+  }
 }
 
 /**
@@ -70,6 +79,13 @@ class sc_edit_symmetry_none extends sc_edit_symmetry_base {
  * All pixels on the left hand size are considered primary. The right hand side is secondary
  */
 class sc_edit_symmetry_horizontal extends sc_edit_symmetry_base {
+  /**
+   * Get the primary pixel from any pixel inside size.
+   * This is the left hand pixel about the centre
+   * @param {number[2]} point Position on map
+   * @param {number[2]} size Size of map
+   * @returns The primary pixel
+   */
   __get_primary_pixel_impl(point, size) {
     // For odd width, the index that transforms to self
     // For even width, the index to the left of centre (last that is not reflected)
@@ -86,14 +102,71 @@ class sc_edit_symmetry_horizontal extends sc_edit_symmetry_base {
   }
 
 
+  /**
+   * Get the secondary pixels corresponding to any primary pixel.
+   * This is the pixel mirrored horizontally around the center
+   * @param {number[2]} point Position on map
+   * @param {number[2]} size Size of map
+   * @returns The secondary pixels
+   */
   __get_secondary_pixels_impl(point, size) {
-    return [];
+    // 257 wide -> 0   -> 256
+    //             127 -> 129
+    //             128 -> 128
+    // 256 wide -> 0   -> 255
+    //             127 -> 128
+    return [[size[0] - point[0] - 1, point[1]]]
+  }
+}
+
+/**
+ * Vertical symmetry
+ * All pixels on the top half are considered primary. The bottom half side is secondary
+ */
+class sc_edit_symmetry_vertical extends sc_edit_symmetry_base {
+  /**
+   * Get the primary pixel from any pixel inside size.
+   * This is the top pixel
+   * @param {number[2]} point Position on map
+   * @param {number[2]} size Size of map
+   * @returns The primary pixel
+   */
+  __get_primary_pixel_impl(point, size) {
+    // For odd width, the index that transforms to self
+    // For even width, the index to the left of centre (last that is not reflected)
+    let mid_index = Math.floor((size[1] - 1) / 2);
+
+    if (point[1] <= mid_index) {
+      return point;
+    } else {
+      // 257 - 129 - 1 = 127
+      // 256 - 128 - 1 = 127
+      return [point[0], size[1] - point[1] - 1];
+    }
+  }
+
+
+  /**
+   * Get the secondary pixels corresponding to any primary pixel.
+   * This is the pixel mirrored vertically around the center
+   * @param {number[2]} point Position on map
+   * @param {number[2]} size Size of map
+   * @returns The secondary pixels
+   */
+  __get_secondary_pixels_impl(point, size) {
+    // 257 high -> 0   -> 256
+    //             127 -> 129
+    //             128 -> 128
+    // 256 high -> 0   -> 255
+    //             127 -> 128
+    return [[point[0], size[1] - point[1] - 1]];
   }
 }
 
 let sc_edit_symmetry = {
   none: sc_edit_symmetry_none,
-  horizontal: sc_edit_symmetry_horizontal
+  horizontal: sc_edit_symmetry_horizontal,
+  vertical: sc_edit_symmetry_vertical,
 };
 
 export { sc_edit_symmetry }
