@@ -31,6 +31,8 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     const inner = tool_data.size * 0.5; // TODO: Make this variable
     const strength = tool_data.strength;
 
+
+    // Recreate the tool
     switch(tool_data.category) {
       case 'select':
         service.tool = null;
@@ -112,6 +114,22 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
         }
         break;
     }
+
+    // Recreate the symmetry view
+    switch(tool_data.symmetry) {
+      case 'none':
+      default:
+        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.none());
+        break;
+
+      case 'horizontal':
+        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.horizontal());
+        break;
+
+      case 'vertical':
+        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.vertical());
+        break;
+    }
   };
 
 
@@ -143,6 +161,9 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     // Build editable heightmap
     service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);
 
+    // Build editable symmetry view
+    service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.none());
+
     // Call each registered map change subscriber
     _.each(service.callbacks.on_new_map, callback => callback());
   };
@@ -164,6 +185,9 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
 
     // Build editable heightmap
     service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);
+
+    // Build editable symmetry view
+    service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.none());
 
     // Call each registered map change subscriber
     _.each(service.callbacks.on_new_map, callback => callback());

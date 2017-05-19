@@ -25,4 +25,7 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
 
   // On any change to the tool variables rebuild the tool
   $scope.$watch('tool', () => { editor_state.build_tool($scope.tool); }, true);
+
+  // On new map, recreate the tool
+  editor_state.on_new_map(() => { editor_state.build_tool($scope.tool); });
 }]);
