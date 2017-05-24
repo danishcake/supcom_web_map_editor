@@ -46,6 +46,9 @@
                 <File name="sc_map_edit_bin\templates\dialogs\configure-textures.html" />
                 <File name="sc_map_edit_bin\templates\dialogs\progress.html" />
             </Folder>
+            <Folder name="popovers">
+                <File name="sc_map_edit_bin\templates\popovers\symmetry.html" />
+            </Folder>
             <File name="sc_map_edit_bin\templates\editor-menu.html" />
             <File name="sc_map_edit_bin\templates\editor-view.html" />
             <File name="sc_map_edit_bin\templates\file-picker.html" />

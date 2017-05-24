@@ -7,8 +7,15 @@
 angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   let service = {};
 
-  service.tool = null; // TODO: Add a select tool
+  // Tool/edit_view/symmetry are populated when the tool is created
+  // Map/scripts/edit_heightmap are populated when the map is created or loaded (which also recreates the tool)
+  service.tool = null;
+  service.edit_view = null;
+  service.symmetry = null;
   service.save_location = "unsaved";
+  service.map = null;
+  service.edit_heightmap
+  service.scripts = null;
 
   /**
    * Returns the location the map was most recently saved to or loaded from
@@ -119,15 +126,18 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     switch(tool_data.symmetry) {
       case 'none':
       default:
-        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.none());
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.none();
+        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, service.symmetry);
         break;
 
       case 'horizontal':
-        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.horizontal());
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.horizontal();
+        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, service.symmetry);
         break;
 
       case 'vertical':
-        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.vertical());
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.vertical();
+        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, service.symmetry);
         break;
     }
   };
