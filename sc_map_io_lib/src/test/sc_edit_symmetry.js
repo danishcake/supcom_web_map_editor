@@ -1,5 +1,67 @@
 import { sc_edit_symmetry } from '../lib/sc_edit_symmetry';
+import {_} from 'underscore';
 const assert = require('chai').assert;
+
+/**
+ * @param symmetry {sc_edit_symmetry_base} Type of symmetry
+ * @param size {Array} 2D size of the complete region
+ * @param points {Array} Array of points to checked
+ *
+ * Checks every point maps is considered primary
+ */
+const all_map_to_primary = function(symmetry, size, points) {
+  _.each(points, (point) => {
+    assert.deepEqual(symmetry.get_primary_pixel(point, size), point);
+  });
+};
+
+
+/**
+ * @param symmetry {sc_edit_symmetry_base} Type of symmetry
+ * @param size {Array} 2D size of the complete region
+ * @param points {Array} Array of points to checked
+ *
+ * Checks every point maps is considered non-primary
+ */
+const none_map_to_primary = function(symmetry, size, points) {
+  _.each(points, (point) => {
+    assert.notDeepEqual(symmetry.get_primary_pixel(point, size), point);
+  });
+};
+
+
+/**
+ * @param symmetry {sc_edit_symmetry_base} Type of symmetry
+ * @param size {Array} 2D size of the complete region
+ * @param point {Array} Single input point
+ * @param points {Array} Expected output points
+ *
+ * Checks a single point maps to all expected outputs
+ */
+const maps_to_all = function(symmetry, size, point, results) {
+  const secondary_pixels = symmetry.get_secondary_pixels(point, size);
+  for (let i = 0; i < secondary_pixels.length; i++) {
+    console.log(`secondary_pixels[${i}]: [${secondary_pixels[i]}]`);
+  }
+  for (let i = 0; i < results.length; i++) {
+    console.log(`results[${i}]: [${results[i]}]`);
+  }
+
+
+
+  for (let i = 0; i < results.length; i++) {
+    let result_matched = _.find(secondary_pixels, function(value) {
+      let match = value[0] == results[i][0] && value[1] == results[i][1];
+      console.log(`Comparing [${value}] and [${results[i]}] == ${match}`);
+      return match;
+    });
+
+    assert.isOk(result_matched, `[${results[i]}] should be contained in [${secondary_pixels}] drived from [${point}]`);
+  }
+  //assert.sameDeepMembers(results, secondary_pixels);
+};
+
+
 
 describe('sc_edit_symmetry', function() {
   describe('base', function() {
@@ -79,7 +141,10 @@ describe('sc_edit_symmetry', function() {
         it('should transform points less than or equal to floor(width / 2) to width - x - 1', function() {
           assert.deepEqual(sym.get_secondary_pixels([0,     0], [257, 257]), [[256,  0]]);
           assert.deepEqual(sym.get_secondary_pixels([127,   0], [257, 257]), [[129,  0]]);
-          assert.deepEqual(sym.get_secondary_pixels([128,   0], [257, 257]), [[128,  0]]);
+        });
+
+        it('should not map the central line', function() {
+          assert.deepEqual(sym.get_secondary_pixels([128,   0], [257, 257]), []);
         });
       });
 
@@ -137,7 +202,10 @@ describe('sc_edit_symmetry', function() {
         it('should transform points less than or equal to floor(height / 2) to height - y - 1', function() {
           assert.deepEqual(sym.get_secondary_pixels([0,     0], [257, 257]), [[0, 256]]);
           assert.deepEqual(sym.get_secondary_pixels([0,   127], [257, 257]), [[0, 129]]);
-          assert.deepEqual(sym.get_secondary_pixels([0,   128], [257, 257]), [[0, 128]]);
+        });
+
+        it('should not map the central line', function() {
+          assert.deepEqual(sym.get_secondary_pixels([0,   128], [257, 257]), []);
         });
       });
 
@@ -148,6 +216,182 @@ describe('sc_edit_symmetry', function() {
           assert.deepEqual(sym.get_secondary_pixels([0,   0], [256, 256]), [[0, 255]]);
           assert.deepEqual(sym.get_secondary_pixels([0, 127], [256, 256]), [[0, 128]]);
         });
+      });
+    });
+  });
+
+
+  describe('Quadrants', function() {
+    const sym = new sc_edit_symmetry.quadrants();
+
+    describe('get_primary_pixel', function() {
+      describe('odd dimensions', function() {
+        const size = [257, 257];
+        it('should consider coordinates < half as primary', function() {
+          all_map_to_primary(sym, size, [
+            [0,     0],
+            [127,   0],
+            [0,   127],
+            [127, 127]]);
+        });
+
+
+        it('should consider coordinates == half as primary', function() {
+          all_map_to_primary(sym, size, [
+            [128,   0],
+            [0,   128],
+            [128, 128]]);
+        });
+
+
+        it('should consider coordinates > half as non-primary', function() {
+          none_map_to_primary(sym, size, [
+            [129, 129],
+            [0,   129],
+            [129,   0],
+            [256, 256]]);
+        });
+      });
+
+
+      describe('even dimensions', function() {
+        const size = [256, 256];
+        it('should consider coordinates < half as primary', function() {
+          all_map_to_primary(sym, size, [
+            [0,     0],
+            [127,   0],
+            [0,   127],
+            [127, 127]]);
+        });
+
+
+        it('should consider coordinates >= half as non-primary', function() {
+          none_map_to_primary(sym, size, [
+            [128, 128],
+            [0,   128],
+            [128,   0],
+            [255, 255]]);
+        });
+      });
+    });
+
+    describe('get_secondary_pixels', function() {
+      describe('odd dimensions', function() {
+        const size = [257, 257];
+
+        it('should map to the other quadrants', function() {
+          maps_to_all(sym, size, [0, 0], [
+            [0,   256],
+            [256,   0],
+            [256, 256]]);
+          maps_to_all(sym, size, [127, 0], [
+            [127,   256],
+            [129,   0],
+            [129, 256]]);
+          maps_to_all(sym, size, [0, 127], [
+            [0,   129],
+            [256, 127],
+            [256, 129]]);
+          maps_to_all(sym, size, [127, 127], [
+            [127, 129],
+            [129, 127],
+            [129, 129]]);
+        });
+
+        it('should not map the central lines', function() {
+          maps_to_all(sym, size, [128,   0], []);
+          maps_to_all(sym, size, [0,   128], []);
+          maps_to_all(sym, size, [128, 128], []);
+        });
+      });
+
+
+      describe('even dimensions', function() {
+        const size = [256, 256];
+        it('should map to the other quadrants', function() {
+          maps_to_all(sym, size, [0, 0], [
+            [0,   255],
+            [255,   0],
+            [255, 255]]);
+          maps_to_all(sym, size, [127, 0], [
+            [128,   0],
+            [127, 255],
+            [128, 255]]);
+          maps_to_all(sym, size, [0, 127], [
+            [0,   128],
+            [255, 127],
+            [255, 128]]);
+          maps_to_all(sym, size, [127, 127], [
+            [127, 128],
+            [128, 127],
+            [128, 128]]);
+        });
+      });
+    });
+  });
+
+
+  describe('Octants', function() {
+    describe('get_primary_pixel', function() {
+      describe('odd dimensions', function() {
+      });
+
+
+      describe('even dimensions', function() {
+      });
+    });
+
+
+    describe('get_secondary_pixels', function() {
+      describe('odd dimensions', function() {
+      });
+
+
+      describe('even dimensions', function() {
+      });
+    });
+  });
+
+
+  describe('XY', function() {
+    describe('get_primary_pixel', function() {
+      describe('odd dimensions', function() {
+      });
+
+
+      describe('even dimensions', function() {
+      });
+    });
+
+
+    describe('get_secondary_pixels', function() {
+      describe('odd dimensions', function() {
+      });
+
+
+      describe('even dimensions', function() {
+      });
+    });
+  });
+
+
+  describe('X-Y', function() {
+    describe('get_primary_pixel', function() {
+      describe('odd dimensions', function() {
+      });
+
+
+      describe('even dimensions', function() {
+      });
+    });
+
+
+    describe('get_secondary_pixels', function() {
+      describe('odd dimensions', function() {
+      });
+
+
+      describe('even dimensions', function() {
       });
     });
   });

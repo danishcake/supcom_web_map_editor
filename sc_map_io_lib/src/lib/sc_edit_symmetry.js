@@ -96,7 +96,6 @@ class sc_edit_symmetry_horizontal extends sc_edit_symmetry_base {
     } else {
       // 257 - 129 - 1 = 127
       // 256 - 128 - 1 = 127
-      //let one_if_even = (size[0] + 1) % 2
       return [size[0] - point[0] - 1, point[1]];
     }
   }
@@ -115,6 +114,13 @@ class sc_edit_symmetry_horizontal extends sc_edit_symmetry_base {
     //             128 -> 128
     // 256 wide -> 0   -> 255
     //             127 -> 128
+    if (size[0] % 2 == 1) {
+      let mid_index = Math.floor((size[0] - 1) / 2);
+      if (point[0] === mid_index) {
+        return [];
+      }
+    }
+
     return [[size[0] - point[0] - 1, point[1]]]
   }
 }
@@ -159,14 +165,82 @@ class sc_edit_symmetry_vertical extends sc_edit_symmetry_base {
     //             128 -> 128
     // 256 high -> 0   -> 255
     //             127 -> 128
+    if (size[1] % 2 == 1) {
+      let mid_index = Math.floor((size[1] - 1) / 2);
+      if (point[1] === mid_index) {
+        return [];
+      }
+    }
+
     return [[point[0], size[1] - point[1] - 1]];
   }
 }
+
+
+/**
+ * Quadrant symmetry
+ * All pixels on the top half-left quadrant are considered primary. The other four
+ * quadrants are secondary
+ */
+class sc_edit_symmetry_quadrants extends sc_edit_symmetry_base {
+  /**
+   * Get the primary pixel from any pixel inside size.
+   * This is the top-left pixel
+   * @param {number[2]} point Position on map
+   * @param {number[2]} size Size of map
+   * @returns The primary pixel
+   */
+  __get_primary_pixel_impl(point, size) {
+    // For odd width, the index that transforms to self
+    // For even width, the index to the left of centre (last that is not reflected)
+    const mid_indices = [Math.floor((size[0] - 1) / 2),
+                         Math.floor((size[1] - 1) / 2)];
+
+    let mapped_point = [point[0], point[1]];
+
+    for (let i = 0; i < 2; i++) {
+      if (mapped_point[i] > mid_indices[i]) {
+        mapped_point[i] = size[i] - point[i] - 1;
+      }
+    }
+
+    return mapped_point;
+  }
+
+
+  /**
+   * Get the secondary pixels corresponding to any primary pixel.
+   * This is the pixel mirrored vertically around the center
+   * @param {number[2]} point Position on map
+   * @param {number[2]} size Size of map
+   * @returns The secondary pixels
+   */
+  __get_secondary_pixels_impl(point, size) {
+    for (let i = 0; i < 2; i++) {
+      if (size[i] % 2 === 1) {
+        const mid_index = Math.floor((size[i] - 1) / 2);
+        if (point[i] === mid_index) {
+          return [];
+        }
+      }
+    }
+
+    return [
+      [size[0] - point[0] - 1, point[1]],
+      [point[0],               size[1] - point[1] - 1],
+      [size[0] - point[0] - 1, size[1] - point[1] - 1]
+    ];
+  }
+}
+
+
+
 
 let sc_edit_symmetry = {
   none: sc_edit_symmetry_none,
   horizontal: sc_edit_symmetry_horizontal,
   vertical: sc_edit_symmetry_vertical,
+  quadrants: sc_edit_symmetry_quadrants
 };
 
 export { sc_edit_symmetry }
