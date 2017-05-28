@@ -1,0 +1,155 @@
+<div class="modal-header dialog-header-notify">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <h4 class="modal-title"><span class="glyphicon glyphicon-list"></span> Configure textures</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+      <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Presets</h3>
+        </div>
+        <div class="panel-body">
+
+          <div class="input-group">
+            <select class="form-control" ng-model="data.selected_preset" ng-change="preset_change()">
+              <option ng-repeat="preset in presets" value="{{preset.name}}" ng-selected="preset.name == data.selected_preset">{{preset.name}}</option>
+            </select>
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button" ng-disabled="data.selected_preset == null" ng-click="use_preset()">Use</button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+      <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Shaders and base textures</h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-lg-3"><h6>Terrain shader</h6></div>
+            <div class="col-lg-8">
+              <select class="form-control" ng-model="data.textures.terrain_shader">
+                <option ng-repeat = "terrain_shader in game_resources.shaders"
+                        value     = "{{terrain_shader.value}}"
+                        selected  = "{{terrain_shader.value == data.textures.terrain_shader ? 'selected' : ''}}">
+                  {{terrain_shader.name}}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-3"><h6>Background texture</h6></div>
+            <div class="col-lg-7">
+              <select class="form-control" ng-model="data.textures.background_texture_path">
+                <option ng-repeat = "background_texture in game_resources.backgrounds"
+                        value     = "{{background_texture.value}}"
+                        selected  = "{{background_texture.value == data.textures.background_texture_path ? 'selected' : ''}}">
+                  {{background_texture.name}}
+                </option>
+              </select>
+            </div>
+            <div class="col-lg-2">
+              <img ng-src="{{game_resources.img_url_lookup(data.textures.background_texture_path)}}"/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-3"><h6>Sky cubemap texture</h6></div>
+            <div class="col-lg-7">
+              <select class="form-control" ng-model="data.textures.sky_cubemap_texture_path">
+                <option ng-repeat = "sky_cubemap_texture in game_resources.sky_cubemaps"
+                        value     = "{{sky_cubemap_texture.value}}"
+                        selected  = "{{sky_cubemap_texture.value == data.textures.sky_cubemap_texture_path ? 'selected' : ''}}">
+                  {{sky_cubemap_texture.name}}
+                </option>
+              </select>
+            </div>
+            <div class="col-lg-2">
+              <img ng-src="{{game_resources.img_url_lookup(data.textures.sky_cubemap_texture_path)}}"/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4"><h6>Environment cubemaps</h6></div>
+            <div class="col-lg-8">
+              <p>TODO: Implement editing</p>
+              <p ng-repeat="environment_cubemap in data.textures.environment_cubemaps">
+                {{environment_cubemap.name}}:{{environment_cubemap.file}}
+                <img ng-src="{{game_resources.img_url_lookup(environment_cubemap.file)}}"/>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+      <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Layers</h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-xs-2"></div>
+            <div class="col-xs-5"><h6>Albedo</h6></div>
+            <div class="col-xs-5"><h6>Normal-map</h6></div>
+          </div>
+          <div class="row" ng-repeat="layer in data.layers.normal_data track by $index">
+            <!-- Note that there are always 9 normal layers and 10 albedo layers -->
+            <div class="col-xs-2"><h6>Layer {{$index}}</h6></div>
+            <div class="col-xs-4">
+              <select class="form-control" ng-model="data.layers.albedo_data[$index].texture_file">
+                <option ng-repeat = "albedo_texture in game_resources.albedo_textures"
+                        value     = "{{albedo_texture.value}}"
+                        selected  = "{{albedo_texture.value == data.layers.albedo_data[$index].texture_file ? 'selected' : ''}}">
+                  {{albedo_texture.tileset}}/{{albedo_texture.name}}
+                </option>
+              </select>
+            </div>
+            <div class="col-xs-1">
+              <img ng-src="{{game_resources.img_url_lookup(data.layers.albedo_data[$index].texture_file)}}"/>
+            </div>
+            <div class="col-xs-5">
+              <select class="form-control" ng-model="data.layers.normal_data[$index].texture_file">
+                <option ng-repeat = "normal_texture in game_resources.normal_textures"
+                        value     = "{{normal_texture.value}}"
+                        selected  = "{{normal_texture.value == data.layers.normal_data[$index].texture_file ? 'selected': ''}}">
+                  {{normal_texture.tileset}}/{{normal_texture.name}}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-2"><h6>Layer 9</h6></div>
+            <div class="col-xs-4">
+              <select class="form-control" ng-model="data.layers.albedo_data[9].texture_file">
+                <option ng-repeat = "albedo_texture in game_resources.albedo_textures"
+                        value     = "{{albedo_texture.value}}"
+                        selected  = "{{albedo_texture.value == data.layers.albedo_data[9].texture_file ? 'selected': ''}}">
+                  {{albedo_texture.tileset}}/{{albedo_texture.name}}
+                </option>
+              </select>
+            </div>
+            <div class="col-xs-1">
+              <img ng-src="{{game_resources.img_url_lookup(data.layers.albedo_data[9].texture_file)}}"/>
+            </div>
+            <div class="col-xs-5"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <span class="pull-left">Any arbitrary combination of textures can be blended together, but typically only a single texture is used except at boundaries between the textures (eg sandy beach transitioning to grassy plain).</span>
+  <button type="button" class="btn btn-default pull-right" ng-click="accept()">OK</button>
+</div>
