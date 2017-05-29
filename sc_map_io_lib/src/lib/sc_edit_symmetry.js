@@ -6,6 +6,8 @@
  */
 
 import {sc_rect} from "./sc_rect"
+import {_} from "underscore"
+import * as glm from 'gl-matrix';
 
 /**
  * Symmetry class. Subclasses should implement
@@ -74,105 +76,103 @@ class sc_edit_symmetry_none extends sc_edit_symmetry_base {
   }
 }
 
+
 /**
- * Horizontal symmetry
- * All pixels on the left hand size are considered primary. The right hand side is secondary
+ * Matrix based symmetry
+ * This is a convenience subclass that allows symmetries that can be expressed using a 2x2 matrix
+ * to be easily expressed
  */
-class sc_edit_symmetry_horizontal extends sc_edit_symmetry_base {
+class sc_edit_symmetry_matrix extends sc_edit_symmetry_base {
+  /**
+   * Stores the matrices that transform a secondary pixel to primary
+   * @param primary_predicate {Function} Returns true if the point provided is a primary pixel
+   * @param matrices {Array} Array to 2x2 matrices that map primary pixels to secondary
+   */
+  constructor(primary_predicate, matrices) {
+    super();
+    this.__primary_predicate = primary_predicate;
+    this.__matrices = matrices;
+  }
+
   /**
    * Get the primary pixel from any pixel inside size.
-   * This is the left hand pixel about the centre
+   * This is always the input pixel
    * @param {number[2]} point Position on map
    * @param {number[2]} size Size of map
    * @returns The primary pixel
    */
   __get_primary_pixel_impl(point, size) {
-    // For odd width, the index that transforms to self
-    // For even width, the index to the left of centre (last that is not reflected)
-    let mid_index = Math.floor((size[0] - 1) / 2);
-
-    if (point[0] <= mid_index) {
+    if (this.__primary_predicate(point, size)) {
       return point;
-    } else {
-      // 257 - 129 - 1 = 127
-      // 256 - 128 - 1 = 127
-      return [size[0] - point[0] - 1, point[1]];
     }
+
+    const secondary_pixels = this.__get_secondary_pixels_impl(point, size);
+    for (let secondary_pixel of secondary_pixels) {
+      if (this.__primary_predicate(secondary_pixel, size)) {
+        return secondary_pixel;
+      }
+    }
+
+    // Disaster - no pixel has been identified as primary.
+    console.log(`[${point[0]}, ${point[1]}] had secondary pixels: [`);
+    for (let secondary_pixel of secondary_pixels) {
+      console.log(`[${secondary_pixel[0]}, ${secondary_pixel[1]}],`);
+    }
+    console.log(`]`);
+    throw new Error(`[${point[0]}, ${point[1]}] does not have a primary pixel`)
   }
 
 
   /**
    * Get the secondary pixels corresponding to any primary pixel.
-   * This is the pixel mirrored horizontally around the center
+   * There are not secondary pixels
    * @param {number[2]} point Position on map
    * @param {number[2]} size Size of map
    * @returns The secondary pixels
    */
   __get_secondary_pixels_impl(point, size) {
-    // 257 wide -> 0   -> 256
-    //             127 -> 129
-    //             128 -> 128
-    // 256 wide -> 0   -> 255
-    //             127 -> 128
-    if (size[0] % 2 == 1) {
-      let mid_index = Math.floor((size[0] - 1) / 2);
-      if (point[0] === mid_index) {
-        return [];
-      }
-    }
+    let mid_indices = glm.vec2.fromValues((size[0] - 1) / 2, (size[1] - 1) / 2);
 
-    return [[size[0] - point[0] - 1, point[1]]]
+    // Find all the secondary pixels
+    let secondary_pixels = _.map(this.__matrices, (transform) => {
+      let secondary_pixel  = glm.vec2.clone(point);
+      glm.vec2.sub(secondary_pixel, secondary_pixel, mid_indices);
+      glm.vec2.transformMat2(secondary_pixel, secondary_pixel, transform);
+      glm.vec2.add(secondary_pixel, secondary_pixel, mid_indices);
+      return [secondary_pixel[0], secondary_pixel[1]]; // TBD: glm produces {'0': x, '1': y} objects...
+      // TODO: If I start using non-integer matrices I'll need to use a Math.round here
+    });
+
+    // If any secondary pixel has mapped to a primary pixel then cull it
+    return _.filter(secondary_pixels, (secondary_pixel) => {
+      return secondary_pixel[0] != point[0] || secondary_pixel[1] != point[1];
+    });
   }
 }
+
+
+/**
+ * Horizontal symmetry
+ * All pixels on the left hand size are considered primary. The right hand side is secondary
+ */
+class sc_edit_symmetry_horizontal extends sc_edit_symmetry_matrix {
+  constructor() {
+    super((point, size) => { return point[0] <= Math.floor((size[0] - 1) / 2); },
+          [[-1,  0,
+             0,  1]]);
+  }
+}
+
 
 /**
  * Vertical symmetry
  * All pixels on the top half are considered primary. The bottom half side is secondary
  */
-class sc_edit_symmetry_vertical extends sc_edit_symmetry_base {
-  /**
-   * Get the primary pixel from any pixel inside size.
-   * This is the top pixel
-   * @param {number[2]} point Position on map
-   * @param {number[2]} size Size of map
-   * @returns The primary pixel
-   */
-  __get_primary_pixel_impl(point, size) {
-    // For odd width, the index that transforms to self
-    // For even width, the index to the left of centre (last that is not reflected)
-    let mid_index = Math.floor((size[1] - 1) / 2);
-
-    if (point[1] <= mid_index) {
-      return point;
-    } else {
-      // 257 - 129 - 1 = 127
-      // 256 - 128 - 1 = 127
-      return [point[0], size[1] - point[1] - 1];
-    }
-  }
-
-
-  /**
-   * Get the secondary pixels corresponding to any primary pixel.
-   * This is the pixel mirrored vertically around the center
-   * @param {number[2]} point Position on map
-   * @param {number[2]} size Size of map
-   * @returns The secondary pixels
-   */
-  __get_secondary_pixels_impl(point, size) {
-    // 257 high -> 0   -> 256
-    //             127 -> 129
-    //             128 -> 128
-    // 256 high -> 0   -> 255
-    //             127 -> 128
-    if (size[1] % 2 == 1) {
-      let mid_index = Math.floor((size[1] - 1) / 2);
-      if (point[1] === mid_index) {
-        return [];
-      }
-    }
-
-    return [[point[0], size[1] - point[1] - 1]];
+class sc_edit_symmetry_vertical extends sc_edit_symmetry_matrix {
+  constructor() {
+    super((point, size) => { return point[1] <= Math.floor((size[1] - 1) / 2); },
+          [[ 1,  0,
+             0, -1]]);
   }
 }
 
@@ -182,58 +182,18 @@ class sc_edit_symmetry_vertical extends sc_edit_symmetry_base {
  * All pixels on the top half-left quadrant are considered primary. The other four
  * quadrants are secondary
  */
-class sc_edit_symmetry_quadrants extends sc_edit_symmetry_base {
-  /**
-   * Get the primary pixel from any pixel inside size.
-   * This is the top-left pixel
-   * @param {number[2]} point Position on map
-   * @param {number[2]} size Size of map
-   * @returns The primary pixel
-   */
-  __get_primary_pixel_impl(point, size) {
-    // For odd width, the index that transforms to self
-    // For even width, the index to the left of centre (last that is not reflected)
-    const mid_indices = [Math.floor((size[0] - 1) / 2),
-                         Math.floor((size[1] - 1) / 2)];
-
-    let mapped_point = [point[0], point[1]];
-
-    for (let i = 0; i < 2; i++) {
-      if (mapped_point[i] > mid_indices[i]) {
-        mapped_point[i] = size[i] - point[i] - 1;
-      }
-    }
-
-    return mapped_point;
-  }
-
-
-  /**
-   * Get the secondary pixels corresponding to any primary pixel.
-   * This is the pixel mirrored vertically around the center
-   * @param {number[2]} point Position on map
-   * @param {number[2]} size Size of map
-   * @returns The secondary pixels
-   */
-  __get_secondary_pixels_impl(point, size) {
-    for (let i = 0; i < 2; i++) {
-      if (size[i] % 2 === 1) {
-        const mid_index = Math.floor((size[i] - 1) / 2);
-        if (point[i] === mid_index) {
-          return [];
-        }
-      }
-    }
-
-    return [
-      [size[0] - point[0] - 1, point[1]],
-      [point[0],               size[1] - point[1] - 1],
-      [size[0] - point[0] - 1, size[1] - point[1] - 1]
-    ];
+class sc_edit_symmetry_quadrants extends sc_edit_symmetry_matrix {
+    constructor() {
+    super((point, size) => { return point[0] <= Math.floor((size[0] - 1) / 2) &&
+                                    point[1] <= Math.floor((size[1] - 1) / 2); },
+          [[ 1,  0,
+             0, -1],
+           [-1,  0,
+             0, 1],
+           [-1,  0,
+             0, -1]]);
   }
 }
-
-
 
 
 let sc_edit_symmetry = {

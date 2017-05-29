@@ -40,25 +40,15 @@ const none_map_to_primary = function(symmetry, size, points) {
  */
 const maps_to_all = function(symmetry, size, point, results) {
   const secondary_pixels = symmetry.get_secondary_pixels(point, size);
-  for (let i = 0; i < secondary_pixels.length; i++) {
-    console.log(`secondary_pixels[${i}]: [${secondary_pixels[i]}]`);
-  }
-  for (let i = 0; i < results.length; i++) {
-    console.log(`results[${i}]: [${results[i]}]`);
-  }
-
-
 
   for (let i = 0; i < results.length; i++) {
     let result_matched = _.find(secondary_pixels, function(value) {
       let match = value[0] == results[i][0] && value[1] == results[i][1];
-      console.log(`Comparing [${value}] and [${results[i]}] == ${match}`);
       return match;
     });
 
     assert.isOk(result_matched, `[${results[i]}] should be contained in [${secondary_pixels}] drived from [${point}]`);
   }
-  //assert.sameDeepMembers(results, secondary_pixels);
 };
 
 
