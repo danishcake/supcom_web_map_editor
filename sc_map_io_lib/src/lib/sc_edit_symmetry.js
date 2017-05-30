@@ -196,11 +196,75 @@ class sc_edit_symmetry_quadrants extends sc_edit_symmetry_matrix {
 }
 
 
+/**
+ * Octant symmetry
+ * The pixels in the top-left octant are considered primary
+ * P
+ * PP
+ * PPP
+ * PPPP
+ */
+class sc_edit_symmetry_octants extends sc_edit_symmetry_matrix {
+    constructor() {
+    super((point, size) => { return point[0] <= point[1] &&
+                                    point[0] <= Math.floor((size[0] - 1) / 2) &&
+                                    point[1] <= Math.floor((size[1] - 1) / 2); },
+      [[ 0,  1,
+        -1,  0],
+       [-1,  0,
+         0, -1],
+       [ 0, -1,
+         1,  0],
+       [ 0,  1,
+         1,  0],
+       [ 1,  0,
+         0, -1],
+       [ 0, -1,
+        -1,  0],
+       [-1,  0,
+         0,  1]]);
+  }
+}
+
+
+/**
+ * X==Y symmetry
+ * The pixels where x <= y are considered primary
+ * P
+ * PP
+ * PPP
+ * PPPP
+ */
+class sc_edit_symmetry_xy extends sc_edit_symmetry_matrix {
+    constructor() {
+    super((point, size) => { return point[0] <= point[1]; },
+      [[ 0,  1,
+         1,  0]]);
+  }
+}
+
+
+/**
+ * X==-Y symmetry (ignoring translation
+ * The pixels in the top-left are considered primary (x + y < size.x)
+ */
+class sc_edit_symmetry_yx extends sc_edit_symmetry_matrix {
+    constructor() {
+    super((point, size) => { return point[0] + point[1] < size[0]; },
+      [[ 0, -1,
+        -1,  0]]);
+  }
+}
+
+
 let sc_edit_symmetry = {
-  none: sc_edit_symmetry_none,
+  none:       sc_edit_symmetry_none,
   horizontal: sc_edit_symmetry_horizontal,
-  vertical: sc_edit_symmetry_vertical,
-  quadrants: sc_edit_symmetry_quadrants
+  vertical:   sc_edit_symmetry_vertical,
+  quadrants:  sc_edit_symmetry_quadrants,
+  octants:    sc_edit_symmetry_octants,
+  xy:         sc_edit_symmetry_xy,
+  yx:         sc_edit_symmetry_yx
 };
 
 export { sc_edit_symmetry }
