@@ -127,19 +127,34 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
       case 'none':
       default:
         service.symmetry = new sc_map_io_lib.sc.edit.symmetry.none();
-        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, service.symmetry);
         break;
 
       case 'horizontal':
         service.symmetry = new sc_map_io_lib.sc.edit.symmetry.horizontal();
-        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, service.symmetry);
         break;
 
       case 'vertical':
         service.symmetry = new sc_map_io_lib.sc.edit.symmetry.vertical();
-        service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, service.symmetry);
+        break;
+
+      case 'xy':
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.xy();
+        break;
+
+      case 'yx':
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.yx();
+        break;
+
+      case 'quadrants':
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.quadrants();
+        break;
+
+      case 'octants':
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.octants();
         break;
     }
+
+    service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, service.symmetry);
   };
 
 
