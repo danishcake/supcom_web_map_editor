@@ -125,7 +125,8 @@ class webgl_effect {
                     " type: " + this.__get_type_string(active_attribute.type));
         this.__attributes[active_attribute.name] = {
           type: active_attribute.type,
-          index: gl.getAttribLocation(this.__program, active_attribute.name)
+          index: gl.getAttribLocation(this.__program, active_attribute.name),
+          bound: false
         };
 
         switch (active_attribute.type) {
@@ -168,7 +169,8 @@ class webgl_effect {
                     " type: " + this.__get_type_string(active_uniform.type));
         this.__uniforms[active_uniform.name] = {
           type: active_uniform.type,
-          index: gl.getUniformLocation(this.__program, active_uniform.name)
+          index: gl.getUniformLocation(this.__program, active_uniform.name),
+          bound: false
         };
       } else {
         break;
@@ -198,6 +200,7 @@ class webgl_effect {
       gl.enableVertexAttribArray(this.__attributes[attribute].index);
     }
   }
+
 
   /**
    * Deactivates the current effect
@@ -245,6 +248,7 @@ class webgl_effect {
     }
 
     this.gl.uniform1f(this.__uniforms[uniform_id].index, val);
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -260,6 +264,7 @@ class webgl_effect {
     }
 
     this.gl.uniformMatrix4fv(this.__uniforms[uniform_id].index, false, new Float32Array(val));
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -275,6 +280,7 @@ class webgl_effect {
     }
 
     this.gl.uniform4fv(this.__uniforms[uniform_id].index, new Float32Array(val));
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -290,6 +296,7 @@ class webgl_effect {
     }
 
     this.gl.uniform3fv(this.__uniforms[uniform_id].index, new Float32Array(val));
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -305,6 +312,7 @@ class webgl_effect {
     }
 
     this.gl.uniform2fv(this.__uniforms[uniform_id].index, new Float32Array(val));
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -323,6 +331,7 @@ class webgl_effect {
     this.gl.activeTexture(this.gl.TEXTURE0);
     this.gl.bindTexture(this.gl.TEXTURE_2D, val);
     this.gl.uniform1i(this.__uniforms[uniform_id].index, 0);
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -335,9 +344,47 @@ class webgl_effect {
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
     this.gl.vertexAttribPointer(attribute.index, attribute.element_count, attribute.element_type, false, 0, 0);
+    attribute.bound = true;
     return true;
   }
 
+
+  /**
+   * Unbinds every attribute and uniform by calling each unbinder setup at binding time
+   * Note: At the moment this just marks stuff as not bound. In the future I could use this
+   * mechanism to actually perform unbinding if it proves to be necessary
+   */
+  unbind_all() {
+    for (let attribute_id of Object.keys(this.__attributes)) {
+      this.__attributes[attribute_id].bound = false;
+    }
+    for (let uniform_id of Object.keys(this.__uniforms)) {
+      this.__uniforms[uniform_id].bound = false;
+    }
+  }
+
+
+  /**
+   * Returns true if every attribute and uniform has been bound since the last call to unbind_all
+   */
+  all_bound() {
+    let ok = true;
+    for (let attribute_id of Object.keys(this.__attributes)) {
+      if (!this.__attributes[attribute_id].bound) {
+        console.log(`Attribute ${attribute_id} not bound`);
+        ok = false;
+      }
+    }
+
+    for (let uniform_id of Object.keys(this.__uniforms)) {
+      if (!this.__uniforms[uniform_id].bound) {
+        console.log(`Uniform ${uniform_id} not bound`);
+        ok = false;
+      }
+    }
+
+    return ok;
+  }
 
 
   get attributes() { return this.__attributes; }

@@ -16,6 +16,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   service.map = null;
   service.edit_heightmap
   service.scripts = null;
+  service.render_mode = "heightmap"
 
   /**
    * Returns the location the map was most recently saved to or loaded from
@@ -41,11 +42,8 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
 
     // Recreate the tool
     switch(tool_data.category) {
-      case 'select':
-        service.tool = null;
-        break;
-
       case 'heightmap':
+        service.render_mode = 'heightmap';
         switch(tool_data.heightmap.type) {
           case 'raise':
             service.tool = new sc_map_io_lib.sc.edit.tool.raise(outer, inner, strength);
@@ -70,6 +68,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
         break;
 
       case 'texture':
+        service.render_mode = 'heightmap';
         service.tool = null;
         break;
 

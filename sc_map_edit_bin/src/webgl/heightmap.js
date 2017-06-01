@@ -156,29 +156,25 @@ class webgl_heightmap {
 
   /**
    * Binds buffers to effect uniform/attributes
+   *
+   * This heightmap can render is several different modes, each using a different effet. As long as everything in
+   * the effect ends up bound we consider that a success.
    */
   __bind_effect(effect, camera) {
     let gl = this.__gl;
 
-    // We require the following attributes:
-    // vec3 aPosition;
+    effect.unbind_all();
 
-    // We require the following uniforms:
-    // uniform mat4 uVMatrix
-    // uniform mat4 uPMatrix
-    // uniform vec2 uMapSize
-    // sampler2D uHeightmap;
-    // sampler2D uTexturemap0_3; // TODO: Add these in once I get simple case working
-    // sampler2D uTexturemap4_7; // TODO: Add these in once I get simple case working
+    effect.set_uniform_mat4("uVMatrix", camera.view);
+    effect.set_uniform_mat4("uPMatrix", camera.projection);
+    effect.set_uniform_vec2("uMapSize", this.__map_size);
+    effect.set_uniform_sampler2d("uHeightmap", this.__height_texture);
+    effect.set_uniform_float("uHeightmapScale", this.__heightmap.scale * 0.01);
+    effect.set_uniform_float("uShadeMin", this.__heightmap.minimum_height);
+    effect.set_uniform_float("uShadeMax", this.__heightmap.maximum_height);
+    effect.bind_attribute("aVertexPosition", this.__vertex_buffer);
 
-    if (!effect.set_uniform_mat4("uVMatrix", camera.view) ||
-        !effect.set_uniform_mat4("uPMatrix", camera.projection) ||
-        !effect.set_uniform_vec2("uMapSize", this.__map_size)   ||
-        !effect.set_uniform_sampler2d("uHeightmap", this.__height_texture) ||
-        !effect.set_uniform_float("uHeightmapScale", this.__heightmap.scale * 0.01) ||
-        !effect.set_uniform_float("uShadeMin", this.__heightmap.minimum_height) ||
-        !effect.set_uniform_float("uShadeMax", this.__heightmap.maximum_height) ||
-        !effect.bind_attribute("aVertexPosition", this.__vertex_buffer))
+    if (!effect.all_bound())
     {
       console.log("Failed to bind effect");
       return;
@@ -186,7 +182,6 @@ class webgl_heightmap {
 
     // Bind the index buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.__index_buffer);
-
   }
 
 
