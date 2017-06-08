@@ -3,6 +3,7 @@
  * and intermediate representations
  */
 import {sc_edit_heightmap} from "./sc_edit_heightmap"
+import {sc_edit_texturemap} from "./sc_edit_texturemap"
 import {sc_edit_tool_args, sc_edit_tool_data} from "./tools/sc_edit_tool_args"
 import {sc_edit_tool_raise, sc_edit_tool_lower} from "./tools/sc_edit_tool_raise"
 import {sc_edit_tool_flatten} from "./tools/sc_edit_tool_flatten"
@@ -16,6 +17,7 @@ import {sc_edit_view_snapshot} from "./views/sc_edit_view_snapshot"
 
 let sc_edit = {
   heightmap: sc_edit_heightmap,
+  texturemap: sc_edit_texturemap,
   tool: {
     args: sc_edit_tool_args,
     data: sc_edit_tool_data,

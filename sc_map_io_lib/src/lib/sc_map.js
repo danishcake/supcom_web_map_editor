@@ -148,6 +148,7 @@ class sc_map_preview_image {
     // Blank dds, excluding header
     // TBD: Change this to store the DDS header and ARGB data (as is available post load?)
     this.__data = new ByteBuffer(256 * 256 * 4, ByteBuffer.LITTLE_ENDIAN);
+    this.__data.fill(0).reset();
   }
 }
 
@@ -1133,6 +1134,10 @@ class sc_map_normalmap {
     output.writeInt32(this.__height);
     output.writeInt32(1); // Normal map count
     output.writeInt32(this.__width * this.__height  * 4 / 4 + 128);
+
+    // Note: DXT5 is capable of lossless compression if there are only a few distinct values,
+    // but it does so in RGB565, which causes the bottom 2-3 bits of each channel to be dropped
+    // This also means that the 2-3 bottom bits are likely to be zero after loading
     sc_dds.save(output, this.__data, this.__width, this.__height, sc_dds_pixelformat.DXT5);
 
     return output;
@@ -1147,8 +1152,8 @@ class sc_map_normalmap {
     // TODO: Check this is up!
     for (let i = 0; i < this.__width * this.__height; i++) {
       this.__data.writeUint8(0);
+      this.__data.writeUint8(255);
       this.__data.writeUint8(0);
-      this.__data.writeUint8(1);
       this.__data.writeUint8(0);
     }
    }
@@ -1217,6 +1222,8 @@ class sc_map_texturemap {
   create(map_args) {
     this.__chan0_3 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4, ByteBuffer.LITTLE_ENDIAN);
     this.__chan4_7 = new ByteBuffer(tm_sz(map_args.size) * tm_sz(map_args.size) * 4, ByteBuffer.LITTLE_ENDIAN);
+    this.__chan0_3.fill(0).reset();
+    this.__chan4_7.fill(0).reset();
     this.__width = tm_sz(map_args.size);
     this.__height = tm_sz(map_args.size);
   }

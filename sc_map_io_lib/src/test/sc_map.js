@@ -515,10 +515,10 @@ describe('sc_map', function() {
                     map.normalmap.data.readUint8(1),
                     map.normalmap.data.readUint8(2),
                     map.normalmap.data.readUint8(3)];
-      assert.equal(0, normal[0]);
-      assert.equal(0, normal[1]);
-      assert.equal(1, normal[2]);
-      assert.equal(0, normal[3]);
+      assert.equal(0,   normal[0]);
+      assert.equal(255, normal[1]);
+      assert.equal(0,   normal[2]);
+      assert.equal(0,   normal[3]);
     });
 
     it('should create correct size texturemap', function() {
@@ -533,6 +533,17 @@ describe('sc_map', function() {
 
       assert.equal(512 * 512 * 4, map_20x20.texturemap.chan0_3.capacity());
       assert.equal(512 * 512 * 4, map_20x20.texturemap.chan4_7.capacity());
+    });
+
+    it('should create zeroed texturemap', function() {
+      let map_5x5 = new sc.map();
+      map_5x5.create(default_5x5_map_args);
+
+
+      for (let i = 0; i < 1000; i++) {
+        assert.equal(0, map_5x5.texturemap.chan0_3.readUint8(i));
+        assert.equal(0, map_5x5.texturemap.chan4_7.readUint8(i));
+      }
     });
 
     it('should create correct watermap', function() {
@@ -745,10 +756,10 @@ describe('sc_map', function() {
     });
 
     it('should write normal maps', function() {
-      assert.equal(this.dest_map.normalmap.data[0], this.src_map.normalmap.data[0]);
-      assert.equal(this.dest_map.normalmap.data[1], this.src_map.normalmap.data[1]);
-      assert.equal(this.dest_map.normalmap.data[2], this.src_map.normalmap.data[2]);
-      assert.equal(this.dest_map.normalmap.data[3], this.src_map.normalmap.data[3]);
+      assert.equal(this.dest_map.normalmap.data.readUint8(0), this.src_map.normalmap.data.readUint8(0));
+      assert.equal(this.dest_map.normalmap.data.readUint8(1), this.src_map.normalmap.data.readUint8(1));
+      assert.equal(this.dest_map.normalmap.data.readUint8(2), this.src_map.normalmap.data.readUint8(2));
+      assert.equal(this.dest_map.normalmap.data.readUint8(3), this.src_map.normalmap.data.readUint8(3));
 
       assert.equal(this.dest_map.normalmap.width, this.src_map.normalmap.width);
       assert.equal(this.dest_map.normalmap.height, this.src_map.normalmap.height);
@@ -757,16 +768,16 @@ describe('sc_map', function() {
 
     it('should write texture maps', function() {
       assert.equal(this.dest_map.texturemap.chan0_3.capacity(), this.src_map.texturemap.chan0_3.capacity());
-      assert.equal(this.dest_map.texturemap.chan0_3[0], this.src_map.texturemap.chan0_3[0]);
-      assert.equal(this.dest_map.texturemap.chan0_3[1], this.src_map.texturemap.chan0_3[1]);
-      assert.equal(this.dest_map.texturemap.chan0_3[2], this.src_map.texturemap.chan0_3[2]);
-      assert.equal(this.dest_map.texturemap.chan0_3[3], this.src_map.texturemap.chan0_3[3]);
+      assert.equal(this.dest_map.texturemap.chan0_3.readUint8(0), this.src_map.texturemap.chan0_3.readUint8(0));
+      assert.equal(this.dest_map.texturemap.chan0_3.readUint8(1), this.src_map.texturemap.chan0_3.readUint8(1));
+      assert.equal(this.dest_map.texturemap.chan0_3.readUint8(2), this.src_map.texturemap.chan0_3.readUint8(2));
+      assert.equal(this.dest_map.texturemap.chan0_3.readUint8(3), this.src_map.texturemap.chan0_3.readUint8(3));
 
       assert.equal(this.dest_map.texturemap.chan4_7.capacity(), this.src_map.texturemap.chan4_7.capacity());
-      assert.equal(this.dest_map.texturemap.chan4_7[0], this.src_map.texturemap.chan4_7[0]);
-      assert.equal(this.dest_map.texturemap.chan4_7[1], this.src_map.texturemap.chan4_7[1]);
-      assert.equal(this.dest_map.texturemap.chan4_7[2], this.src_map.texturemap.chan4_7[2]);
-      assert.equal(this.dest_map.texturemap.chan4_7[3], this.src_map.texturemap.chan4_7[3]);
+      assert.equal(this.dest_map.texturemap.chan4_7.readUint8(0), this.src_map.texturemap.chan4_7.readUint8(0));
+      assert.equal(this.dest_map.texturemap.chan4_7.readUint8(1), this.src_map.texturemap.chan4_7.readUint8(1));
+      assert.equal(this.dest_map.texturemap.chan4_7.readUint8(2), this.src_map.texturemap.chan4_7.readUint8(2));
+      assert.equal(this.dest_map.texturemap.chan4_7.readUint8(3), this.src_map.texturemap.chan4_7.readUint8(3));
     });
 
     it('should write water maps', function() {
