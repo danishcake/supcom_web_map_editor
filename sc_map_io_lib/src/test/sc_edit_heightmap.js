@@ -24,7 +24,7 @@ describe('sc_edit_heightmap', function() {
     let map = new sc_map();
     map.create({size: 0, default_height: 1000});
     let edit_heightmap = new sc_edit_heightmap(map.heightmap);
-    edit_heightmap.set_pixel([0, 0], 50);
+    edit_heightmap.set_pixel([0, 0], [50]);
     edit_heightmap.export_to_heightmap(map.heightmap);
 
     it('should have same heights', function () {
