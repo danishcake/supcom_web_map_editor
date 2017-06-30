@@ -8,15 +8,16 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   let service = {};
 
   // Tool/edit_view/symmetry are populated when the tool is created
-  // Map/scripts/edit_heightmap are populated when the map is created or loaded (which also recreates the tool)
+  // Map/scripts/edit_heightmap/edit_heightmap are populated when the map is created or loaded (which also recreates the tool)
   service.tool = null;
   service.edit_view = null;
   service.symmetry = null;
   service.save_location = "unsaved";
   service.map = null;
-  service.edit_heightmap
+  service.edit_heightmap = null;
+  service.edit_texturemap = null;
   service.scripts = null;
-  service.render_mode = "heightmap"
+  service.render_mode = "heightmap";
 
   /**
    * Returns the location the map was most recently saved to or loaded from
@@ -68,7 +69,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
         break;
 
       case 'texture':
-        service.render_mode = 'heightmap';
+        service.render_mode = 'texturemap';
         service.tool = null;
         break;
 
@@ -182,11 +183,13 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     service.scripts.save = map.scripts.save;
     service.save_location = map.save_location;
 
-    // Build editable heightmap
+    // Build editable heightmap/texturemap
     service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);
+    service.edit_texturemap = new sc_map_io_lib.sc.edit.texturemap(service.map.texturemap)
 
     // Build editable symmetry view
     service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.none());
+    service.edit_texturemap_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_texturemap, new sc_map_io_lib.sc.edit.symmetry.none());
 
     // Call each registered map change subscriber
     _.each(service.callbacks.on_new_map, callback => callback());
@@ -207,11 +210,13 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     service.scripts.scenario.create(initial_map_params);
     service.scripts.save.create(initial_map_params);
 
-    // Build editable heightmap
+    // Build editable heightmap/texturemap
     service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);
+    service.edit_texturemap = new sc_map_io_lib.sc.edit.texturemap(service.map.texturemap);
 
-    // Build editable symmetry view
+    // Build editable symmetry views
     service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.none());
+    service.edit_texturemap_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_texturemap, new sc_map_io_lib.sc.edit.symmetry.none());
 
     // Call each registered map change subscriber
     _.each(service.callbacks.on_new_map, callback => callback());

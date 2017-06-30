@@ -608,6 +608,8 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
   /**
    * Searches through the available textures for the first with a matching value
    * and returns the image URL, or "" if not found
+   *
+   * TODO: Case insensitive lookups
    */
   service.img_url_lookup = function(img_value) {
     const texture_sets = [
@@ -626,6 +628,38 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
       return matching_texture.img.src;
     } else {
       return "";
+    }
+  };
+
+
+  /**
+   * Retrieves the WebGL texture ID for a texture
+   *
+   * Currently only albedo textures are required.
+   * @param {string} img_value The name of the texture as recorded in the map file
+   * @return {WebGLTexture} The corresponding WebGL texture. If not available then the unused
+   * texture is returned
+   *
+   * TODO: Case insensitive lookups
+   */
+  service.gl_texture_lookup = function(img_value) {
+    const texture_sets = [
+      service.albedo_textures,
+    ];
+
+    let matching_texture = _.chain(texture_sets)
+      .flatten()
+      .findWhere({value: img_value})
+      .value();
+
+    if (matching_texture) {
+      return matching_texture.texture_id;
+    } else {
+      // This better work or I'll recurse to death
+      if (img_value !== '') {
+        console.log(`Texture lookup failed: '${img_value}'`);
+      }
+      return service.gl_texture_lookup('');
     }
   };
 
@@ -680,6 +714,7 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
       texture.texture_id = gl.createTexture();
 
       // Setup texture parameters
+      gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, texture.texture_id);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.img);

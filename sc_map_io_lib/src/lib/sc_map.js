@@ -24,14 +24,22 @@ const dds_dxt5_sz = function(d) { return dds_dxt5_sz2(d, d); };
 const dds_raw_sz2 = function(x, y) { return 4 * x * y + 128; };
 const dds_raw_sz = function(d) { return dds_raw_sz2(d, d); };
 
-/* Used to determine height map size from a zero based size enum */
+/**
+ * Used to determine height map size from a zero based size enum
+ * @param {sc_map_size} idx Map size
+ * @return {number} The size of the heightmap for the given size
+ */
 const hm_sz = function(idx) {
   check.between(0, 4, idx, "Invalid map size");
   const lut = [256, 512, 1024, 2048, 4096];
   return lut[idx];
 };
 
-/* Used to determine texture map size from a zero based size enum */
+/**
+ * Used to determine texture map size from a zero based size enum
+ * @param {sc_map_size} idx Map size
+ * @return {number} The size of the texturemap for the given size
+ */
 const tm_sz = function(idx) {
   check.between(0, 4, idx, "Invalid map size");
   const lut = [128, 256, 512, 1024, 2048];
@@ -53,6 +61,7 @@ const wmtt_sz = hm_sz;
 
 
 /**
+ * @class sc_map_header
  * Initial header
  */
 class sc_map_header {
@@ -61,7 +70,9 @@ class sc_map_header {
     this.__height = undefined;
   }
 
+  /** @type {number} */
   get width() { return this.__width; }
+  /** @type {number} */
   get height() { return this.__height; }
 
   load(input) {
@@ -104,6 +115,7 @@ class sc_map_header {
 }
 
 /**
+ * @class sc_map_preview_image
  * Preview image
  */
 class sc_map_preview_image {
@@ -111,6 +123,7 @@ class sc_map_preview_image {
     this.__data = undefined;
   }
 
+  /** @type {ByteBuffer} */
   get data() { return this.__data; }
 
   load(input) {
@@ -153,6 +166,7 @@ class sc_map_preview_image {
 }
 
 /**
+ * @class sc_map_heightmap
  * Heightmap
  */
 class sc_map_heightmap {
@@ -163,11 +177,19 @@ class sc_map_heightmap {
     this.__data = undefined;
   }
 
+  /** @type {Number} Width of heightmap */
   get width() { return this.__width; }
+  /** @type {Number} Height of heightmap */
   get height() { return this.__height; }
+  /** @type {Number} Vertical scaling factor for heightmap*/
   get scale() { return this.__scale; }
+  /** @type {ByteBuffer} Heightmap contents */
   get data() { return this.__data; }
 
+  /**
+   * Loads the heightmap from the provided input
+   * @param {ByteBuffer} input File to load
+   */
   load(input) {
     let width = input.readInt32();
     let height = input.readInt32();
@@ -186,6 +208,7 @@ class sc_map_heightmap {
     this.__data = data;
   }
 
+  /** @return {ByteBuffer} Serialised heightmap */
   save() {
     const hm_count = (this.__width + 1) * (this.__height + 1);
 
@@ -201,6 +224,10 @@ class sc_map_heightmap {
     return output;
   }
 
+  /**
+   * Populates fields
+   * @param {sc_map_args} map_args The defining characteristics of the map
+   */
   create(map_args) {
     this.__width = hm_sz(map_args.size);
     this.__height = hm_sz(map_args.size);
@@ -218,18 +245,26 @@ class sc_map_heightmap {
 }
 
 /**
+ * @class sc_map_environment_cubemap
  * Environment cubemap definition
  */
 class sc_map_environment_cubemap
 {
+  /**
+   * Constructor
+   * @param {string} name
+   * @param {string} file
+   */
   constructor(name, file) {
     this.__name = name;
     this.__file = file;
   }
 
+  /** @type {string} */
   get name() { return this.__name; }
+  /** @type {string} */
   get file() { return this.__file; }
-};
+}
 
 /**
  * Textures and cubemaps
@@ -242,13 +277,21 @@ class sc_map_textures {
     this.__environment_cubemaps = [];
   }
 
+  /** @type {string} */
   get terrain_shader()                { return this.__terrain_shader; }
+  /** @param {string} value */
   set terrain_shader(value)           { this.__terrain_shader = value; }
+  /** @type {string} */
   get background_texture_path()       { return this.__background_texture_path; }
+  /** @param {string} value */
   set background_texture_path(value)  { this.__background_texture_path = value; }
+  /** @type {string} */
   get sky_cubemap_texture_path()      { return this.__sky_cubemap_texture_path; }
+  /** @param {string} value */
   set sky_cubemap_texture_path(value) { this.__sky_cubemap_texture_path = value; }
+  /** @type {sc_map_environment_cubemap[]} */
   get environment_cubemaps()          { return this.__environment_cubemaps; }
+  /** @param {sc_map_environment_cubemap[]} value */
   set environment_cubemaps(value)     { this.__environment_cubemaps = value; }
 
   load(input) {
@@ -309,6 +352,7 @@ class sc_map_textures {
 }
 
 /**
+ * @class sc_map_lighting
  * Lighting
  */
 class sc_map_lighting {
@@ -325,15 +369,25 @@ class sc_map_lighting {
     this.__fog_end = undefined;
   }
 
+  /** @type {number} */
   get lighting_multiplier() { return this.__lighting_multiplier; }
+  /** @type {sc_vec3} */
   get lighting_sun_direction() { return this.__lighting_sun_direction; }
+  /** @type {sc_vec3} */
   get lighting_sun_ambience() { return this.__lighting_sun_ambience; }
+  /** @type {sc_vec3} */
   get lighting_sun_colour(){ return this.__lighting_sun_colour; }
+  /** @type {sc_vec3} */
   get shadow_fill_colour() { return this.__shadow_fill_colour; }
+  /** @type {sc_vec4} */
   get specular_colour() { return this.__specular_colour; }
+  /** @type {number} */
   get bloom() { return this.__bloom; }
+  /** @type {sc_vec3} */
   get fog_colour() { return this.__fog_colour; }
+  /** @type {number} */
   get fog_start() { return this.__fog_start; }
+  /** @type {number} */
   get fog_end() { return this.__fog_end; }
 
   load(input) {
@@ -433,6 +487,7 @@ class sc_map_lighting {
 }
 
 /**
+ * @class sc_map_water_texture
  * Water texture
  */
 class sc_map_water_texture {
@@ -441,7 +496,9 @@ class sc_map_water_texture {
     this.__texture_file = texture_file;
   }
 
+  /** @type {sc_vec2} */
   get normal_movement() { return this.__normal_movement; }
+  /** @type {string} */
   get texture_file() { return this.__texture_file; }
 
   load(input) {
@@ -464,6 +521,7 @@ class sc_map_water_texture {
 }
 
 /**
+ * @class sc_mp_wave_generator
  * Wave generator
  */
 class sc_map_wave_generator {
@@ -485,20 +543,35 @@ class sc_map_wave_generator {
     this.__strip_count = undefined;
   }
 
+  /** @type {string} */
   get texture_file() { return this.__texture_file; }
+  /** @type {string} */
   get ramp_file() { return this.__ramp_file; }
+  /** @type {sc_vec3} */
   get position() { return this.__position; }
+  /** @type {number} */
   get rotation() { return this.__rotation; }
+  /** @type {sc_vec3} */
   get velocity() { return this.__velocity; }
+  /** @type {number} */
   get lifetime_first() { return this.__lifetime_first; }
+  /** @type {number} */
   get lifetime_last() { return this.__lifetime_last; }
+  /** @type {number} */
   get period_first() { return this.__period_first; }
+  /** @type {number} */
   get period_second() { return this.__period_second; }
+  /** @type {number} */
   get scale_first() { return this.__scale_first; }
+  /** @type {number} */
   get scale_second() { return this.__scale_second; }
+  /** @type {number} */
   get frame_count() { return this.__frame_count; }
+  /** @type {number} */
   get frame_rate_first() { return this.__frame_rate_first; }
+  /** @type {number} */
   get frame_rate_second() { return this.__frame_rate_second; }
+  /** @type {number} */
   get strip_count() { return this.__strip_count; }
 
   load(input) {
@@ -556,6 +629,7 @@ class sc_map_wave_generator {
 }
 
 /**
+ * @class sc_map_water
  * Water
  */
 class sc_map_water {
@@ -584,27 +658,61 @@ class sc_map_water {
     this.__wave_generators = [];
   }
 
+  /** @type {boolean} **/
   get has_water() { return this.__has_water; }
+  /**
+   * @type {number}
+   * Depth of shallow water
+   */
   get elevation() { return this.__elevation; }
+  /**
+   * @type {number}
+   * Depth of deep water, which is rendered darker
+   */
   get elevation_deep() { return this.__elevation_deep; }
+  /**
+   * @type {number}
+   * Depth of the abyssal depths where Cthulu slumbers
+   */
   get elevation_abyss() { return this.__elevation_abyss; }
+  /**
+   * @type {sc_vec3}
+   * Surface colour of water
+   */
   get surface_colour() { return this.__surface_colour; }
+  /** @type {sc_vec2} */
   get colour_lerp() { return this.__colour_lerp; }
+  /** @type {number} */
   get refraction_scale() { return this.__refraction_scale; }
+  /** @type {number} */
   get fresnel_bias() { return this.__fresnel_bias; }
+  /** @type {number} */
   get fresnel_power() { return this.__fresnel_power; }
+  /** @type {number} */
   get unit_reflection() { return this.__unit_reflection; }
+  /** @type {number} */
   get sky_reflection() { return this.__sky_reflection; }
+  /** @type {number} */
   get water_sun_shininess() { return this.__water_sun_shininess; }
+  /** @type {number} */
   get water_sun_strength() { return this.__water_sun_strength; }
+  /** @type {vec3} */
   get water_sun_direction() { return this.__water_sun_direction; }
+  /** @type {vec3} */
   get water_sun_colour() { return this.__water_sun_colour; }
+  /** @type {number} */
   get water_sun_reflection() { return this.__water_sun_reflection; }
+  /** @type {number} */
   get water_sun_glow() { return this.__water_sun_glow; }
+  /** @type {string} */
   get water_cubemap_file() { return this.__water_cubemap_file; }
+  /** @type {string} */
   get water_ramp_file() { return this.__water_ramp_file; }
+  /** @type {sc_vec4} */
   get normal_repeat() { return this.__normal_repeat; }
+  /** @type {sc_map_water_texture[]} */
   get water_textures() { return this.__water_textures; }
+  /** @type {sc_map_wave_generator[]} */
   get wave_generators() { return this.__wave_generators; }
 
   load(input) {
@@ -772,17 +880,27 @@ class sc_map_water {
 }
 
 /**
+ * @class sc_map_layer
  * Layer entry
  */
 export class sc_map_layer {
+  /**
+   * Constructor. If arguments are omitted they must be populated with load instead
+   * @param {string} [texture_file]
+   * @param {number} [texture_scale]
+   */
   constructor(texture_file, texture_scale) {
     this.__texture_file = (texture_file || "").toLowerCase();
     this.__texture_scale = texture_scale;
   }
 
+  /** @type {string} */
   get texture_file()       { return this.__texture_file; }
+  /** @param {string} value */
   set texture_file(value)  { this.__texture_file = (value || "").toLowerCase(); }
+  /** @type {number} */
   get texture_scale()      { return this.__texture_scale; }
+  /** @param {number} value */
   set texture_scale(value) { this.__texture_scale = value; }
 
   load(input) {
@@ -808,7 +926,8 @@ export class sc_map_layer {
 }
 
 /**
- * Layers
+ * @class sc_map_layers
+ * The collection of layers defining how the texturemaps are rendered
  */
 class sc_map_layers {
   constructor() {
@@ -816,7 +935,9 @@ class sc_map_layers {
     this.__normal_data = [];
   }
 
+  /** @type {sc_map_layer[]} */
   get albedo_data() { return this.__albedo_data; }
+  /** @type {sc_map_layer[]} */
   get normal_data() { return this.__normal_data; }
 
   load(input) {
@@ -889,7 +1010,8 @@ class sc_map_layers {
 }
 
 /**
- * Decal entry
+ * @class sc_map_decal
+ * An individual decal record
  */
 class sc_map_decal {
   constructor() {
@@ -905,15 +1027,25 @@ class sc_map_decal {
     this.__owner_army = undefined;
   }
 
+  /** @type {number} */
   get id() { return this.__id; }
+  /** @type {number} */
   get decal_type() { return this.__decal_type; }
+  /** @type {number} */
   get texture_count() { return this.__texture_count; }
+  /** @type {string} */
   get texture_file() { return this.__texture_file; }
+  /** @type {sc_vec3} */
   get scale() { return this.__scale; }
+  /** @type {sc_vec3} */
   get position() { return this.__position; }
+  /** @type {sc_vec3} */
   get rotation() { return this.__rotation; }
+  /** @type {number} */
   get cutoff_lod() { return this.__cutoff_lod; }
+  /** @type {number} */
   get near_cutoff_lod() { return this.__near_cutoff_lod; }
+  /** @type {number} */
   get owner_army() { return this.__owner_army; }
 
   load(input) {
@@ -979,7 +1111,8 @@ class sc_map_decal {
 }
 
 /**
- * Decal group entry
+ * @class sc_map_decal_group
+ * Defines a related collection of decals
  */
 class sc_map_decal_group {
   constructor() {
@@ -988,8 +1121,11 @@ class sc_map_decal_group {
     this.__data = [];
   }
 
+  /** @type {number} */
   get id() { return this.__id; }
+  /** @type {string} */
   get name() { return this.__name; }
+  /** @type {number[]} */
   get data() { return this.__data; }
 
   load(input) {
@@ -1027,7 +1163,8 @@ class sc_map_decal_group {
 }
 
 /**
- * Decals
+ * @class sc_map_decals
+ * The decals and decal groups for the map
  */
 class sc_map_decals {
   constructor() {
@@ -1035,7 +1172,9 @@ class sc_map_decals {
     this.__decal_groups = [];
   }
 
+  /** @type {sc_map_decal[]} */
   get decals() { return this.__decals; }
+  /** @type {sc_map_decal_group[]} */
   get decal_groups() { return this.__decal_groups; }
 
   load(input) {
@@ -1093,8 +1232,9 @@ class sc_map_decals {
 }
 
 /**
- * Normalmap.
- * Only one currently supported
+ * @class sc_map_normalmap
+ * The normal map records. Technically the file format supports multiple instances of normal maps,
+ * but this library doesn't
  */
 class sc_map_normalmap {
   constructor() {
@@ -1103,8 +1243,11 @@ class sc_map_normalmap {
     this.__data = undefined;
   }
 
+  /** @type {number} */
   get width() { return this.__width; }
+  /** @type {number} */
   get height() { return this.__height; }
+  /** @type {ByteBuffer} */
   get data() { return this.__data; }
 
   load(input) {
@@ -1160,7 +1303,7 @@ class sc_map_normalmap {
 }
 
 /**
- * Texturemap
+ * @class sc_map_texturemap
  * Formed of two individual texturemaps for a total of 8 layers
  * TODO: Document the slightly fruity blending and layer priority
  */
@@ -1172,9 +1315,13 @@ class sc_map_texturemap {
     this.__height = undefined;
   }
 
+  /** @type {ByteBuffer} */
   get chan0_3() { return this.__chan0_3; }
+  /** @type {ByteBuffer} */
   get chan4_7() { return this.__chan4_7; }
+  /** @type {number} */
   get width() { return this.__width; }
+  /** @type {number} */
   get height() { return this.__height; }
 
   load(input) {
@@ -1230,9 +1377,15 @@ class sc_map_texturemap {
 }
 
 /**
- * Watermap - size coupled to heightmap size
+ * @class sc_map_watermap
+ * The size of the watermap is coupled to heightmap size, so
+ * the heightmap is provided at construction
  */
 class sc_map_watermap {
+  /**
+   * Constructor
+   * @param {sc_map_heightmap} heightmap
+   */
   constructor(heightmap) {
     this.__heightmap = heightmap;
 
@@ -1243,20 +1396,35 @@ class sc_map_watermap {
     this.__terrain_type_data = undefined;
   }
 
+  /** @type {ByteBuffer} */
   get watermap_data() { return this.__watermap_data; }
+  /** @type {number} */
   get watermap_width() { return this.__heightmap.width / 2; }
+  /** @type {number} */
   get watermap_height() { return this.__heightmap.height / 2; }
+  /** @type {ByteBuffer} */
   get foam_mask_data() { return this.__foam_mask_data; }
+  /** @type {number} */
   get foam_mask_width() { return this.__heightmap.width / 2; }
+  /** @type {number} */
   get foam_mask_height() { return this.__heightmap.height / 2; }
+  /** @type {ByteBuffer} */
   get flatness_data() { return this.__flatness_data; }
+  /** @type {number} */
   get flatness_width() { return this.__heightmap.width / 2; }
+  /** @type {number} */
   get flatness_height() { return this.__heightmap.height / 2; }
+  /** @type {ByteBuffer} */
   get depth_bias_data() { return this.__depth_bias_data; }
+  /** @type {number} */
   get depth_bias_width() { return this.__heightmap.width / 2; }
+  /** @type {number} */
   get depth_bias_height() { return this.__heightmap.height / 2; }
+  /** @type {ByteBuffer} */
   get terrain_type_data() { return this.__terrain_type_data; }
+  /** @type {number} */
   get terrain_type_width() { return this.__heightmap.width; }
+  /** @type {number} */
   get terrain_type_height() { return this.__heightmap.height; }
 
   load(input) {
@@ -1329,6 +1497,7 @@ class sc_map_watermap {
 }
 
 /**
+ * @class sc_map_prop
  * Prop entry
  */
 class sc_map_prop {
@@ -1341,11 +1510,17 @@ class sc_map_prop {
     this.__scale = [undefined, undefined, undefined]; // unused
   }
 
+  /** @type {string} */
   get blueprint_path() { return this.__blueprint_path; }
+  /** @type {sc_vec3} */
   get position() { return this.__position; }
+  /** @type {sc_vec3} */
   get rotation_x() { return this.__rotation_x; }
+  /** @type {sc_vec3} */
   get rotation_y() { return this.__rotation_y; }
+  /** @type {sc_vec3} */
   get rotation_z() { return this.__rotation_z; }
+  /** @type {sc_vec3} */
   get scale() { return this.__scale; }
 
   load(input) {
@@ -1394,13 +1569,15 @@ class sc_map_prop {
 }
 
 /**
- * Props
+ * @class sc_map_props
+ * Collection of props
  */
 class sc_map_props {
   constructor() {
     this.__props = [];
   }
 
+  /** @type {sc_map_prop[]} */
   get props() { return this.__props; }
 
   load(input) {
@@ -1435,6 +1612,24 @@ class sc_map_props {
   }
 }
 
+/**
+ * @class sc_map
+ * Top level map class
+ * @example
+ * // Loading
+ * let map = new sc_map();
+ * map.load(map_bytebuffer);
+ * @example
+ * // Creation
+ * let map = new sc_map();
+ * map.create({
+ *   name: "Gentle fields",
+ *   author: "MrBombastic",
+ *   description: "Rolling hills and shallow waters...",
+ *   size: 1,
+ *   default_height: 10240
+ * });
+ */
 export class sc_map {
   constructor() {
     this.__header = new sc_map_header();
@@ -1451,17 +1646,29 @@ export class sc_map {
     this.__props = new sc_map_props();
   }
 
+  /** @type {sc_map_header} */
   get header() { return this.__header; }
+  /** @type {sc_map_preview_image} */
   get preview_image() { return this.__preview_image; }
+  /** @type {sc_map_heightmap} */
   get heightmap() { return this.__heightmap; }
+  /** @type {sc_map_textures} */
   get textures() { return this.__textures; }
+  /** @type {sc_map_lighting} */
   get lighting() { return this.__lighting; }
+  /** @type {sc_map_water} */
   get water() { return this.__water; }
+  /** @type {sc_map_layers} */
   get layers() { return this.__layers; }
+  /** @type {sc_map_decals} */
   get decals() { return this.__decals; }
+  /** @type {sc_map_normalmap} */
   get normalmap() { return this.__normalmap; }
+  /** @type {sc_map_texturemap} */
   get texturemap() { return this.__texturemap; }
+  /** @type {sc_map_watermap} */
   get watermap() { return this.__watermap; }
+  /** @type {sc_map_props} */
   get props() { return this.__props; }
 
   load(input) {
@@ -1517,7 +1724,7 @@ export class sc_map {
 
   /**
    * Creates a new map.
-   * @param map_args {Object}
+   * @param {sc_map_args} map_args
    * At a minimum map_args must contain the size field.
    * {
    *   name: "Name of map",               // not used in this class, serialised by Lua related classes

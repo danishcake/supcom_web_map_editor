@@ -1,4 +1,9 @@
+import {sc_rect} from "./sc_rect"
+import {sc_edit_view_base} from "./views/sc_edit_view"
+import {_} from "underscore";
+
 /**
+ * @class sc_edit_heightmap
  * Intermediate heightmap for use in rendering and editing
  * * This stores the heightmap as Float32 rather than operating on UInt16,
  *     This is due to WebGL having poor support for Uint16 textures and my not particularly
@@ -7,13 +12,11 @@
  *     This is to allow the dirty region to be transferred to the GPU texture
  *     using glTexSubImage2d/glPixelStorei
  */
-
-import {sc_rect} from "./sc_rect"
-import {sc_edit_view_base} from "./views/sc_edit_view"
-import {_} from "underscore";
-
-
 export class sc_edit_heightmap extends sc_edit_view_base {
+  /**
+   * Constructor
+   * @param {sc_map_heightmap} heightmap Wrapped heightmap
+   */
   constructor(heightmap) {
     // TODO: Check type of heightmap
     super(null);
@@ -44,6 +47,7 @@ export class sc_edit_heightmap extends sc_edit_view_base {
   /**
    * Exports the working heightmap to a serialisable heightmap,
    * clamping values to  Uint16 values
+   * @param {sc_edit_heightmap} heightmap Heightmap to export back to
    */
   export_to_heightmap(heightmap) {
     for (let y = 0; y < this.height; y++) {
@@ -64,7 +68,8 @@ export class sc_edit_heightmap extends sc_edit_view_base {
 
 
   /**
-   * Mark a region as dirty
+   * Mark a region as dirty. This will expand any previous dirty region
+   * @param {sc_rect} rect Region to mark dirty
    */
   mark_dirty_region(rect) {
     this.__dirty_region = (this.__dirty_region || rect).expand(rect);
@@ -113,12 +118,16 @@ export class sc_edit_heightmap extends sc_edit_view_base {
 
   /**
    * Returns the value of a pixel at the given coordinate
+   * @param {sc_point} position X/Y coordinate of pixel
+   * @return {sc_pixel} Value at X/Y
    */
   __get_pixel_impl(position) { return [this.__working_heightmap[position[0] + position[1] * this.width]]; }
 
 
   /**
    * Sets the value of a pixel at the given coordinate
+   * @param {sc_point} position X/Y coordinate of pixel
+   * @param {sc_pixel} value Pixel value to write
    */
   __set_pixel_impl(position, value) {
     this.__working_heightmap[position[0] + position[1] * this.width] = value[0];

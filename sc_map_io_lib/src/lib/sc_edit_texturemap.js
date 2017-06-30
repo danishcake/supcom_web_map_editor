@@ -111,11 +111,11 @@ export class sc_edit_texturemap extends sc_edit_view_base {
   /**
    * Gets the texturemap channels 0-3
    */
-  get chan0_3() { return this.__chan0_3; }
+  get chan0_3() { return this.__source_heightmap.chan0_3; }
 
 
   /**
    * Gets the texturemap channels 4-7
    */
-  get chan4_7() { return this.__chan4_7; }
+  get chan4_7() { return this.__source_heightmap.chan4_7; }
 };
