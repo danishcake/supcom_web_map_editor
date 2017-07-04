@@ -123,9 +123,9 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     scope.scene = {
       heightmap: new webgl_heightmap(scope.gl, editor_state.edit_heightmap, editor_state.map.layers, editor_state.edit_texturemap, game_resources),
       markers: {
-        mass: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name == "Mass").texture_id),
-        energy: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name == "Energy").texture_id),
-        unknown: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name == "Unknown").texture_id)
+        mass: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Mass").texture),
+        energy: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Energy").texture),
+        unknown: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Unknown").texture)
       }
     };
   };

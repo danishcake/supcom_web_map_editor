@@ -11,8 +11,8 @@
  * @property {WebGLBuffer} __index_buffer WebGL buffer containing index data
  * @property {WebGLBuffer} __vertex_buffer WebGL buffer containing raw vertex data
  * @property {number} __element_count Number of triangles
- * @property {WebGLTexture} __height_texture WebGL texture with float heightmap
- * @property {WebGLTexture[]} __texturemap_textures Pair of WebGL textures containing the 8 texture channels
+ * @property {webgl_texture} __height_texture WebGL texture with float heightmap
+ * @property {webgl_texture[]} __texturemap_textures Pair of WebGL textures containing the 8 texture channels
  * @property {} __game_resources Game resources service
  */
 class webgl_heightmap {
@@ -95,15 +95,14 @@ class webgl_heightmap {
     this.__element_count = indices.length / 3;
 
     // Build texture buffer (single channel 32bpp)
-    this.__height_texture = gl.createTexture();
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.__height_texture);
-    // Configure texture filtering for non-POT texture
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    this.__height_texture = new webgl_texture(gl, [
+      {key: gl.TEXTURE_MIN_FILTER, value: gl.NEAREST},
+      {key: gl.TEXTURE_MAG_FILTER, value: gl.NEAREST},
+      {key: gl.TEXTURE_WRAP_S, value: gl.CLAMP_TO_EDGE},
+      {key: gl.TEXTURE_WRAP_T, value: gl.CLAMP_TO_EDGE}
+    ]);
 
+    this.__height_texture.bind_to_unit(gl.TEXTURE0);
     gl.texImage2D(gl.TEXTURE_2D,
                   0,
                   gl.ALPHA,
@@ -115,21 +114,19 @@ class webgl_heightmap {
                   this.__heightmap.working_heightmap,
                   0);
 
-    gl.bindTexture(gl.TEXTURE_2D, null);
+    this.__height_texture.unbind();
 
     // Build the two texture lookup textures
     this.__texturemap_textures = [];
     for (let i = 0; i < 2; i++) {
-      let texturemap_texture = gl.createTexture();
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, texturemap_texture);
+      let texturemap_texture = new webgl_texture(gl, [
+        {key: gl.TEXTURE_MIN_FILTER, value: gl.LINEAR},
+        {key: gl.TEXTURE_MAG_FILTER, value: gl.LINEAR},
+        {key: gl.TEXTURE_WRAP_S, value: gl.CLAMP_TO_EDGE},
+        {key: gl.TEXTURE_WRAP_T, value: gl.CLAMP_TO_EDGE}
+      ]);
 
-      // Configure texture filtering for non-POT texture
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
+      texturemap_texture.bind_to_unit(gl.TEXTURE0);
       gl.texImage2D(gl.TEXTURE_2D,
                     0,
                     gl.RGBA,
@@ -141,7 +138,7 @@ class webgl_heightmap {
                     [this.__texturemap.chan0_3.view, this.__texturemap.chan4_7.view][i],
                     0);
 
-      gl.bindTexture(gl.TEXTURE_2D, null);
+      texturemap_texture.unbind();
       this.__texturemap_textures.push(texturemap_texture);
     }
   }
@@ -167,10 +164,7 @@ class webgl_heightmap {
     this.__heightmap.update_range_stats();
 
     if (dirty_region) {
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.__height_texture);
-
-
+      this.__height_texture.bind_to_unit(gl.TEXTURE0);
       // If I had WebGL 2.0 I could use
       // gl.pixelStorei(gl.UNPACK_ROW_LENGTH, ...
       // gl.pixelStorei(gl.UNPACK_SKIP_PIXELS, ...
@@ -196,7 +190,7 @@ class webgl_heightmap {
                        gl.FLOAT,
                        contiguous_dirty);
 
-      gl.bindTexture(gl.TEXTURE_2D, null);
+      this.__height_texture.unbind();
     }
 
     this.__heightmap.reset_dirty_region();
@@ -237,9 +231,7 @@ class webgl_heightmap {
       }
 
       for (let i = 0; i < 2; i++) {
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, this.__texturemap_textures[i]);
-
+        this.__texturemap_textures[i].bind_to_unit(gl.TEXTURE0);
         gl.texSubImage2D(gl.TEXTURE_2D,
                          0,
                          dirty_region.left,
@@ -250,7 +242,7 @@ class webgl_heightmap {
                          gl.UNSIGNED_BYTE,
                          contiguous_dirty[i]);
 
-        gl.bindTexture(gl.TEXTURE_2D, null);
+        this.__texturemap_textures[i].unbind();
       }
     }
 

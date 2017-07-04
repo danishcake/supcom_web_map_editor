@@ -621,7 +621,7 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
 
     let matching_texture = _.chain(texture_sets)
       .flatten()
-      .findWhere({value: img_value})
+      .findWhere({value: img_value.toLowerCase()})
       .value();
 
     if (matching_texture) {
@@ -637,7 +637,7 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
    *
    * Currently only albedo textures are required.
    * @param {string} img_value The name of the texture as recorded in the map file
-   * @return {WebGLTexture} The corresponding WebGL texture. If not available then the unused
+   * @return {webgl_texture} The corresponding WebGL texture. If not available then the unused
    * texture is returned
    *
    * TODO: Case insensitive lookups
@@ -649,11 +649,11 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
 
     let matching_texture = _.chain(texture_sets)
       .flatten()
-      .findWhere({value: img_value})
+      .findWhere({value: img_value.toLowerCase()})
       .value();
 
     if (matching_texture) {
-      return matching_texture.texture_id;
+      return matching_texture.texture;
     } else {
       // This better work or I'll recurse to death
       if (img_value !== '') {
@@ -711,27 +711,26 @@ angular.module('sc_map_edit_bin.services').factory('game_resources', ["$timeout"
     const build_webgl_texture = function(index) {
       const texture = texture_set[index];
       // Create an OpenGL texture
-      texture.texture_id = gl.createTexture();
+      texture.texture = new webgl_texture(gl, []);
 
       // Setup texture parameters
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, texture.texture_id);
+      texture.texture.bind_to_unit(gl.TEXTURE0);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.img);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 
-      if ((texture.img.width & (texture.img.width - 1)) == 0) {
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.GL_NEAREST_MIPMAP_LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.GL_LINEAR);
+      if ((texture.img.width & (texture.img.width - 1)) === 0) {
+        texture.texture.tex_parameters_i.push({key: gl.TEXTURE_MIN_FILTER, value: gl.GL_NEAREST_MIPMAP_LINEAR});
+        texture.texture.tex_parameters_i.push({key: gl.TEXTURE_MAG_FILTER, value: gl.GL_LINEAR});
         gl.generateMipmap(gl.TEXTURE_2D);
       } else {
         // NPOT texture
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        texture.texture.tex_parameters_i.push({key: gl.TEXTURE_MIN_FILTER, value: gl.NEAREST});
+        texture.texture.tex_parameters_i.push({key: gl.TEXTURE_MAG_FILTER, value: gl.NEAREST});
+        texture.texture.tex_parameters_i.push({key: gl.TEXTURE_WRAP_S, value: gl.CLAMP_TO_EDGE});
+        texture.texture.tex_parameters_i.push({key: gl.TEXTURE_WRAP_T, value: gl.CLAMP_TO_EDGE});
       }
-      gl.bindTexture(gl.TEXTURE_2D, null);
+      texture.texture.unbind();
 
       index++;
       if (index === texture_set.length) {

@@ -359,7 +359,7 @@ class webgl_effect {
    * Sets a texture sampler to the specified texture.
    * Always uses texture slot 0 and leaves texture bound
    * @param uniform_id {String} Name of uniform as it appears in GLSL
-   * @param val {Number} Texture ID
+   * @param val {webgl_texture} Texture ID
    */
   set_uniform_sampler2d(uniform_id, val) {
     if (!this.__check_uniform_type(uniform_id, this.gl.SAMPLER_2D)) {
@@ -374,8 +374,7 @@ class webgl_effect {
       this.__textures_bound++;
     }
 
-    this.gl.activeTexture(this.gl.TEXTURE0 + this.__uniforms[uniform_id].texture_unit);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, val);
+    val.bind_to_unit(this.gl.TEXTURE0 + this.__uniforms[uniform_id].texture_unit);
     this.gl.uniform1i(this.__uniforms[uniform_id].index, this.__uniforms[uniform_id].texture_unit);
     this.__uniforms[uniform_id].bound = true;
     return true;
