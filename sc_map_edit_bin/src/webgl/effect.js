@@ -255,7 +255,7 @@ class webgl_effect {
    */
   __check_uniform_type(uniform_id, uniform_type) {
     if (this.__uniforms[uniform_id] === undefined) {
-      console.log(`No such uniform '${uniform_id}'`);
+      //console.log(`No such uniform '${uniform_id}'`);
       return false;
     }
 
@@ -271,7 +271,6 @@ class webgl_effect {
   /*
   * TODO: I could provide more overloads here
   * TODO: Automate unbinding by tracking what is bound
-  * TODO: Track texture usage so I can use more than one texture
   */
 
 
