@@ -887,7 +887,8 @@ export class sc_map_layer {
   /**
    * Constructor. If arguments are omitted they must be populated with load instead
    * @param {string} [texture_file]
-   * @param {number} [texture_scale]
+   * @param {number} [texture_scale] This could be more accurately named 'texture_tile_count' as I think
+   * it represents the number of times this texture will be repeated over the entire map
    */
   constructor(texture_file, texture_scale) {
     this.__texture_file = (texture_file || "").toLowerCase();

@@ -113,25 +113,46 @@
     uniform lowp sampler2D uTerrainTexture6;
     uniform lowp sampler2D uTerrainTexture7;
     uniform lowp sampler2D uTerrainTextureMacro;
-    // TODO: Texture scale....
+    uniform mediump float uTextureScaleBase;
+    uniform mediump float uTextureScale0;
+    uniform mediump float uTextureScale1;
+    uniform mediump float uTextureScale2;
+    uniform mediump float uTextureScale3;
+    uniform mediump float uTextureScale4;
+    uniform mediump float uTextureScale5;
+    uniform mediump float uTextureScale6;
+    uniform mediump float uTextureScale7;
+    uniform mediump float uTextureScaleMacro;
     // TODO: Minimum 0.5 threshold
+    // This comes from terrain.fx. Mask here is the uTerrainChan03 variable
+    // float4 mask = saturate(tex2Dproj( UtilitySamplerA, inV.mTexWT  * TerrainScale)* 2 - 1 );
     // is this the MSB indicating enabled?
+
+    // Notes from terrain.fx
+    // Textures are scale according to textureCoord * TerrainScale * PerStrataScale
+    // There isn't much of an indication of what the value of TerrainScale is, but the PerStrataScale
+    // is referred to as 'LowerAlbedoTile' etc, so it could reasonable be expected to scale the texture coordinates
+    // into the range 0-1, which I'm already doing
 
     void main(void) {
       vec4 chan03 = texture2D(uTerrainChan03, vTextureCoord);
       vec4 chan47 = texture2D(uTerrainChan47, vTextureCoord);
 
       // TODO: Figure out how to blend this properly, overwriting the previous value
-      vec4 op = texture2D(uTerrainTextureBase, vTextureCoord);
-      op = op * (1.0 - chan03.r) + chan03.r * texture2D(uTerrainTexture0, vTextureCoord);
-      op = op * (1.0 - chan03.g) + chan03.g * texture2D(uTerrainTexture1, vTextureCoord);
-      op = op * (1.0 - chan03.b) + chan03.b * texture2D(uTerrainTexture2, vTextureCoord);
-      op = op * (1.0 - chan03.a) + chan03.a * texture2D(uTerrainTexture3, vTextureCoord);
-      op = op * (1.0 - chan47.r) + chan47.r * texture2D(uTerrainTexture4, vTextureCoord);
-      op = op * (1.0 - chan47.g) + chan47.g * texture2D(uTerrainTexture5, vTextureCoord);
-      op = op * (1.0 - chan47.b) + chan47.b * texture2D(uTerrainTexture6, vTextureCoord);
-      op = op * (1.0 - chan47.a) + chan47.a * texture2D(uTerrainTexture7, vTextureCoord);
-      op = op + texture2D(uTerrainTextureMacro, vTextureCoord) * 0.1;
+      // TBD: Is there a lerp primative that is quicker here?
+      vec4 op = texture2D(uTerrainTextureBase, vTextureCoord * uTextureScaleBase);
+      op = op * (1.0 - chan03.r) + chan03.r * texture2D(uTerrainTexture0, vTextureCoord * uTextureScale0);
+      op = op * (1.0 - chan03.g) + chan03.g * texture2D(uTerrainTexture1, vTextureCoord * uTextureScale1);
+      op = op * (1.0 - chan03.b) + chan03.b * texture2D(uTerrainTexture2, vTextureCoord * uTextureScale2);
+      op = op * (1.0 - chan03.a) + chan03.a * texture2D(uTerrainTexture3, vTextureCoord * uTextureScale3);
+      op = op * (1.0 - chan47.r) + chan47.r * texture2D(uTerrainTexture4, vTextureCoord * uTextureScale4);
+      op = op * (1.0 - chan47.g) + chan47.g * texture2D(uTerrainTexture5, vTextureCoord * uTextureScale5);
+      op = op * (1.0 - chan47.b) + chan47.b * texture2D(uTerrainTexture6, vTextureCoord * uTextureScale6);
+      op = op * (1.0 - chan47.a) + chan47.a * texture2D(uTerrainTexture7, vTextureCoord * uTextureScale7);
+      // Last channel is mixed in using the alpha channel, but I must have screwed up the conversion as it
+      // appears the alpha channel is fully set to 255.
+      // For now I'm just going to mix this in at 10%
+      op = op * 0.9 + 0.1 * texture2D(uTerrainTextureMacro, vTextureCoord * uTextureScaleMacro);
 
       gl_FragColor = op;
     }

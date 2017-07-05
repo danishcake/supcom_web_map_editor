@@ -282,8 +282,7 @@ class webgl_heightmap {
     effect.set_uniform_sampler2d("uTerrainChan03", this.__texturemap_textures[0]);
     effect.set_uniform_sampler2d("uTerrainChan47", this.__texturemap_textures[1]);
 
-    // TBD: This assumes that layer zero is the base texture and layer 9 is some sort of special macrotexture. Not sure how
-    // the macro texture is blended in
+    // Bind the many textures
     effect.set_uniform_sampler2d("uTerrainTextureBase", this.__game_resources.gl_texture_lookup(this.__layers.albedo_data[0].texture_file));
     effect.set_uniform_sampler2d("uTerrainTexture0", this.__game_resources.gl_texture_lookup(this.__layers.albedo_data[1].texture_file));
     effect.set_uniform_sampler2d("uTerrainTexture1", this.__game_resources.gl_texture_lookup(this.__layers.albedo_data[2].texture_file));
@@ -294,6 +293,18 @@ class webgl_heightmap {
     effect.set_uniform_sampler2d("uTerrainTexture6", this.__game_resources.gl_texture_lookup(this.__layers.albedo_data[7].texture_file));
     effect.set_uniform_sampler2d("uTerrainTexture7", this.__game_resources.gl_texture_lookup(this.__layers.albedo_data[8].texture_file));
     effect.set_uniform_sampler2d("uTerrainTextureMacro", this.__game_resources.gl_texture_lookup(this.__layers.albedo_data[9].texture_file));
+
+    // And the corresponding texture tiling constants
+    effect.set_uniform_float("uTextureScaleBase", this.__layers.albedo_data[0].texture_scale);
+    effect.set_uniform_float("uTextureScale0", this.__layers.albedo_data[1].texture_scale);
+    effect.set_uniform_float("uTextureScale1", this.__layers.albedo_data[2].texture_scale);
+    effect.set_uniform_float("uTextureScale2", this.__layers.albedo_data[3].texture_scale);
+    effect.set_uniform_float("uTextureScale3", this.__layers.albedo_data[4].texture_scale);
+    effect.set_uniform_float("uTextureScale4", this.__layers.albedo_data[5].texture_scale);
+    effect.set_uniform_float("uTextureScale5", this.__layers.albedo_data[6].texture_scale);
+    effect.set_uniform_float("uTextureScale6", this.__layers.albedo_data[7].texture_scale);
+    effect.set_uniform_float("uTextureScale7", this.__layers.albedo_data[8].texture_scale);
+    effect.set_uniform_float("uTextureScaleMacro", this.__layers.albedo_data[9].texture_scale);
 
     effect.set_uniform_float("uHeightmapScale", this.__heightmap.scale * 0.01);
     effect.set_uniform_float("uShadeMin", this.__heightmap.minimum_height);
