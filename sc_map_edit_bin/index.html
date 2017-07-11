@@ -126,7 +126,12 @@
     // TODO: Minimum 0.5 threshold
     // This comes from terrain.fx. Mask here is the uTerrainChan03 variable
     // float4 mask = saturate(tex2Dproj( UtilitySamplerA, inV.mTexWT  * TerrainScale)* 2 - 1 );
-    // is this the MSB indicating enabled?
+    // This occurs whenever the chan03/47 variables are used for texturing, but not when working with normals
+    // Here the full range is used to blend the normal maps together in a similar fashion.
+    // So value below 0.5 will have no effect on the colour of the terrain, but WILL start affecting the normal output
+    // eg 0.4 will cause that normal channel to be weighted at 40%
+    // So how do I deal with this? I don't intend to (initially) handle normals, so changes below 0.5 will
+    // be invisible. Instead I'll try to keep the range of values between 0.5 and 1
 
     // Notes from terrain.fx
     // Textures are scale according to textureCoord * TerrainScale * PerStrataScale
@@ -141,18 +146,18 @@
       // TODO: Figure out how to blend this properly, overwriting the previous value
       // TBD: Is there a lerp primative that is quicker here?
       vec4 op = texture2D(uTerrainTextureBase, vTextureCoord * uTextureScaleBase);
-      op = op * (1.0 - chan03.r) + chan03.r * texture2D(uTerrainTexture0, vTextureCoord * uTextureScale0);
-      op = op * (1.0 - chan03.g) + chan03.g * texture2D(uTerrainTexture1, vTextureCoord * uTextureScale1);
-      op = op * (1.0 - chan03.b) + chan03.b * texture2D(uTerrainTexture2, vTextureCoord * uTextureScale2);
-      op = op * (1.0 - chan03.a) + chan03.a * texture2D(uTerrainTexture3, vTextureCoord * uTextureScale3);
-      op = op * (1.0 - chan47.r) + chan47.r * texture2D(uTerrainTexture4, vTextureCoord * uTextureScale4);
-      op = op * (1.0 - chan47.g) + chan47.g * texture2D(uTerrainTexture5, vTextureCoord * uTextureScale5);
-      op = op * (1.0 - chan47.b) + chan47.b * texture2D(uTerrainTexture6, vTextureCoord * uTextureScale6);
-      op = op * (1.0 - chan47.a) + chan47.a * texture2D(uTerrainTexture7, vTextureCoord * uTextureScale7);
+      op = mix(op, texture2D(uTerrainTexture0, vTextureCoord * uTextureScale0), clamp(chan03.r * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture1, vTextureCoord * uTextureScale1), clamp(chan03.g * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture2, vTextureCoord * uTextureScale2), clamp(chan03.b * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture3, vTextureCoord * uTextureScale3), clamp(chan03.a * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture4, vTextureCoord * uTextureScale4), clamp(chan47.r * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture5, vTextureCoord * uTextureScale5), clamp(chan47.g * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture6, vTextureCoord * uTextureScale6), clamp(chan47.b * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture7, vTextureCoord * uTextureScale7), clamp(chan47.a * 2.0 - 1.0, 0.0, 1.0));
       // Last channel is mixed in using the alpha channel, but I must have screwed up the conversion as it
       // appears the alpha channel is fully set to 255.
       // For now I'm just going to mix this in at 10%
-      op = op * 0.9 + 0.1 * texture2D(uTerrainTextureMacro, vTextureCoord * uTextureScaleMacro);
+      op = mix(op, texture2D(uTerrainTextureMacro, vTextureCoord * uTextureScaleMacro), 0.1);
 
       gl_FragColor = op;
     }
