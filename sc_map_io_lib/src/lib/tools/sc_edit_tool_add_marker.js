@@ -42,6 +42,9 @@ export class sc_edit_tool_add_marker {
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
   start(data, args) {
+    // Adjust scale to account for different targets
+    args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
+
     if (!this.__active) {
       // First application, so place marker at current position
       const marker_names = _.chain(data.save_script.markers)

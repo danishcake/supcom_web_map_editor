@@ -6,8 +6,9 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
       type: 'raise'
     },
     texturemap: {
-      texture_index: 0,
-      type: 'add'
+      base_enabled: true,
+      layer: 0,
+      type: 'saturate_layer'
     },
     marker: {
       type: 'select'
@@ -33,14 +34,26 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
         const primary_pixel = editor_state.symmetry.get_primary_pixel(current_pixel, map_size);
         if (current_pixel[0] == primary_pixel[0] && current_pixel[1] == primary_pixel[1])
         {
-          editor_state.edit_view.set_pixel(current_pixel, editor_state.edit_view.get_pixel(current_pixel));
+          editor_state.edit_heightmap_view.set_pixel(current_pixel, editor_state.edit_heightmap_view.get_pixel(current_pixel));
         }
       }
     }
   };
 
   // On any change to the tool variables rebuild the tool
-  $scope.$watch('tool', () => { editor_state.build_tool($scope.tool); }, true);
+  $scope.$watch('tool', () => {
+    // Enforce enabled state for layers
+    $scope.tool.texturemap.base_enabled = $scope.tool.texturemap.type === "clear_higher_layers";
+
+    // If the base layer is selected when not enabled, select the bottom layer instead
+    if (!$scope.tool.texturemap.base_enabled && $scope.tool.texturemap.layer === -1) {
+      $scope.tool.texturemap.layer = 0;
+    }
+
+
+    // Rebuild the tool
+    editor_state.build_tool($scope.tool);
+  }, true);
 
   // On new map, recreate the tool
   editor_state.on_new_map(() => { editor_state.build_tool($scope.tool); });

@@ -44,6 +44,9 @@ export class sc_edit_tool_select_marker {
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
   start(data, args) {
+    // Adjust scale to account for different targets
+    args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
+
     if (!this.__active) {
       // First application, so toggle selection of what's under the cursor
       const clicked_marker = this.__get_clicked_marker(data.save_script, args.position);
@@ -97,6 +100,9 @@ export class sc_edit_tool_select_marker {
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
   apply(data, args) {
+    // Adjust scale to account for different targets
+    args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
+
     const delta = [args.grid_position[0] - this.__last_position[0], args.grid_position[1] - this.__last_position[1]];
 
     if (!this.__moved) {

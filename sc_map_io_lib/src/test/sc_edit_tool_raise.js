@@ -23,9 +23,9 @@ describe('sc_edit_tool_raise', function() {
     assert.equal(1000, this.hm.get_pixel([128, 128])[0]);
 
     let tool = new sc_edit_tool_raise(16, 8, 10);
-    tool.start(new sc_edit_tool_data(this.hm, null),
+    tool.start(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(this.hm, null),
+    tool.end(new sc_edit_tool_data(this.hm, null, null),
              new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
 
     // All pixels within radius 8 of centre will now be raised by 10
@@ -43,9 +43,9 @@ describe('sc_edit_tool_raise', function() {
 
   it('raises terrain outside outer radius by nothing', function() {
     let tool = new sc_edit_tool_raise(16, 8, 10);
-    tool.start(new sc_edit_tool_data(this.hm, null),
+    tool.start(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(this.hm, null),
+    tool.end(new sc_edit_tool_data(this.hm, null, null),
              new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
 
     // All pixels outside radius 16 of centre will be unchanged
@@ -63,9 +63,9 @@ describe('sc_edit_tool_raise', function() {
 
   it('raises terrain between inner and outer radius by amount between nothing and stength', function() {
     let tool = new sc_edit_tool_raise(16, 8, 8);
-    tool.start(new sc_edit_tool_data(this.hm, null),
+    tool.start(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(this.hm, null),
+    tool.end(new sc_edit_tool_data(this.hm, null, null),
              new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
 
 
@@ -105,9 +105,9 @@ describe('sc_edit_tool_raise', function() {
   it('marks the affected region as dirty', function() {
     this.hm.reset_dirty_region();
     let tool = new sc_edit_tool_raise(16, 8, 8);
-    tool.start(new sc_edit_tool_data(this.hm, null),
+    tool.start(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(this.hm, null),
+    tool.end(new sc_edit_tool_data(this.hm, null, null),
              new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none));
 
     assert.equal(128 - 16, this.hm.dirty_region.left);
@@ -117,9 +117,9 @@ describe('sc_edit_tool_raise', function() {
     assert.equal(33,       this.hm.dirty_region.width);
     assert.equal(33,       this.hm.dirty_region.height);
 
-    tool.start(new sc_edit_tool_data(this.hm, null),
+    tool.start(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([64, 128], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(this.hm, null),
+    tool.end(new sc_edit_tool_data(this.hm, null, null),
              new sc_edit_tool_args([64, 128], sc_edit_tool_args.modifier_none));
 
     assert.equal(64  - 16, this.hm.dirty_region.left);

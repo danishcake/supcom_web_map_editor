@@ -57,3 +57,10 @@
 .error-highlight {
   border: 1px solid #e00 !important;
 }
+
+.btn-tiny {
+  height: 18px !important;
+  font-size: 10pt !important;;
+  padding-top: 1px !important;;
+  padding-bottom: 1px !important;;
+}

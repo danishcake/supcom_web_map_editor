@@ -20,10 +20,16 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
 
     // LMB held during move, start/apply a tool step
     if ((evt.buttons & 1) && editor_state.tool !== null) {
-      editor_state.tool.apply(new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_view, editor_state.scripts.save),
-                              new sc_map_io_lib.sc.edit.tool.args(world_position,
-                                                                  evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
-                                                                                 sc_map_io_lib.sc.edit.tool.args.modifier_none));
+      const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
+                                                            editor_state.edit_texturemap_view,
+                                                            editor_state.scripts.save,
+                                                            editor_state.edit_target_view);
+      const tool_args = new sc_map_io_lib.sc.edit.tool.args(world_position,
+                                                            evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
+                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none);
+
+      editor_state.tool.apply(tool_data, tool_args);
+
     }
   };
 
@@ -33,10 +39,15 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
     if (evt.which == 1 && editor_state.tool !== null) {
       let world_position = $scope.camera.project_to_world([evt.offsetX, evt.offsetY]);
 
-      editor_state.tool.start(new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_view, editor_state.scripts.save),
-                              new sc_map_io_lib.sc.edit.tool.args(world_position,
-                                                                  evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
-                                                                                 sc_map_io_lib.sc.edit.tool.args.modifier_none));
+      const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
+                                                            editor_state.edit_texturemap_view,
+                                                            editor_state.scripts.save,
+                                                            editor_state.edit_target_view);
+      const tool_args = new sc_map_io_lib.sc.edit.tool.args(world_position,
+                                                            evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
+                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none);
+
+      editor_state.tool.start(tool_data, tool_args);
     }
   };
 
@@ -48,10 +59,14 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
     // LMB released, end tool application
     if (evt.which == 1 && editor_state.tool !== null) {
       let world_position = $scope.camera.project_to_world([evt.offsetX, evt.offsetY]);
-      editor_state.tool.end(new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_view, editor_state.scripts.save),
-                            new sc_map_io_lib.sc.edit.tool.args(world_position,
-                                                                evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
-                                                                               sc_map_io_lib.sc.edit.tool.args.modifier_none));
+      const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
+                                                            editor_state.edit_texturemap_view,
+                                                            editor_state.scripts.save,
+                                                            editor_state.edit_target_view);
+      const tool_args = new sc_map_io_lib.sc.edit.tool.args(world_position,
+                                                            evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
+                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none);
+      editor_state.tool.end(tool_data, tool_args);
     }
   };
 
@@ -61,10 +76,15 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
   $scope.on_mouseleave = function(evt) {
     // Cursor left, end tool application
     if (editor_state.tool !== null) {
-      editor_state.tool.end(new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_view, editor_state.scripts.save),
-                            new sc_map_io_lib.sc.edit.tool.args([0, 0],
-                                                                evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
-                                                                               sc_map_io_lib.sc.edit.tool.args.modifier_none));
+      const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
+                                                            editor_state.edit_texturemap_view,
+                                                            editor_state.scripts.save,
+                                                            editor_state.edit_target_view);
+      const tool_args = new sc_map_io_lib.sc.edit.tool.args([0, 0],
+                                                            evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
+                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none);
+
+      editor_state.tool.end(tool_data, tool_args);
     }
   };
 }]);

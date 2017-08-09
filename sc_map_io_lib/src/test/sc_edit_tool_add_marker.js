@@ -26,7 +26,7 @@ describe('sc_edit_tool_add_marker', function() {
 
   it('adds a marker when start called', function() {
     let tool = new sc_edit_tool_add_marker(this.marker_template);
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
 
     assert.equal(1, Object.keys(this.save_script.markers).length);
@@ -35,16 +35,16 @@ describe('sc_edit_tool_add_marker', function() {
   it('only adds a marker on first call to start', function() {
     let tool = new sc_edit_tool_add_marker(this.marker_template);
 
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
     assert.equal(1, Object.keys(this.save_script.markers).length);
 
     // .end resets state and allows a second marker
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
     assert.equal(2, Object.keys(this.save_script.markers).length);
   });
@@ -52,13 +52,13 @@ describe('sc_edit_tool_add_marker', function() {
   it('ensures marker names are unique', function() {
     let tool = new sc_edit_tool_add_marker(this.marker_template);
 
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
 
     assert.property(this.save_script.markers, 'MASSPOINT_0');
@@ -67,7 +67,7 @@ describe('sc_edit_tool_add_marker', function() {
 
   it('creates marker at specified location', function() {
     let tool = new sc_edit_tool_add_marker(this.marker_template);
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([25, 15], sc_edit_tool_args.modifier_none));
 
     assert.equal(25, this.save_script.markers['MASSPOINT_0'].position.x);

@@ -29,7 +29,7 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let start_impl_spy = sinon.spy(tool, '__start_impl');
 
-      tool.start(new sc_edit_tool_data(this.edit_heightmap, null),
+      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null),
                  new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
       assert(start_impl_spy.withArgs(this.edit_heightmap, [0, 0]).calledOnce);
     });
@@ -38,7 +38,7 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.start(new sc_edit_tool_data(this.edit_heightmap, null),
+      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null),
                  new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
       assert(apply_impl_spy.withArgs(this.edit_heightmap, [0, 0]).calledOnce);
     });
@@ -47,7 +47,7 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let end_impl_spy = sinon.spy(tool, '__end_impl');
 
-      tool.start(new sc_edit_tool_data(this.edit_heightmap, null),
+      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null),
                  new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
       tool.end(new sc_edit_tool_data(this.edit_heightmap, null),
                  new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
@@ -58,7 +58,7 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.apply(new sc_edit_tool_data(this.edit_heightmap, null),
+      tool.apply(new sc_edit_tool_data(this.edit_heightmap, null, null),
                  new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
       assert(!apply_impl_spy.called);
     });
@@ -67,7 +67,7 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let end_impl_spy = sinon.spy(tool, '__end_impl');
 
-      tool.end(new sc_edit_tool_data(this.edit_heightmap, null),
+      tool.end(new sc_edit_tool_data(this.edit_heightmap, null, null),
                new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
       assert(!end_impl_spy.called);
     });
@@ -80,9 +80,9 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.start(new sc_edit_tool_data(this.edit_heightmap, null),
+      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null),
                  new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-      tool.apply(new sc_edit_tool_data(this.edit_heightmap, null),
+      tool.apply(new sc_edit_tool_data(this.edit_heightmap, null, null),
                  new sc_edit_tool_args([10, 0], sc_edit_tool_args.modifier_none));
       assert.equal(apply_impl_spy.callCount, 6);
 
@@ -104,9 +104,9 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.start(new sc_edit_tool_data(this.edit_heightmap, null),
+      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null),
                  new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-      tool.apply(new sc_edit_tool_data(this.edit_heightmap, null),
+      tool.apply(new sc_edit_tool_data(this.edit_heightmap, null, null),
                  new sc_edit_tool_args([9, 0], sc_edit_tool_args.modifier_none));
       assert.equal(apply_impl_spy.callCount, 5);
     });

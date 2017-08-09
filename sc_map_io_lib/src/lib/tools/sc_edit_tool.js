@@ -52,9 +52,12 @@ export class sc_edit_tool_base {
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
   start(data, args) {
+    // Adjust scale to account for different targets
+    args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
+
     // First application, so apply once at current position
-    this.__start_impl(data.edit_heightmap, args.grid_position);
-    this.__apply_impl(data.edit_heightmap, args.grid_position);
+    this.__start_impl(data.target, args.grid_position);
+    this.__apply_impl(data.target, args.grid_position);
 
     // Store last position and mark active
     this.__active = true;
@@ -68,12 +71,15 @@ export class sc_edit_tool_base {
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
   apply(data, args) {
+    // Adjust scale to account for different targets
+    args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
+
     if (this.__active) {
       // Previously active. Calculate intermediate steps and apply at each
       const interpolated_points = this.__calculate_intermediate_points(this.__position, args.grid_position);
 
       for (let point of interpolated_points) {
-        this.__apply_impl(data.edit_heightmap, point);
+        this.__apply_impl(data.target, point);
       }
 
       // Store last position
@@ -88,6 +94,9 @@ export class sc_edit_tool_base {
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
   end(data, args) {
+    // Adjust scale to account for different targets
+    args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
+
     if (this.__active) {
       this.__end_impl();
     }

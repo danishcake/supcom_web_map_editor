@@ -19,18 +19,18 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
   /**
    * Prepares a heightmap patch to apply using blend
    */
-  __start_impl(edit_heightmap, position) {
+  __start_impl(target_view, position) {
     // Create the patch that will be applied periodically
     this.__patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1],
-                                     edit_heightmap.subpixel_count,
-                                     edit_heightmap.subpixel_max);
+                                     target_view.subpixel_count,
+                                     target_view.subpixel_max);
 
     // Create the blending weight patch that will be used to lerp between
     this.__blending_patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1],
-                                              edit_heightmap.subpixel_count,
-                                              edit_heightmap.subpixel_max);
-    const inner_strength = sc_edit_view_methods.make_pixel(edit_heightmap.subpixel_count, Math.min(1, this.__strength / 255.0));
-    const outer_strength = sc_edit_view_methods.make_pixel(edit_heightmap.subpixel_count, 0);
+                                              target_view.subpixel_count,
+                                              target_view.subpixel_max);
+    const inner_strength = sc_edit_view_methods.make_pixel(target_view.subpixel_count, Math.min(1, this.__strength / 255.0));
+    const outer_strength = sc_edit_view_methods.make_pixel(target_view.subpixel_count, 0);
     sc_edit_view_methods.radial_fill(this.__blending_patch,
                                      inner_strength,
                                      this.__inner_radius,
@@ -38,14 +38,14 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
                                      this.__outer_radius);
 
     // Create a cache of the original heightmap
-    this.__snapshot = new sc_edit_view_snapshot(edit_heightmap);
+    this.__snapshot = new sc_edit_view_snapshot(target_view);
   }
 
 
   /**
    * Smooths the terrain around the application site
    */
-  __apply_impl(edit_heightmap, position) {
+  __apply_impl(target_view, position) {
     // Find average value of the tools region every time it is applied
     // TODO: If I reuse averages a lot I should write sc_edit_view_averaged/blurred
     // or even sc_edit_view_convolution
@@ -64,7 +64,7 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
     sc_edit_view_methods.fill(this.__patch, _.map(sum, value => value / (this.__patch.width * this.__patch.height)));
 
     // Move the tool region towards that average
-    sc_edit_view_methods.ratcheted_weighted_blend(edit_heightmap, // To edit_heightmap
+    sc_edit_view_methods.ratcheted_weighted_blend(target_view, // To edit_heightmap
                                                   [position[0] - this.__outer_radius, position[1] - this.__outer_radius],  // At this position
                                                   this.__patch, // From this source
                                                   this.__snapshot, // And this source

@@ -29,11 +29,11 @@ describe('sc_edit_tool_select_marker', function() {
 
   it('will select a marker if clicked', function() {
     let tool = new sc_edit_tool_select_marker();
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
 
     assert.isTrue(this.save_script.markers["MASSPOINT_0"].selected);
@@ -42,11 +42,11 @@ describe('sc_edit_tool_select_marker', function() {
 
   it('will not move in same application as selection', function() {
     let tool = new sc_edit_tool_select_marker();
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([55, 60], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([60, 70], sc_edit_tool_args.modifier_none));
 
     assert.isTrue(this.save_script.markers["MASSPOINT_0"].selected);
@@ -56,11 +56,11 @@ describe('sc_edit_tool_select_marker', function() {
 
   it('will not select a marker if too far away', function() {
     let tool = new sc_edit_tool_select_marker();
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([75, 75], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([75, 75], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([75, 75], sc_edit_tool_args.modifier_none));
 
     assert.isNotOk(this.save_script.markers["MASSPOINT_0"].selected);
@@ -69,18 +69,18 @@ describe('sc_edit_tool_select_marker', function() {
 
   it('will select additional markers if shift held', function() {
         let tool = new sc_edit_tool_select_marker();
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
 
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([100, 100], sc_edit_tool_args.modifier_shift));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([100, 100], sc_edit_tool_args.modifier_shift));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([100, 100], sc_edit_tool_args.modifier_shift));
 
     assert.isTrue(this.save_script.markers["MASSPOINT_0"].selected);
@@ -89,21 +89,21 @@ describe('sc_edit_tool_select_marker', function() {
 
   it('will deselect other markers if a new marker is selected and shift not held', function() {
     let tool = new sc_edit_tool_select_marker();
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
 
     assert.isTrue(this.save_script.markers["MASSPOINT_0"].selected);
     assert.isNotOk(this.save_script.markers["MASSPOINT_1"].selected);
 
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([100, 100], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([100, 100], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([100, 100], sc_edit_tool_args.modifier_none));
 
     assert.isNotOk(this.save_script.markers["MASSPOINT_0"].selected);
@@ -112,21 +112,21 @@ describe('sc_edit_tool_select_marker', function() {
 
   it('will deselect all markers if too far away and shift not held', function() {
     let tool = new sc_edit_tool_select_marker();
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
 
     assert.isTrue(this.save_script.markers["MASSPOINT_0"].selected);
     assert.isNotOk(this.save_script.markers["MASSPOINT_1"].selected);
 
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([75, 75], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([75, 75], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([75, 75], sc_edit_tool_args.modifier_none));
 
     assert.isNotOk(this.save_script.markers["MASSPOINT_0"].selected);
@@ -135,40 +135,40 @@ describe('sc_edit_tool_select_marker', function() {
 
   it('will deselect a selected marker if reselected and shift held', function() {
     let tool = new sc_edit_tool_select_marker();
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
 
     assert.isTrue(this.save_script.markers["MASSPOINT_0"].selected);
 
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_shift));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_shift));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_shift));
     assert.isNotOk(this.save_script.markers["MASSPOINT_0"].selected);
   });
 
   it('will start move if a selected marker reselected and shift not held', function() {
     let tool = new sc_edit_tool_select_marker();
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
 
     assert.isTrue(this.save_script.markers["MASSPOINT_0"].selected);
 
-    tool.start(new sc_edit_tool_data(null, this.save_script),
+    tool.start(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([50, 50], sc_edit_tool_args.modifier_none));
-    tool.apply(new sc_edit_tool_data(null, this.save_script),
+    tool.apply(new sc_edit_tool_data(null, null, this.save_script),
                new sc_edit_tool_args([75, 50], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(null, this.save_script),
+    tool.end(new sc_edit_tool_data(null, null, this.save_script),
              new sc_edit_tool_args([100, 50], sc_edit_tool_args.modifier_none));
 
     assert.closeTo(75, this.save_script.markers["MASSPOINT_0"].position.x, 0.001);
