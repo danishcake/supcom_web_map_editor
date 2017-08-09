@@ -16,6 +16,7 @@ import {sc_edit_view_symmetry} from "./views/sc_edit_view_symmetry"
 import {sc_edit_patch} from "./views/sc_edit_patch"
 import {sc_edit_view_snapshot} from "./views/sc_edit_view_snapshot"
 import {sc_edit_view_mask} from "./views/sc_edit_view_mask"
+import {sc_edit_view_methods} from "./views/sc_edit_view_methods"
 
 let sc_edit = {
   heightmap: sc_edit_heightmap,
@@ -36,7 +37,8 @@ let sc_edit = {
     symmetry: sc_edit_view_symmetry,
     patch: sc_edit_patch,
     snapshot: sc_edit_view_snapshot,
-    mask: sc_edit_view_mask
+    mask: sc_edit_view_mask,
+    methods: sc_edit_view_methods
   }
 };
 

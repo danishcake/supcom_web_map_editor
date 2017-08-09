@@ -32,6 +32,16 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   service.set_save_location = (location) => { service.save_location = location; };
 
   /**
+   * Creates an 8 element array suitable for use with a mask view, leaving specified channel unmasked
+   * @param {number} tool_layer Layer to leave unmasked
+   */
+  const mask_from_tool_layer = function(tool_layer) {
+    const mask = sc_map_io_lib.sc.edit.view.methods.make_pixel(8, 0);
+    mask[tool_layer] = 1;
+    return mask;
+  };
+
+  /**
    * @function target_view_wrapper
    * @param {sc_edit_view_base} wrapped_view A view to be wrapped in another
    * @return {sc_edit_view_base} The passed view wrapped in some wrapper (eg symmetry, mask etc)
@@ -81,17 +91,17 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
         switch(tool_data.texturemap.type) {
           case 'saturate_layer':
             service.tool = new sc_map_io_lib.sc.edit.tool.set(outer, outer, 255);
-            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, [1, 0, 0, 0, 0, 0, 0, 0]);
+            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
             break;
 
           case 'half_layer':
             service.tool = new sc_map_io_lib.sc.edit.tool.set(outer, outer, 192);
-            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, [1, 0, 0, 0, 0, 0, 0, 0]);
+            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
             break;
 
           case 'clear_layer':
             service.tool = new sc_map_io_lib.sc.edit.tool.set(outer, outer, 0);
-            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, [1, 0, 0, 0, 0, 0, 0, 0]);
+            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
             break;
 
           case 'raise_layer':
