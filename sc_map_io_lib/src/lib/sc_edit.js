@@ -9,6 +9,7 @@ import {sc_edit_tool_raise, sc_edit_tool_lower} from "./tools/sc_edit_tool_raise
 import {sc_edit_tool_flatten} from "./tools/sc_edit_tool_flatten"
 import {sc_edit_tool_smooth} from "./tools/sc_edit_tool_smooth"
 import {sc_edit_tool_set} from "./tools/sc_edit_tool_set"
+import {sc_edit_tool_clear_higher} from "./tools/sc_edit_tool_clear_higher"
 import {sc_edit_tool_select_marker} from "./tools/sc_edit_tool_select_marker"
 import {sc_edit_tool_add_marker} from "./tools/sc_edit_tool_add_marker"
 import {sc_edit_symmetry} from "./sc_edit_symmetry"
@@ -28,6 +29,7 @@ let sc_edit = {
     lower: sc_edit_tool_lower,
     flatten: sc_edit_tool_flatten,
     set: sc_edit_tool_set,
+    clear_higher: sc_edit_tool_clear_higher,
     smooth: sc_edit_tool_smooth,
     select_marker: sc_edit_tool_select_marker,
     add_marker: sc_edit_tool_add_marker,
