@@ -71,14 +71,14 @@ export class sc_edit_texturemap extends sc_edit_view_base {
    */
   __set_pixel_impl(position, value) {
     const index_base = (position[0] + position[1] * this.width) * 4;
-    this.__source_heightmap.chan0_3.writeUint8(value[0], index_base + 0);
-    this.__source_heightmap.chan0_3.writeUint8(value[1], index_base + 1);
-    this.__source_heightmap.chan0_3.writeUint8(value[2], index_base + 2);
-    this.__source_heightmap.chan0_3.writeUint8(value[3], index_base + 3);
-    this.__source_heightmap.chan4_7.writeUint8(value[4], index_base + 0);
-    this.__source_heightmap.chan4_7.writeUint8(value[5], index_base + 1);
-    this.__source_heightmap.chan4_7.writeUint8(value[6], index_base + 2);
-    this.__source_heightmap.chan4_7.writeUint8(value[7], index_base + 3);
+    this.__source_heightmap.chan0_3.writeUint8(Math.floor(value[0]), index_base + 0);
+    this.__source_heightmap.chan0_3.writeUint8(Math.floor(value[1]), index_base + 1);
+    this.__source_heightmap.chan0_3.writeUint8(Math.floor(value[2]), index_base + 2);
+    this.__source_heightmap.chan0_3.writeUint8(Math.floor(value[3]), index_base + 3);
+    this.__source_heightmap.chan4_7.writeUint8(Math.floor(value[4]), index_base + 0);
+    this.__source_heightmap.chan4_7.writeUint8(Math.floor(value[5]), index_base + 1);
+    this.__source_heightmap.chan4_7.writeUint8(Math.floor(value[6]), index_base + 2);
+    this.__source_heightmap.chan4_7.writeUint8(Math.floor(value[7]), index_base + 3);
 
     if (this.__dirty_region != null) {
       this.__dirty_region.expand_point(position);

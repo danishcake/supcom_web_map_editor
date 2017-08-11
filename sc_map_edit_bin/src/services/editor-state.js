@@ -104,9 +104,12 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
             target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
             break;
 
+          case 'clear_higher_layers':
+            service.tool = new sc_map_io_lib.sc.edit.tool.clear_higher(outer, inner, tool_data.texturemap.layer);
+            break;
+
           case 'raise_layer':
           case 'lower_layer':
-          case 'clear_higher_layers':
           case 'smooth_edges':
           default:
             service.tool = null;
