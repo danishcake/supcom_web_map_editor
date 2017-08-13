@@ -1,0 +1,13 @@
+<div>
+  <div class="btn-group-vertical">
+    <label class="btn btn-default" ng-model="tool.symmetry" uib-btn-radio="'none'" uib-tooltip="No symmetry enforced" tooltip-placement="right"><span class="glyphicon glyphicon-resize-vertical"></span></label>
+    <label class="btn btn-default" ng-model="tool.symmetry" uib-btn-radio="'horizontal'" uib-tooltip="Reflected around central X coordinate" tooltip-placement="right"><span class="glyphicon glyphicon-tint"></span></label>
+    <label class="btn btn-default" ng-model="tool.symmetry" uib-btn-radio="'vertical'" uib-tooltip="Reflected around central Y coordinate" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
+    <label class="btn btn-default" ng-model="tool.symmetry" uib-btn-radio="'xy'" uib-tooltip="Reflected around X=Y" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
+    <label class="btn btn-default" ng-model="tool.symmetry" uib-btn-radio="'yx'" uib-tooltip="Reflected around X=-Y" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
+    <label class="btn btn-default" ng-model="tool.symmetry" uib-btn-radio="'quadrants'" uib-tooltip="Quadrilateral symmetry around centre" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
+    <label class="btn btn-default" ng-model="tool.symmetry" uib-btn-radio="'octants'" uib-tooltip="Octagonal symmetry around centre" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
+  </div>
+
+  <button class="btn btn-default" uib-tooltip="Symmetry is normally enforced only on the parts of the map that change. This enforces symmetry over the entire map" tooltip-placement="bottom" ng-click="enforce_symmetry()">Enforce</button>
+</div>

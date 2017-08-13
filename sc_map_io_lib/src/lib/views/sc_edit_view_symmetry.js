@@ -11,8 +11,9 @@ export class sc_edit_view_symmetry extends sc_edit_view_base {
 
   __get_width_impl() { return this.__wrapped_view.width; }
   __get_height_impl() { return this.__wrapped_view.height; }
-  __get_pixel(position) { return this.__wrapped_view.get_pixel(position); }
-  __set_pixel(position, value) {
+  __get_pixel_impl(position) { return this.__wrapped_view.get_pixel(position); }
+  __oob_pixel_value_impl(position) { return this.__wrapped_view.__oob_pixel_value_impl(position); } // TBD: Should I first reflect this?
+  __set_pixel_impl(position, value) {
     const primary_pixel = this.__symmetry.get_primary_pixel(position, [this.__wrapped_view.width, this.__wrapped_view.height]);
     if (primary_pixel[0] === position[0] && primary_pixel[1] === position[1]) {
       const secondary_pixels = this.__symmetry.get_secondary_pixels(position, [this.__wrapped_view.width, this.__wrapped_view.height]);

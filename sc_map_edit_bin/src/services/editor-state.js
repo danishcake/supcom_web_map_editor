@@ -7,8 +7,15 @@
 angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   let service = {};
 
-  service.tool = null; // TODO: Add a select tool
+  // Tool/edit_view/symmetry are populated when the tool is created
+  // Map/scripts/edit_heightmap are populated when the map is created or loaded (which also recreates the tool)
+  service.tool = null;
+  service.edit_view = null;
+  service.symmetry = null;
   service.save_location = "unsaved";
+  service.map = null;
+  service.edit_heightmap
+  service.scripts = null;
 
   /**
    * Returns the location the map was most recently saved to or loaded from
@@ -31,6 +38,8 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     const inner = tool_data.size * 0.5; // TODO: Make this variable
     const strength = tool_data.strength;
 
+
+    // Recreate the tool
     switch(tool_data.category) {
       case 'select':
         service.tool = null;
@@ -112,6 +121,40 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
         }
         break;
     }
+
+    // Recreate the symmetry view
+    switch(tool_data.symmetry) {
+      case 'none':
+      default:
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.none();
+        break;
+
+      case 'horizontal':
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.horizontal();
+        break;
+
+      case 'vertical':
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.vertical();
+        break;
+
+      case 'xy':
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.xy();
+        break;
+
+      case 'yx':
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.yx();
+        break;
+
+      case 'quadrants':
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.quadrants();
+        break;
+
+      case 'octants':
+        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.octants();
+        break;
+    }
+
+    service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, service.symmetry);
   };
 
 
@@ -143,6 +186,9 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     // Build editable heightmap
     service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);
 
+    // Build editable symmetry view
+    service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.none());
+
     // Call each registered map change subscriber
     _.each(service.callbacks.on_new_map, callback => callback());
   };
@@ -164,6 +210,9 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
 
     // Build editable heightmap
     service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);
+
+    // Build editable symmetry view
+    service.edit_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, new sc_map_io_lib.sc.edit.symmetry.none());
 
     // Call each registered map change subscriber
     _.each(service.callbacks.on_new_map, callback => callback());
