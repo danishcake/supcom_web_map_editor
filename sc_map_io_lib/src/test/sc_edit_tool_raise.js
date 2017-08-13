@@ -20,7 +20,7 @@ describe('sc_edit_tool_raise', function() {
   });
 
   it('raises terrain within inner radius by strength', function() {
-    assert.equal(1000, this.hm.get_pixel([128, 128]));
+    assert.equal(1000, this.hm.get_pixel([128, 128])[0]);
 
     let tool = new sc_edit_tool_raise(16, 8, 10);
     tool.start(new sc_edit_tool_data(this.hm, null),
@@ -33,7 +33,7 @@ describe('sc_edit_tool_raise', function() {
       for (let x = -8; x <= 8; x++) {
         const r = Math.sqrt(x * x + y * y);
         if (r < 8) {
-          const height = this.hm.get_pixel([128 + x, 128 + y]);
+          const height = this.hm.get_pixel([128 + x, 128 + y])[0];
           assert.equal(1010, height, `Pixel at [${128+x}. ${128+y}] raised`);
         }
       }
@@ -53,7 +53,7 @@ describe('sc_edit_tool_raise', function() {
       for (let x = -8; x <= 8; x++) {
         const r = Math.sqrt(x * x + y * y);
         if (r > 16) {
-          const height = this.hm.get_pixel([128 + x, 128 + y]);
+          const height = this.hm.get_pixel([128 + x, 128 + y])[0];
           assert.equal(1000, height, `Pixel at [${128+x}. ${128+y}] not changed`);
         }
       }
@@ -89,16 +89,16 @@ describe('sc_edit_tool_raise', function() {
     // 9 113 -> 1001 Math.floor(8 * (16 - 15) / 8);
     // 9 112 -> 1000 Math.floor(8 * (16 - 16) / 8);
 
-    assert.closeTo(1008, this.hm.get_pixel([120, 128]), 0.0001);
-    assert.closeTo(1007, this.hm.get_pixel([119, 128]), 0.0001);
-    assert.closeTo(1006, this.hm.get_pixel([118, 128]), 0.0001);
-    assert.closeTo(1005, this.hm.get_pixel([117, 128]), 0.0001);
-    assert.closeTo(1004, this.hm.get_pixel([116, 128]), 0.0001);
-    assert.closeTo(1003, this.hm.get_pixel([115, 128]), 0.0001);
-    assert.closeTo(1002, this.hm.get_pixel([114, 128]), 0.0001);
-    assert.closeTo(1001, this.hm.get_pixel([113, 128]), 0.0001);
-    assert.closeTo(1000, this.hm.get_pixel([112, 128]), 0.0001);
-    assert.closeTo(1000, this.hm.get_pixel([111, 128]), 0.0001);
+    assert.closeTo(1008, this.hm.get_pixel([120, 128])[0], 0.0001);
+    assert.closeTo(1007, this.hm.get_pixel([119, 128])[0], 0.0001);
+    assert.closeTo(1006, this.hm.get_pixel([118, 128])[0], 0.0001);
+    assert.closeTo(1005, this.hm.get_pixel([117, 128])[0], 0.0001);
+    assert.closeTo(1004, this.hm.get_pixel([116, 128])[0], 0.0001);
+    assert.closeTo(1003, this.hm.get_pixel([115, 128])[0], 0.0001);
+    assert.closeTo(1002, this.hm.get_pixel([114, 128])[0], 0.0001);
+    assert.closeTo(1001, this.hm.get_pixel([113, 128])[0], 0.0001);
+    assert.closeTo(1000, this.hm.get_pixel([112, 128])[0], 0.0001);
+    assert.closeTo(1000, this.hm.get_pixel([111, 128])[0], 0.0001);
   });
 
 

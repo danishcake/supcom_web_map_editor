@@ -10,7 +10,6 @@ class webgl_marker {
     this.__texture = texture;
     this.__model_matrix = mat4.create();
 
-    // TODO: Build the vertex buffer here
     this.__generate_mesh();
   }
 

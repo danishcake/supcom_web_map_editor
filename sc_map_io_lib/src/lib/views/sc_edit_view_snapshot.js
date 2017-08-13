@@ -59,10 +59,20 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
   /** Returns the default pixel value (0) */
   __oob_pixel_value_impl(position) { return 0; }
 
+
+  /** Returns the number of subpixels */
+  __get_subpixel_count_impl() { return this.__wrapped_view.subpixel_count; }
+
+
+  /** Returns the maximum value of a subpixel */
+  __get_subpixel_max_impl() { return this.__wrapped_view.subpixel_max; }
+
+
   /** Gets the [x,y] index of the tile corresponding to the pixel position */
   __get_tile_indices(position) {
     return [Math.floor(position[0] / this.__tilesize), Math.floor(position[1] / this.__tilesize)];
   }
+
 
   /** Gets the [x,y] pixel coordinate of the start of the tile */
   __get_tile_origin(position) {
@@ -72,11 +82,13 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
     return tile_indices;
   }
 
+
   /** Gets the [x,y] pixel coordinate of pixel within its tile */
   __get_position_in_tile(position) {
     let tile_origin = this.__get_tile_origin(position);
     return [position[0] - tile_origin[0], position[1] - tile_origin[1]];
   }
+
 
   /** Ensures a tile is cached, but makes no change if already cached */
   __ensure_cached(position) {
@@ -84,11 +96,12 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
 
     if (!this.__tiles[tile_indices[0]][tile_indices[1]]) {
       const tile_origin = this.__get_tile_origin(position);
-      const tile = new sc_edit_patch(this.__tilesize2d);
+      const tile = new sc_edit_patch(this.__tilesize2d, this.subpixel_count, this.subpixel_max);
       sc_edit_view_methods.copy(tile, [0, 0], this.__wrapped_view, tile_origin, this.__tilesize2d);
       this.__tiles[tile_indices[0]][tile_indices[1]] = tile;
     }
   }
+
 
   /** Gets the number of stored tiles. Primarily for unit testing */
   get tile_count() {

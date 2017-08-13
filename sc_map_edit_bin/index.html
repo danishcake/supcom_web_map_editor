@@ -41,11 +41,12 @@
   <script src="dist/services/game-resources.js"></script>
   <script src="dist/webgl/effect.js"></script>
   <script src="dist/webgl/camera.js"></script>
+  <script src="dist/webgl/texture.js"></script>
   <script src="dist/webgl/heightmap.js"></script>
   <script src="dist/webgl/marker.js"></script>
   <script src="lib/io_lib/sc_map.js"></script>
 
-  <!-- Shaders related to rendering terrain -->
+  <!-- Shaders for rendering simple greyscale heightmap -->
   <script id="vs-terrain-greyscale" type="x-shader/x-vertex">
     precision highp float;
     attribute vec3 aVertexPosition;
@@ -59,11 +60,11 @@
     uniform highp float uShadeMax;
 
     void main(void) {
-        vec2 textureCoord = aVertexPosition.xy / uMapSize;
-        highp float height = texture2D(uHeightmap, textureCoord).a;
-        vec3 displacedPosition = aVertexPosition + vec3(0, 0, height * uHeightmapScale);
-        gl_Position = uPMatrix * uVMatrix * vec4(displacedPosition, 1.0);
-        vHeight = (height - uShadeMin) / (uShadeMax - uShadeMin);
+      vec2 textureCoord = aVertexPosition.xy / uMapSize;
+      highp float height = texture2D(uHeightmap, textureCoord).a;
+      vec3 displacedPosition = aVertexPosition + vec3(0, 0, height * uHeightmapScale);
+      gl_Position = uPMatrix * uVMatrix * vec4(displacedPosition, 1.0);
+      vHeight = (height - uShadeMin) / (uShadeMax - uShadeMin);
     }
   </script>
 
@@ -72,10 +73,98 @@
     precision mediump float;
     varying highp float vHeight;
     void main(void) {
-        gl_FragColor = vec4(vHeight, vHeight, vHeight, 1.0);
+      gl_FragColor = vec4(vHeight, vHeight, vHeight, 1.0);
     }
   </script>
 
+
+  <!-- Shaders for rendering a textured heightmap -->
+  <script id="vs-terrain-textured" type="x-shader/x-vertex">
+    precision highp float;
+    attribute vec3 aVertexPosition;
+    uniform mat4 uVMatrix;
+    uniform mat4 uPMatrix;
+    uniform vec2 uMapSize;
+    uniform highp sampler2D uHeightmap;
+    uniform highp float uHeightmapScale;
+    varying highp vec2 vTextureCoord;
+
+    void main(void) {
+      vTextureCoord = aVertexPosition.xy / uMapSize;
+      highp float height = texture2D(uHeightmap, vTextureCoord).a;
+      vec3 displacedPosition = aVertexPosition + vec3(0, 0, height * uHeightmapScale);
+      gl_Position = uPMatrix * uVMatrix * vec4(displacedPosition, 1.0);
+    }
+  </script>
+
+
+  <script id="fs-terrain-textured" type="x-shader/x-fragment">
+    precision mediump float;
+    varying highp vec2 vTextureCoord;
+    uniform mediump sampler2D uTerrainChan03;
+    uniform mediump sampler2D uTerrainChan47;
+    uniform lowp sampler2D uTerrainTextureBase;
+    uniform lowp sampler2D uTerrainTexture0;
+    uniform lowp sampler2D uTerrainTexture1;
+    uniform lowp sampler2D uTerrainTexture2;
+    uniform lowp sampler2D uTerrainTexture3;
+    uniform lowp sampler2D uTerrainTexture4;
+    uniform lowp sampler2D uTerrainTexture5;
+    uniform lowp sampler2D uTerrainTexture6;
+    uniform lowp sampler2D uTerrainTexture7;
+    uniform lowp sampler2D uTerrainTextureMacro;
+    uniform mediump float uTextureScaleBase;
+    uniform mediump float uTextureScale0;
+    uniform mediump float uTextureScale1;
+    uniform mediump float uTextureScale2;
+    uniform mediump float uTextureScale3;
+    uniform mediump float uTextureScale4;
+    uniform mediump float uTextureScale5;
+    uniform mediump float uTextureScale6;
+    uniform mediump float uTextureScale7;
+    uniform mediump float uTextureScaleMacro;
+    // TODO: Minimum 0.5 threshold
+    // This comes from terrain.fx. Mask here is the uTerrainChan03 variable
+    // float4 mask = saturate(tex2Dproj( UtilitySamplerA, inV.mTexWT  * TerrainScale)* 2 - 1 );
+    // This occurs whenever the chan03/47 variables are used for texturing, but not when working with normals
+    // Here the full range is used to blend the normal maps together in a similar fashion.
+    // So value below 0.5 will have no effect on the colour of the terrain, but WILL start affecting the normal output
+    // eg 0.4 will cause that normal channel to be weighted at 40%
+    // So how do I deal with this? I don't intend to (initially) handle normals, so changes below 0.5 will
+    // be invisible. Instead I'll try to keep the range of values between 0.5 and 1
+
+    // Notes from terrain.fx
+    // Textures are scale according to textureCoord * TerrainScale * PerStrataScale
+    // There isn't much of an indication of what the value of TerrainScale is, but the PerStrataScale
+    // is referred to as 'LowerAlbedoTile' etc, so it could reasonable be expected to scale the texture coordinates
+    // into the range 0-1, which I'm already doing
+
+    void main(void) {
+      vec4 chan03 = texture2D(uTerrainChan03, vTextureCoord);
+      vec4 chan47 = texture2D(uTerrainChan47, vTextureCoord);
+
+      // TODO: Figure out how to blend this properly, overwriting the previous value
+      // TBD: Is there a lerp primative that is quicker here?
+      vec4 op = texture2D(uTerrainTextureBase, vTextureCoord * uTextureScaleBase);
+      op = mix(op, texture2D(uTerrainTexture0, vTextureCoord * uTextureScale0), clamp(chan03.r * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture1, vTextureCoord * uTextureScale1), clamp(chan03.g * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture2, vTextureCoord * uTextureScale2), clamp(chan03.b * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture3, vTextureCoord * uTextureScale3), clamp(chan03.a * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture4, vTextureCoord * uTextureScale4), clamp(chan47.r * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture5, vTextureCoord * uTextureScale5), clamp(chan47.g * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture6, vTextureCoord * uTextureScale6), clamp(chan47.b * 2.0 - 1.0, 0.0, 1.0));
+      op = mix(op, texture2D(uTerrainTexture7, vTextureCoord * uTextureScale7), clamp(chan47.a * 2.0 - 1.0, 0.0, 1.0));
+      // Last channel is mixed in using the alpha channel, but I must have screwed up the conversion as it
+      // appears the alpha channel is fully set to 255.
+      // For now I'm just going to mix this in at 10%
+      op = mix(op, texture2D(uTerrainTextureMacro, vTextureCoord * uTextureScaleMacro), 0.1);
+
+      gl_FragColor = op;
+    }
+  </script>
+
+
+  <!-- Shaders for rendering icons on the map -->
   <script id="vs-marker" type="x-shader/x-vertex">
     precision highp float;
     varying vec2 vTextureCoordinate;

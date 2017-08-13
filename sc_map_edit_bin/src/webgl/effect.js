@@ -1,6 +1,38 @@
 /**
+ * @class webl_effect_type_lut
+ * Object containing lookup table of WebGL type enumerations to string representations
+ */
+
+/**
+ * @class webgl_effect_attribute
+ * @property {number} type WebGL type constant. @see webgl_effect_type_lut
+ * @property {number} index Attribute index
+ * @property {boolean} bound Value set true when attribute is bound
+ * @property {number} element_type WebGL type constant. In practice always gl.FLOAT
+ * @property {number} element_count Number of elements in this attribute. eg Vec4 will be 4
+ */
+
+/**
+ * @class webgl_effect_uniform
+ * @property {number} type WebGL type constant. @see webgl_effect_type_lut
+ * @property {number} index Attribute index
+ * @property {boolean} bound Value set true when attribute is bound
+ * @property {number|null} texture_unit If a sampler is bound to this uniform, the texture unit used
+ */
+
+/**
+ * @class webgl_effect
  * Effect class
  * Combines a vertex and fragment shader
+ * @property {webl_effect_type_lut} __lut
+ * @property {string} __vs_src Source code of vertex shader
+ * @property {string} __fs_src Source code of fragment shader
+ * @property {WebGLShader} __vs_obj Compiled vertex shader
+ * @property {WebGLShader} __vs_obj Compiled fragment shader
+ * @property {WebGLProgram} __program Linked and usable shader program
+ * @property {webgl_effect_attribute[]} __attributes List of attributes stored by name as it appears in the shader source
+ * @property {webgl_effect_uniform[]} __uniforms List of uniforms stored by name as it appears in the shader source
+ * @property {number} __textures_bound Count of the textures bound. Used to address a new texture unit for each texture
  */
 class webgl_effect {
   constructor(gl, vertex_shader_src, fragment_shader_src) {
@@ -26,6 +58,7 @@ class webgl_effect {
     this.__type_lut[gl.SAMPLER_2D]   = "SAMPLER_2D";
     this.__type_lut[gl.SAMPLER_CUBE] = "SAMPLER_CUBE";
 
+    this.__textures_bound = 0;
 
     this.__compile(vertex_shader_src, fragment_shader_src);
     this.__enumerate_attributes();
@@ -125,7 +158,8 @@ class webgl_effect {
                     " type: " + this.__get_type_string(active_attribute.type));
         this.__attributes[active_attribute.name] = {
           type: active_attribute.type,
-          index: gl.getAttribLocation(this.__program, active_attribute.name)
+          index: gl.getAttribLocation(this.__program, active_attribute.name),
+          bound: false
         };
 
         switch (active_attribute.type) {
@@ -168,7 +202,9 @@ class webgl_effect {
                     " type: " + this.__get_type_string(active_uniform.type));
         this.__uniforms[active_uniform.name] = {
           type: active_uniform.type,
-          index: gl.getUniformLocation(this.__program, active_uniform.name)
+          index: gl.getUniformLocation(this.__program, active_uniform.name),
+          bound: false,
+          texture_unit: null
         };
       } else {
         break;
@@ -179,6 +215,8 @@ class webgl_effect {
 
   /**
    * Returns a string representation of the given OpenGL type
+   * @param {number} type OpenGL type enumeration
+   * @return {string} String representation of the provided type
    */
   __get_type_string(type) {
     return this.__type_lut[type] || `UNKNOWN TYPE (${type})`;
@@ -199,6 +237,7 @@ class webgl_effect {
     }
   }
 
+
   /**
    * Deactivates the current effect
    */
@@ -210,11 +249,13 @@ class webgl_effect {
 
   /**
    * Checks uniform exists and is of correct type
+   * @param {number} uniform_id Name of the uniform as it appears in the shader source
+   * @param {number} uniform_type OpenGL type enumeration
    * @return false on mismatch
    */
   __check_uniform_type(uniform_id, uniform_type) {
     if (this.__uniforms[uniform_id] === undefined) {
-      console.log(`No such uniform '${uniform_id}'`);
+      //console.log(`No such uniform '${uniform_id}'`);
       return false;
     }
 
@@ -230,7 +271,6 @@ class webgl_effect {
   /*
   * TODO: I could provide more overloads here
   * TODO: Automate unbinding by tracking what is bound
-  * TODO: Track texture usage so I can use more than one texture
   */
 
 
@@ -245,6 +285,7 @@ class webgl_effect {
     }
 
     this.gl.uniform1f(this.__uniforms[uniform_id].index, val);
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -260,6 +301,7 @@ class webgl_effect {
     }
 
     this.gl.uniformMatrix4fv(this.__uniforms[uniform_id].index, false, new Float32Array(val));
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -275,6 +317,7 @@ class webgl_effect {
     }
 
     this.gl.uniform4fv(this.__uniforms[uniform_id].index, new Float32Array(val));
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -290,6 +333,7 @@ class webgl_effect {
     }
 
     this.gl.uniform3fv(this.__uniforms[uniform_id].index, new Float32Array(val));
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -305,6 +349,7 @@ class webgl_effect {
     }
 
     this.gl.uniform2fv(this.__uniforms[uniform_id].index, new Float32Array(val));
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -313,16 +358,24 @@ class webgl_effect {
    * Sets a texture sampler to the specified texture.
    * Always uses texture slot 0 and leaves texture bound
    * @param uniform_id {String} Name of uniform as it appears in GLSL
-   * @param val {Number} Texture ID
+   * @param val {webgl_texture} Texture ID
    */
   set_uniform_sampler2d(uniform_id, val) {
     if (!this.__check_uniform_type(uniform_id, this.gl.SAMPLER_2D)) {
       return false;
     }
 
-    this.gl.activeTexture(this.gl.TEXTURE0);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, val);
-    this.gl.uniform1i(this.__uniforms[uniform_id].index, 0);
+    // Determine which texture unit to bind to
+    // If not already bound just use the next one
+    // If already bound, reuse the previous one
+    if (this.__uniforms[uniform_id].texture_unit === null) {
+      this.__uniforms[uniform_id].texture_unit = this.__textures_bound;
+      this.__textures_bound++;
+    }
+
+    val.bind_to_unit(this.gl.TEXTURE0 + this.__uniforms[uniform_id].texture_unit);
+    this.gl.uniform1i(this.__uniforms[uniform_id].index, this.__uniforms[uniform_id].texture_unit);
+    this.__uniforms[uniform_id].bound = true;
     return true;
   }
 
@@ -335,9 +388,49 @@ class webgl_effect {
 
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
     this.gl.vertexAttribPointer(attribute.index, attribute.element_count, attribute.element_type, false, 0, 0);
+    attribute.bound = true;
     return true;
   }
 
+
+  /**
+   * Unbinds every attribute and uniform by calling each unbinder setup at binding time
+   * Note: At the moment this just marks stuff as not bound. In the future I could use this
+   * mechanism to actually perform unbinding if it proves to be necessary
+   */
+  unbind_all() {
+    for (let attribute_id of Object.keys(this.__attributes)) {
+      this.__attributes[attribute_id].bound = false;
+    }
+    for (let uniform_id of Object.keys(this.__uniforms)) {
+      this.__uniforms[uniform_id].bound = false;
+      this.__uniforms[uniform_id].texture_unit = null;
+    }
+    this.__textures_bound = 0;
+  }
+
+
+  /**
+   * Returns true if every attribute and uniform has been bound since the last call to unbind_all
+   */
+  all_bound() {
+    let ok = true;
+    for (let attribute_id of Object.keys(this.__attributes)) {
+      if (!this.__attributes[attribute_id].bound) {
+        console.log(`Attribute ${attribute_id} not bound`);
+        ok = false;
+      }
+    }
+
+    for (let uniform_id of Object.keys(this.__uniforms)) {
+      if (!this.__uniforms[uniform_id].bound) {
+        console.log(`Uniform ${uniform_id} not bound`);
+        ok = false;
+      }
+    }
+
+    return ok;
+  }
 
 
   get attributes() { return this.__attributes; }

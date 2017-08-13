@@ -2,6 +2,7 @@ import {sc_edit_tool_base} from "./sc_edit_tool"
 import {sc_edit_patch} from "../views/sc_edit_patch"
 import {sc_edit_view_snapshot} from "../views/sc_edit_view_snapshot"
 import {sc_edit_view_methods} from "../views/sc_edit_view_methods"
+import {_} from "underscore"
 
 /**
  * Terrain smoothing tool
@@ -20,14 +21,20 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
    */
   __start_impl(edit_heightmap, position) {
     // Create the patch that will be applied periodically
-    this.__patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1]);
+    this.__patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1],
+                                     edit_heightmap.subpixel_count,
+                                     edit_heightmap.subpixel_max);
 
     // Create the blending weight patch that will be used to lerp between
-    this.__blending_patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1]);
+    this.__blending_patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1],
+                                              edit_heightmap.subpixel_count,
+                                              edit_heightmap.subpixel_max);
+    const inner_strength = sc_edit_view_methods.make_pixel(edit_heightmap.subpixel_count, Math.min(1, this.__strength / 255.0));
+    const outer_strength = sc_edit_view_methods.make_pixel(edit_heightmap.subpixel_count, 0);
     sc_edit_view_methods.radial_fill(this.__blending_patch,
-                                     Math.min(1, this.__strength / 255.0),
+                                     inner_strength,
                                      this.__inner_radius,
-                                     0,
+                                     outer_strength,
                                      this.__outer_radius);
 
     // Create a cache of the original heightmap
@@ -42,15 +49,19 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
     // Find average value of the tools region every time it is applied
     // TODO: If I reuse averages a lot I should write sc_edit_view_averaged/blurred
     // or even sc_edit_view_convolution
-    let sum = 0;
+
+    let sum = sc_edit_view_methods.make_pixel(this.__patch.subpixel_count, 0);
     for (let y = -this.__outer_radius; y <= this.__outer_radius; y++) {
       let iy = y + position[1];
       for (let x = -this.__outer_radius; x <= this.__outer_radius; x++) {
         let ix = x + position[0];
-        sum += this.__snapshot.get_pixel([ix, iy]);
+        let original_pixel = this.__snapshot.get_pixel([ix, iy]);
+        for (let i = 0; i < this.__patch.subpixel_count; i++) {
+          sum[i] += original_pixel[i];
+        }
       }
     }
-    sc_edit_view_methods.fill(this.__patch, sum / (this.__patch.width * this.__patch.height));
+    sc_edit_view_methods.fill(this.__patch, _.map(sum, value => value / (this.__patch.width * this.__patch.height)));
 
     // Move the tool region towards that average
     sc_edit_view_methods.ratcheted_weighted_blend(edit_heightmap, // To edit_heightmap

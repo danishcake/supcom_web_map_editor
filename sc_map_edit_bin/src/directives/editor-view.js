@@ -6,8 +6,8 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
   let render = function(scope) {
     let gl = scope.gl;
 
-    var displayWidth  = gl.canvas.clientWidth;
-    var displayHeight = gl.canvas.clientHeight;
+    let displayWidth  = gl.canvas.clientWidth;
+    let displayHeight = gl.canvas.clientHeight;
 
     // Check if the canvas is not the same size.
     if (gl.canvas.width  != displayWidth ||
@@ -26,7 +26,15 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
 
     // Draw heightmap
     scope.scene.heightmap.update();
-    scope.scene.heightmap.draw(scope.terrainShader, scope.camera);
+    switch (editor_state.render_mode) {
+      case 'heightmap':
+      default:
+        scope.scene.heightmap.draw(scope.heightmap_shader, scope.camera);
+        break;
+      case 'texturemap':
+        scope.scene.heightmap.draw(scope.terrain_texture_shader, scope.camera);
+        break;
+    }
 
     // Draw the markers
     // Clear the depth buffers only
@@ -36,13 +44,13 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       const marker = markers[marker_id];
       switch (marker.type) {
         case "Mass":
-          scope.scene.markers.mass.draw(scope.markerShader, scope.camera, marker.position, !!marker.selected);
+          scope.scene.markers.mass.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected);
           break;
         case "Hydrocarbon":
-          scope.scene.markers.energy.draw(scope.markerShader, scope.camera, marker.position, !!marker.selected);
+          scope.scene.markers.energy.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected);
           break;
         default:
-          scope.scene.markers.unknown.draw(scope.markerShader, scope.camera, marker.position, !!marker.selected);
+          scope.scene.markers.unknown.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected);
           break;
       }
     }
@@ -97,7 +105,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     scope.camera = new webgl_camera(scope.gl,
                                     [editor_state.map.heightmap.width, editor_state.map.heightmap.height],
                                     [scope.gl.canvas.width, scope.gl.canvas.height]);
-  }
+  };
 
 
   /**
@@ -105,7 +113,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
    */
   let initialiseDummyCamera = function(scope) {
     scope.camera = new webgl_camera(scope.gl, [256, 256], [100, 100]);
-  }
+  };
 
 
   /**
@@ -113,14 +121,14 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
    */
   let initialiseScene = function(scope) {
     scope.scene = {
-      heightmap: new webgl_heightmap(scope.gl, editor_state.edit_heightmap),
+      heightmap: new webgl_heightmap(scope.gl, editor_state.edit_heightmap, editor_state.map.layers, editor_state.edit_texturemap, game_resources),
       markers: {
-        mass: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name == "Mass").texture_id),
-        energy: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name == "Energy").texture_id),
-        unknown: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name == "Unknown").texture_id)
+        mass: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Mass").texture),
+        energy: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Energy").texture),
+        unknown: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Unknown").texture)
       }
     };
-  }
+  };
 
 
   /**
@@ -150,8 +158,9 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       gl.depthFunc(gl.LEQUAL);                                  // Near things obscure far things
 
       // Create the terrain shader
-      scope.terrainShader = webgl_effect.create_from_dom(gl, "vs-terrain-greyscale", "fs-terrain-greyscale");
-      scope.markerShader = webgl_effect.create_from_dom(gl, "vs-marker", "fs-marker");
+      scope.heightmap_shader = webgl_effect.create_from_dom(gl, "vs-terrain-greyscale", "fs-terrain-greyscale");
+      scope.terrain_texture_shader = webgl_effect.create_from_dom(gl, "vs-terrain-textured", "fs-terrain-textured");
+      scope.marker_shader = webgl_effect.create_from_dom(gl, "vs-marker", "fs-marker");
 
       // Save the context to scope
       scope.gl = gl;
