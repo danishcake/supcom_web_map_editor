@@ -1019,7 +1019,7 @@ class sc_map_decal {
     this.__id = undefined;
     this.__decal_type = undefined;
     this.__texture_count = undefined;
-    this.__texture_file = undefined;
+    this.__texture_files = [];
     this.__scale = [undefined, undefined, undefined];
     this.__position = [undefined, undefined, undefined];
     this.__rotation = [undefined, undefined, undefined];
@@ -1035,7 +1035,7 @@ class sc_map_decal {
   /** @type {number} */
   get texture_count() { return this.__texture_count; }
   /** @type {string} */
-  get texture_file() { return this.__texture_file; }
+  get texture_files() { return this.__texture_files; }
   /** @type {sc_vec3} */
   get scale() { return this.__scale; }
   /** @type {sc_vec3} */
@@ -1053,11 +1053,16 @@ class sc_map_decal {
     let id = input.readInt32();
     let decal_type = input.readInt32();
     let texture_count = input.readInt32();
+    let texture_files = [];
 
-    // Sanity checks
-    check.equal(1, texture_count, "Only single decal textures are supported");
+    // Sanity checks. I have no idea what the limit actually is
+    check.between(0, 16, texture_count, "Suspicious number of decal textures");
 
-    let texture_file = input.readIString();
+    for (let i = 0; i < texture_count; i++) {
+      let texture_file = input.readIString();
+      check.between(0, 512, texture_file.length, "Suspicious decal texture name length");
+      texture_files.push(texture_file);
+    }
     let scale = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
     let position = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
     let rotation = [input.readFloat32(), input.readFloat32(), input.readFloat32()];
@@ -1066,14 +1071,13 @@ class sc_map_decal {
     let owner_army = input.readInt32();
 
     // Sanity checks
-    check.between(0, 512, texture_file.length, "Suspicious layer texture filename length");
-    check.between(0, 16, owner_army, "Suspicious owner army");
+    check.between(-1, 16, owner_army, "Suspicious owner army");
 
     // Record fields
     this.__id = id;
     this.__decal_type = decal_type;
     this.__texture_count = texture_count;
-    this.__texture_file = texture_file;
+    this.__texture_files = texture_files;
     this.__scale = scale;
     this.__position = position;
     this.__rotation = rotation;
@@ -1088,7 +1092,10 @@ class sc_map_decal {
     output.writeInt32(this.__id);
     output.writeInt32(this.__decal_type);
     output.writeInt32(this.__texture_count);
-    output.writeCString(this.__texture_file);
+    // TODO: This is actually wrong - needs to be writeIString without a trailing NULL...
+    for (let i = 0; i < this.__texture_count; i++) {
+      output.writeCString(this.__texture_files[i]);
+    }
     output.writeFloat32(this.__scale[0]);
     output.writeFloat32(this.__scale[1]);
     output.writeFloat32(this.__scale[2]);
@@ -1672,19 +1679,29 @@ export class sc_map {
   /** @type {sc_map_props} */
   get props() { return this.__props; }
 
+  /**
+   * Populates the sc_map ohject from a ByteBuffer
+   * @param {ByteBuffer} input
+   */
   load(input) {
-    this.header.load(input);
-    this.preview_image.load(input);
-    this.heightmap.load(input);
-    this.textures.load(input);
-    this.lighting.load(input);
-    this.water.load(input);
-    this.layers.load(input);
-    this.decals.load(input);
-    this.normalmap.load(input);
-    this.texturemap.load(input);
-    this.watermap.load(input);
-    this.props.load(input);
+    try {
+      this.header.load(input);
+      this.preview_image.load(input);
+      this.heightmap.load(input);
+      this.textures.load(input);
+      this.lighting.load(input);
+      this.water.load(input);
+      this.layers.load(input);
+      this.decals.load(input);
+      this.normalmap.load(input);
+      this.texturemap.load(input);
+      this.watermap.load(input);
+      this.props.load(input);
+    } catch(error) {
+      // Log diagnostics and move on
+      console.log(`${error}. This occurred at or around input offset ${input.offset}`);
+      throw error;
+    }
   }
 
   /**
