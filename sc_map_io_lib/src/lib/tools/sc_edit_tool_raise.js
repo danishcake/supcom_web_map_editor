@@ -3,7 +3,7 @@ import {sc_edit_patch} from "../views/sc_edit_patch"
 import {sc_edit_view_methods} from "../views/sc_edit_view_methods"
 
 /**
- * Raise/lower tool. Applicable to single dimension data channel 0 only
+ * Raise/lower tool. Applies to all subchannels equally
  */
 class sc_edit_tool_height_change extends sc_edit_tool_base {
   /**
