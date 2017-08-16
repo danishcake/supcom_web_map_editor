@@ -105,7 +105,9 @@ module.exports = function (grunt) {
           '<%= paths.npm_src %>/bytebuffer/dist/**',
           '<%= paths.npm_src %>/gl-matrix/dist/gl-matrix-min.js',
           '<%= paths.npm_src %>/async/dist/**',
-          '<%= paths.npm_src %>/underscore/underscore.js'
+          '<%= paths.npm_src %>/underscore/underscore.js',
+          '<%= paths.npm_src %>/font-awesome/fonts/**',
+          '<%= paths.npm_src %>/font-awesome/css/**'
         ],
         dest: '<%= paths.npm_dst %>'
       }
