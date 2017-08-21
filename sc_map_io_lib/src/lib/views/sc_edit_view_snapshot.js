@@ -57,7 +57,7 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
 
 
   /** Returns the default pixel value (0) */
-  __oob_pixel_value_impl(position) { return 0; }
+  __oob_pixel_value_impl(position) { return sc_edit_view_methods.make_pixel(this.subpixel_count, 0); }
 
 
   /** Returns the number of subpixels */

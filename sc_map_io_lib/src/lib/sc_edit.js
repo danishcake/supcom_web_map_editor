@@ -17,6 +17,7 @@ import {sc_edit_view_symmetry} from "./views/sc_edit_view_symmetry"
 import {sc_edit_patch} from "./views/sc_edit_patch"
 import {sc_edit_view_snapshot} from "./views/sc_edit_view_snapshot"
 import {sc_edit_view_mask} from "./views/sc_edit_view_mask"
+import {sc_edit_view_convolution} from "./views/sc_edit_view_convolution"
 import {sc_edit_view_methods} from "./views/sc_edit_view_methods"
 
 let sc_edit = {
@@ -40,6 +41,7 @@ let sc_edit = {
     patch: sc_edit_patch,
     snapshot: sc_edit_view_snapshot,
     mask: sc_edit_view_mask,
+    convolution: sc_edit_view_convolution,
     methods: sc_edit_view_methods
   }
 };
