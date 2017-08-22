@@ -1,11 +1,14 @@
 import {sc_edit_tool_base} from "./sc_edit_tool"
 import {sc_edit_patch} from "../views/sc_edit_patch"
 import {sc_edit_view_snapshot} from "../views/sc_edit_view_snapshot"
+import {sc_edit_view_convolution} from "../views/sc_edit_view_convolution"
 import {sc_edit_view_methods} from "../views/sc_edit_view_methods"
 import {_} from "underscore"
 
 /**
  * Terrain smoothing tool
+ * @property {sc_edit_view_snapshot} __snapshot Value of the view prior to changes
+ * @property {sc_edit_view_convolution} __convolution View of __snapshot with gausian blur applied
  */
 export class sc_edit_tool_smooth extends sc_edit_tool_base {
   /**
@@ -39,6 +42,9 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
 
     // Create a cache of the original heightmap
     this.__snapshot = new sc_edit_view_snapshot(target_view);
+    // Create a flat average filter
+    const weights = sc_edit_view_methods.make_pixel((this.__outer_radius * 2 + 1) * (this.__outer_radius * 2 + 1), 1);
+    this.__convolution = new sc_edit_view_convolution(this.__snapshot, weights, weights.length);
   }
 
 
@@ -47,21 +53,10 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
    */
   __apply_impl(target_view, position) {
     // Find average value of the tools region every time it is applied
-    // TODO: If I reuse averages a lot I should write sc_edit_view_averaged/blurred
-    // or even sc_edit_view_convolution
+    const average_value = this.__convolution.get_pixel(position);
 
-    let sum = sc_edit_view_methods.make_pixel(this.__patch.subpixel_count, 0);
-    for (let y = -this.__outer_radius; y <= this.__outer_radius; y++) {
-      let iy = y + position[1];
-      for (let x = -this.__outer_radius; x <= this.__outer_radius; x++) {
-        let ix = x + position[0];
-        let original_pixel = this.__snapshot.get_pixel([ix, iy]);
-        for (let i = 0; i < this.__patch.subpixel_count; i++) {
-          sum[i] += original_pixel[i];
-        }
-      }
-    }
-    sc_edit_view_methods.fill(this.__patch, _.map(sum, value => value / (this.__patch.width * this.__patch.height)));
+    // Fill entire patch with average
+    sc_edit_view_methods.fill(this.__patch, average_value);
 
     // Move the tool region towards that average
     sc_edit_view_methods.ratcheted_weighted_blend(target_view, // To edit_heightmap
@@ -76,5 +71,6 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
     this.__patch = null;
     this.__blending_patch = null;
     this.__snapshot = null;
+    this.__convolution = null;
   }
 }

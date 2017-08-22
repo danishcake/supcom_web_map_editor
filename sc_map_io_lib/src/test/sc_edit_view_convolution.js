@@ -7,21 +7,21 @@ describe('sc_edit_view_convolution', function() {
   it('should throw if passed invalid array size', function () {
     const patch = new sc_edit_patch([128, 128], 1, 255);
     for (let i = 1; i < 99; i += 2) {
-      new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(i * i, 1));
+      new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(i * i, 1), 1);
     }
 
-    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(2, 1)));
-    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(3, 1)));
-    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(4, 1)));
-    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(6, 1)));
-    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(7, 1)));
-    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(8, 1)));
+    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(2, 1), 1));
+    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(3, 1), 1));
+    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(4, 1), 1));
+    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(6, 1), 1));
+    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(7, 1), 1));
+    assert.throws(() => new sc_edit_view_convolution(patch, sc_edit_view_methods.make_pixel(8, 1), 1));
   });
 
 
   it('should return convolution of pixels', function() {
     const patch = new sc_edit_patch([128, 128], 1, 255);
-    const conv = new sc_edit_view_convolution(patch, [-1, -1, -1, -1, 9, -1, -1, -1, -1]);
+    const conv = new sc_edit_view_convolution(patch, [-1, -1, -1, -1, 9, -1, -1, -1, -1], 1);
     patch.set_pixel([10, 10], [10]);
 
     assert.closeTo(conv.get_pixel([5,   5])[0], 0,  0.0001);
@@ -31,9 +31,19 @@ describe('sc_edit_view_convolution', function() {
   });
 
 
+  it('should divide by given scalar', function() {
+    const patch = new sc_edit_patch([128, 128], 1, 255);
+    const conv = new sc_edit_view_convolution(patch, [-1, -1, -1, -1, 3, -1, -1, -1, -1], 2);
+    patch.set_pixel([10, 10], [10]);
+
+    // (3 x 10) / 2 = 15
+    assert.closeTo(conv.get_pixel([10, 10])[0], 15, 0.0001);
+  });
+
+
   it('should exclude OOB regions from the calculation', function() {
     const patch = new sc_edit_patch([128, 128], 1, 255);
-    const conv = new sc_edit_view_convolution(patch, [-1, -1, -1, -1, 9, -1, -1, -1, -1]);
+    const conv = new sc_edit_view_convolution(patch, [-1, -1, -1, -1, 9, -1, -1, -1, -1], 1);
     patch.set_pixel([0, 0], [10]);
     patch.set_pixel([1, 0], [10]);
 

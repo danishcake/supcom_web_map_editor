@@ -7,6 +7,7 @@ import {sc_edit_view_methods} from "./sc_edit_view_methods"
  * @property {number} __weights Array of convolution elements. Interpreted as a square array starting at the
  *                              top left
  * @property {number} __weight_radius Number of bins to check on each side of the central bin
+ * @property {number} __divisor Scalar factor to apply post convolution
  */
 export class sc_edit_view_convolution extends sc_edit_view_base {
   /**
@@ -14,11 +15,15 @@ export class sc_edit_view_convolution extends sc_edit_view_base {
    * Creates a convolution view
    * @param {sc_edit_view_base} wrapped_view The view to wrap
    * @param {number[]} weights An array of weights. Must be the square of an odd number in size (1x1, 3x3, 5x5)
+   * @param {number} divisor A scalar to divide final convolution by
    */
-  constructor(wrapped_view, weights) {
+  constructor(wrapped_view, weights, divisor) {
     super(wrapped_view);
     if  (!weights) {
       throw new Error(`sc_edit_view_convolution weights argument cannot be null`);
+    }
+    if  (!divisor) {
+      throw new Error(`sc_edit_view_convolution divisor argument cannot be null`);
     }
     if  (Math.sqrt(weights.length) % 2 !== 1) {
       throw new Error(`sc_edit_view_convolution weights argument must be square of an odd number in length`);
@@ -26,6 +31,7 @@ export class sc_edit_view_convolution extends sc_edit_view_base {
 
     this.__weights = weights;
     this.__weight_radius = (Math.sqrt(weights.length) - 1) / 2;
+    this.__divisor = divisor;
   }
 
 
@@ -58,6 +64,7 @@ export class sc_edit_view_convolution extends sc_edit_view_base {
 
     // Subpixels are clamped to valid range so that the rest of the code can continue to make assumptions
     for (let subpixel = 0; subpixel< this.subpixel_count; subpixel++) {
+      sum[subpixel] /= this.__divisor;
       sum[subpixel] = Math.max(Math.min(sum[subpixel], this.subpixel_max), 0);
     }
 
