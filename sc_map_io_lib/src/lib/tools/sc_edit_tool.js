@@ -1,9 +1,9 @@
 /**
- * Base class for all tools. Subclasses shoud implemente
+ * Base class for all tools. Subclasses should implement
  * 1. apply_impl()
  * 2. start_impl()
  *
- * When the tool is applied by draging the mouse over a region with LMB held the following events
+ * When the tool is applied by dragging the mouse over a region with LMB held the following events
  * will occur:
  *
  * 1. start_impl() will be called

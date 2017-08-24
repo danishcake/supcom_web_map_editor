@@ -8,14 +8,25 @@ import {_} from "underscore"
 /**
  * Terrain smoothing tool
  * @property {sc_edit_view_snapshot} __snapshot Value of the view prior to changes
- * @property {sc_edit_view_convolution} __convolution View of __snapshot with gausian blur applied
+ * @property {sc_edit_view_convolution} __convolution View of __snapshot with a blur applied
+ * @property {string} __blur_type The type of blur to apply. @see blur_gaussian or blur_average
  */
 export class sc_edit_tool_smooth extends sc_edit_tool_base {
   /**
    * Height smoothing tool
+   * @param {number} outer_radius Maximum radius of effect
+   * @param {number} inner_radius Maximum radius of full intensity effect
+   * @param {number} strength Intensity of effect. At 255 the inner radius will be fully set to the smoothed value
+   * @property {string} __blur_type The type of blur to apply. @see blur_gaussian or blur_average
    */
-  constructor(outer_radius, inner_radius, strength) {
+  constructor(outer_radius, inner_radius, strength, blur_type) {
     super(outer_radius, inner_radius, strength);
+
+    if (blur_type !== sc_edit_tool_smooth.blur_gaussian &&
+        blur_type !== sc_edit_tool_smooth.blur_average) {
+      throw new Error(`Parameter 'blur_type' must be a known blur type`);
+    }
+    this.__blur_type = blur_type;
   }
 
 
@@ -43,7 +54,17 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
     // Create a cache of the original heightmap
     this.__snapshot = new sc_edit_view_snapshot(target_view);
     // Create a flat average filter
-    const weights = sc_edit_view_methods.make_pixel((this.__outer_radius * 2 + 1) * (this.__outer_radius * 2 + 1), 1);
+    let weights;
+    switch (this.__blur_type) {
+      case sc_edit_tool_smooth.blur_average:
+        weights = sc_edit_view_methods.make_pixel((this.__outer_radius * 2 + 1) * (this.__outer_radius * 2 + 1), 1);
+        break;
+      default:
+      case sc_edit_tool_smooth.blur_gaussian:
+        throw new Error("Not implemented");
+        break;
+    }
+
     this.__convolution = new sc_edit_view_convolution(this.__snapshot, weights, weights.length);
   }
 
@@ -73,4 +94,7 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
     this.__snapshot = null;
     this.__convolution = null;
   }
+
+  static get blur_gaussian() { return 'gaussian'; }
+  static get blur_average() { return 'average'; }
 }
