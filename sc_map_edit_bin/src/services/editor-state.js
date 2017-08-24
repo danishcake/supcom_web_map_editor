@@ -11,6 +11,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   // Map/scripts/edit_heightmap/edit_heightmap are populated when the map is created or loaded (which also recreates the tool)
   service.tool = null;
   service.edit_heightmap_view = null;
+  service.edit_texturemap_view = null;
   service.symmetry = null;
   service.save_location = "unsaved";
   service.map = null;
