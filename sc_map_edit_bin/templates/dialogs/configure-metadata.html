@@ -1,0 +1,25 @@
+<div class="modal-header dialog-header-notify">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <h4 class="modal-title"><span class="glyphicon glyphicon-plane"></span> Configure map metadata</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+    <div class="col-xs-4"><h6>Map name</h6></div>
+    <div class="col-lg-8"><input ng-model="data.name" ng-change="update_validity()" ng-class="validity.name ? '' : 'error-highlight'" type="text" class="form-control" placeholder="Map name (e.g. Seton's Clutch)"/></div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-4"><h6>Map description</h6></div>
+    <div class="col-lg-8"><input ng-model="data.description" ng-change="update_validity()" ng-class="validity.description ? '' : 'error-highlight'" type="text" class="form-control" placeholder="Map description (e.g. a brief description to provide some flavor)"/></div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-4"><h6>Map author</h6></div>
+    <div class="col-lg-8"><input ng-model="data.author" ng-change="update_validity()" ng-class="validity.author ? '' : 'error-highlight'" type="text" class="form-control" placeholder="Your name (or 7331 internet haxor tag)"/></div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-default pull-right" ng-click="ok()" ng-disabled="!validity.all">OK</button>
+</div>

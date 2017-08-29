@@ -41,7 +41,18 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
     dialogs.create("templates/dialogs/save-as.html", "save-as", {}, modal_dlg_opts);
   };
   $scope.edit_metadata = function() {
-    dialogs.error('Metadata','Not implemented.');
+    let dlg = dialogs.create("templates/dialogs/configure-metadata.html",
+                             "configure-metadata",
+                             {
+                               name: editor_state.scripts.scenario.name,
+                               description: editor_state.scripts.scenario.description,
+                               author: "TODO" // TODO: This isn't actually stored anywhere yet!
+                             },
+                             modal_dlg_opts);
+    dlg.result.then((result) => {
+      editor_state.scripts.scenario.name = result.name;
+      editor_state.scripts.scenario.description = result.description;
+    });
   };
   $scope.edit_textures = function() {
     let dlg = dialogs.create("templates/dialogs/configure-textures.html",
