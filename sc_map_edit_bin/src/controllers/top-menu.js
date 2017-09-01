@@ -46,12 +46,14 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
                              {
                                name: editor_state.scripts.scenario.name,
                                description: editor_state.scripts.scenario.description,
-                               author: "TODO" // TODO: This isn't actually stored anywhere yet!
+                               author: "TODO", // TODO: This isn't actually stored anywhere yet!
+                               heightmap_scale: editor_state.map.heightmap.scale
                              },
                              modal_dlg_opts);
     dlg.result.then((result) => {
       editor_state.scripts.scenario.name = result.name;
       editor_state.scripts.scenario.description = result.description;
+      editor_state.map.heightmap.scale = result.heightmap_scale;
     });
   };
   $scope.edit_textures = function() {
