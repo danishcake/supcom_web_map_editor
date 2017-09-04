@@ -37,6 +37,11 @@ export class sc_edit_tool_base {
     this.__inner_radius = inner_radius;
   }
 
+  /** @type {number} */
+  get outer_radius() { return this.__outer_radius; }
+  /** @type {number} */
+  get inner_radius() { return this.__inner_radius; }
+
 
   /**
    * Setter for stength

@@ -211,7 +211,7 @@ class webgl_camera {
       //console.log(`[${position_screen[0]}, ${position_screen[1]}] -> [${plane_intersection[0]}, ${plane_intersection[1]}, ${plane_intersection[2]}]`);
       return plane_intersection;
     } else {
-      return vec3.fromValues(0, 0, 0, 0);
+      return vec3.fromValues(0, 0, 0);
     }
   }
 }

@@ -83,7 +83,6 @@ class webgl_marker {
     // attribute vec3 aVertexPosition;
     // attribute vec2 aTextureCoordinate;
 
-    this.__view = mat4.create();
     mat4.fromTranslation(this.__model_matrix, [position.x, position.z, 0]);
 
     let tint = [0, 0, 0];

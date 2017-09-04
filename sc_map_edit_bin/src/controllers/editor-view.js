@@ -17,6 +17,7 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
     // This is then the new focus for the zoom
     let world_position = $scope.camera.project_to_world([evt.offsetX, evt.offsetY]);
     $scope.camera.set_focus(world_position);
+    editor_state.tool_position = world_position;
 
     // LMB held during move, start/apply a tool step
     if ((evt.buttons & 1) && editor_state.tool !== null) {
@@ -86,5 +87,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
 
       editor_state.tool.end(tool_data, tool_args);
     }
+
+    // Clear the tool position
+    editor_state.tool_position = null;
   };
 }]);

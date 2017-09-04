@@ -23,6 +23,8 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
 
     // Clear the color and depth buffers
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // Enable z-buffer depth test
+    gl.enable(gl.DEPTH_TEST);
 
     // Draw heightmap
     scope.scene.heightmap.update();
@@ -55,6 +57,13 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       }
     }
 
+    // Disable z-buffer depth test
+    gl.enable(gl.DEPTH_TEST);
+    // Draw tool highlight
+    if (editor_state.tool !== null && editor_state.tool_position !== null) {
+      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.tool.outer_radius, [1, 1, 1, 0.6]);
+      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.tool.inner_radius, [1, 1, 1, 0.3]);
+    }
 
     // Trigger next redraw in approximately 16ms (for 60Hz monitors)
     scope.scheduleRedraw();
@@ -126,7 +135,8 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
         mass: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Mass").texture),
         energy: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Energy").texture),
         unknown: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Unknown").texture)
-      }
+      },
+      tool_highlight: new webgl_ring(scope.gl)
     };
   };
 
@@ -161,6 +171,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       scope.heightmap_shader = webgl_effect.create_from_dom(gl, "vs-terrain-greyscale", "fs-terrain-greyscale");
       scope.terrain_texture_shader = webgl_effect.create_from_dom(gl, "vs-terrain-textured", "fs-terrain-textured");
       scope.marker_shader = webgl_effect.create_from_dom(gl, "vs-marker", "fs-marker");
+      scope.line_shader = webgl_effect.create_from_dom(gl, "vs-line", "fs-line");
 
       // Save the context to scope
       scope.gl = gl;

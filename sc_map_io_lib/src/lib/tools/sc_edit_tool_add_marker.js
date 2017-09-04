@@ -35,6 +35,11 @@ export class sc_edit_tool_add_marker {
    */
   set_strength(strength) {}
 
+  /** @type {number} */
+  get outer_radius() { return 1; }
+  /** @type {number} */
+  get inner_radius() { return 1; }
+
 
   /**
    * Start function. This should be called at when mouse first clicked.
