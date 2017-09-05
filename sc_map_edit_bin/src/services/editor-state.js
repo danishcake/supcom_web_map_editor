@@ -21,6 +21,10 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   service.scripts = null;
   service.render_mode = "heightmap";
   service.tool_position = null;
+  service.overlays = {
+    show_navigability: false,
+    show_water: false
+  };
 
   /**
    * Returns the location the map was most recently saved to or loaded from

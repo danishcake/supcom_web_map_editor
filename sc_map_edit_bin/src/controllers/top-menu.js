@@ -1,6 +1,12 @@
 angular.module('sc_map_edit_bin.controllers').controller("top-menu",
 ["$scope", "editor_state", "dialogs", function($scope, editor_state, dialogs) {
   $scope.editor_state = editor_state;
+  $scope.data = {
+    overlays: {
+      show_navigability: false,
+      show_water: false,
+    }
+  };
 
   $scope.new_map = function() {
     let dlg = dialogs.create("templates/dialogs/new-map.html", "new-map", {}, modal_dlg_opts);
@@ -107,4 +113,8 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
     () => {});
   };
 
+  // Update editor state when overlay rendering options change
+  $scope.$watch('data.overlays', () => {
+    editor_state.overlays = data.overlays;
+  }, true);
 }]);
