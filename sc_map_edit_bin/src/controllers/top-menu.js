@@ -115,6 +115,6 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
 
   // Update editor state when overlay rendering options change
   $scope.$watch('data.overlays', () => {
-    editor_state.overlays = data.overlays;
+    editor_state.overlays = $scope.data.overlays;
   }, true);
 }]);

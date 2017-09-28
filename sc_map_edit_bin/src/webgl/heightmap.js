@@ -267,7 +267,7 @@ class webgl_heightmap {
   /**
    * Binds buffers to effect uniform/attributes
    *
-   * This heightmap can render is several different modes, each using a different effet. As long as everything in
+   * This heightmap can render is several different modes, each using a different effect. As long as everything in
    * the effect ends up bound we consider that a success.
    */
   __bind_effect(effect, camera) {
@@ -306,7 +306,7 @@ class webgl_heightmap {
     effect.set_uniform_float("uTextureScale7", this.__layers.albedo_data[8].texture_scale);
     effect.set_uniform_float("uTextureScaleMacro", this.__layers.albedo_data[9].texture_scale);
 
-    effect.set_uniform_float("uHeightmapScale", this.__heightmap.scale * 0.01);
+    effect.set_uniform_float("uHeightmapScale", this.__heightmap.scale);
     effect.set_uniform_float("uShadeMin", this.__heightmap.minimum_height);
     effect.set_uniform_float("uShadeMax", this.__heightmap.maximum_height);
     effect.bind_attribute("aVertexPosition", this.__vertex_buffer);
@@ -328,7 +328,7 @@ class webgl_heightmap {
   __draw_mesh() {
     let gl = this.__gl;
 
-    gl.drawElements(gl.TRIANGLES, this.__element_count * 3, gl.UNSIGNED_INT, 0)
+    gl.drawElements(gl.TRIANGLES, this.__element_count * 3, gl.UNSIGNED_INT, 0);
 
     // TBD: Unbind stuff?
     // I think I only need to unbind the 'global' stuff. I can leave the effect specific stuff bound

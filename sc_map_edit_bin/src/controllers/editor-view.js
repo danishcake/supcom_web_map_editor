@@ -5,8 +5,9 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
    * Zooms the map around the current mouse hover position
    */
   $scope.on_wheel = function(evt, d, dx, dy) {
-     $scope.camera.zoom_steps(dy);
-   };
+    $scope.camera.set_focus([evt.originalEvent.offsetX, evt.originalEvent.offsetY]);
+    $scope.camera.zoom_steps(dy);
+  };
 
 
   /**
@@ -16,7 +17,6 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
     // This now needs to be reverse projected from screen to camera unit vector, then intersected with the z=0 plane
     // This is then the new focus for the zoom
     let world_position = $scope.camera.project_to_world([evt.offsetX, evt.offsetY]);
-    $scope.camera.set_focus(world_position);
     editor_state.tool_position = world_position;
 
     // LMB held during move, start/apply a tool step
