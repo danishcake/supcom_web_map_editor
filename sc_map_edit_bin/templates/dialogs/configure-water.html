@@ -1,0 +1,55 @@
+<div class="modal-header dialog-header-notify">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <h4 class="modal-title"><span class="glyphicon glyphicon-plane"></span> Configure map water</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+    <div class="col-xs-4"><h6>Enabled</h6></div>
+    <div class="col-lg-8">
+      <input ng-model="data.name"
+             type="checkbox"
+             class="form-control"/>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-4"><h6>Shallow</h6></div>
+    <div class="col-lg-8">
+      <input ng-model="data.elevation"
+             ng-change="update_elevation()"
+             type="number"
+             max="65535"
+             min="0"
+             class="form-control"/>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-4"><h6>Deep</h6></div>
+    <div class="col-lg-8">
+      <input ng-model="data.elevation_deep"
+             ng-change="update_elevation_deep()"
+             type="number"
+             max="65535"
+             min="0"
+             class="form-control"/>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-4"><h6>Abyssal</h6></div>
+    <div class="col-lg-8">
+      <input ng-model="data.elevation_abyss"
+             ng-change="update_elevation_abyss()"
+             type="number"
+             max="65535"
+             min="0"
+             class="form-control"/>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-default pull-right" ng-click="ok()">OK</button>
+</div>
