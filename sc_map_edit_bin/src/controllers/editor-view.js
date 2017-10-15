@@ -24,7 +24,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
       const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
                                                             editor_state.edit_texturemap_view,
                                                             editor_state.scripts.save,
-                                                            editor_state.edit_target_view);
+                                                            editor_state.edit_target_view,
+                                                            editor_state.map);
       const tool_args = new sc_map_io_lib.sc.edit.tool.args(world_position,
                                                             evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
                                                                            sc_map_io_lib.sc.edit.tool.args.modifier_none);
@@ -43,7 +44,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
       const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
                                                             editor_state.edit_texturemap_view,
                                                             editor_state.scripts.save,
-                                                            editor_state.edit_target_view);
+                                                            editor_state.edit_target_view,
+                                                            editor_state.map);
       const tool_args = new sc_map_io_lib.sc.edit.tool.args(world_position,
                                                             evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
                                                                            sc_map_io_lib.sc.edit.tool.args.modifier_none);
@@ -63,7 +65,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
       const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
                                                             editor_state.edit_texturemap_view,
                                                             editor_state.scripts.save,
-                                                            editor_state.edit_target_view);
+                                                            editor_state.edit_target_view,
+                                                            editor_state.map);
       const tool_args = new sc_map_io_lib.sc.edit.tool.args(world_position,
                                                             evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
                                                                            sc_map_io_lib.sc.edit.tool.args.modifier_none);
@@ -80,7 +83,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
       const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
                                                             editor_state.edit_texturemap_view,
                                                             editor_state.scripts.save,
-                                                            editor_state.edit_target_view);
+                                                            editor_state.edit_target_view,
+                                                            editor_state.map);
       const tool_args = new sc_map_io_lib.sc.edit.tool.args([0, 0],
                                                             evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
                                                                            sc_map_io_lib.sc.edit.tool.args.modifier_none);

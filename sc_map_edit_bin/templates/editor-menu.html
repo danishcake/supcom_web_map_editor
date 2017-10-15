@@ -4,6 +4,7 @@
     <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'heightmap'" uib-tooltip="Heightmap tools" tooltip-placement="right"><span class="glyphicon glyphicon-resize-vertical"></span></label>
     <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'texture'" uib-tooltip="Texture tools" tooltip-placement="right"><span class="glyphicon glyphicon-tint"></span></label>
     <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'marker'" uib-tooltip="Markers" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
+    <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'water'" uib-tooltip="Water" tooltip-placement="right"><span class="glyphicon glyphicon-cloud"></span></label>
   </div>
 
   <!-- Symmetry -->
@@ -63,5 +64,12 @@
     <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'army'" uib-tooltip="Army spawn" tooltip-placement="right"><span class="glyphicon glyphicon-home"></span></label>
     <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'mass'" uib-tooltip="Mass point" tooltip-placement="right"><img src="/gamedata/editor_icons/Mass_icon.png"></label>
     <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'hydro'" uib-tooltip="Hydrocarbons" tooltip-placement="right"><img src="/gamedata/editor_icons/Energy_icon.png"></label>
+  </div>
+
+  <!-- Water tools -->
+  <div class="btn-group-vertical" ng-show="tool.category === 'water'">
+    <label class="btn btn-default" ng-model="tool.water.type" uib-btn-radio="'elevation'" uib-tooltip="Shallow water" tooltip-placement="right"><span class="glyphicon glyphicon-volume-up"></span></label>
+    <label class="btn btn-default" ng-model="tool.water.type" uib-btn-radio="'elevation_deep'" uib-tooltip="Deep water" tooltip-placement="right"><span class="glyphicon glyphicon-volume-down"></span></label>
+    <label class="btn btn-default" ng-model="tool.water.type" uib-btn-radio="'elevation_abyss'" uib-tooltip="Abyssal depths" tooltip-placement="right"><span class="glyphicon glyphicon-volume-off"></span></label>
   </div>
 </div>

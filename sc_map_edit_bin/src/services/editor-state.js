@@ -136,7 +136,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
 
         break;
 
-      default:
+      case 'marker':
         switch (tool_data.marker.type) {
           case 'select':
             service.tool = new sc_map_io_lib.sc.edit.tool.select_marker();
@@ -182,6 +182,30 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
             service.tool = null;
             break;
         }
+        break;
+
+      case 'water':
+        switch (tool_data.water.type) {
+          case 'elevation':
+            service.tool = new sc_map_io_lib.sc.edit.tool.water_elevation(sc_map_io_lib.sc.edit.tool.water_elevation.shallow);
+            break;
+
+          case 'elevation_deep':
+            service.tool = new sc_map_io_lib.sc.edit.tool.water_elevation(sc_map_io_lib.sc.edit.tool.water_elevation.deep);
+            break;
+
+          case 'elevation_abyss':
+            service.tool = new sc_map_io_lib.sc.edit.tool.water_elevation(sc_map_io_lib.sc.edit.tool.water_elevation.abyssal);
+            break;
+
+          default:
+            service.tool = null;
+            break;
+        }
+        break;
+
+      default:
+        service.tool = null;
         break;
     }
 
@@ -247,7 +271,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   };
   service.on_new_map = function(callback) {
     service.callbacks.on_new_map.push(callback);
-  }
+  };
 
 
   /**
