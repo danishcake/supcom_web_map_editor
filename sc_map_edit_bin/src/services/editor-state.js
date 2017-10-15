@@ -276,9 +276,9 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
       save: new sc_map_io_lib.sc.script.save()
     };
 
-    service.map.create(initial_map_params);
-    service.scripts.scenario.create(initial_map_params);
-    service.scripts.save.create(initial_map_params);
+    service.map.create(map_params);
+    service.scripts.scenario.create(map_params);
+    service.scripts.save.create(map_params);
 
     // Build editable heightmap/texturemap
     service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);

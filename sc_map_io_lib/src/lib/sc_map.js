@@ -181,8 +181,10 @@ class sc_map_heightmap {
   get width() { return this.__width; }
   /** @type {Number} Height of heightmap */
   get height() { return this.__height; }
-  /** @type {Number} Vertical scaling factor for heightmap*/
+  /** @type {Number} Vertical scaling factor for heightmap */
   get scale() { return this.__scale; }
+  /** @type {Number} Vertical scaling factor for heightmap */
+  set scale(value) { this.__scale = value; }
   /** @type {ByteBuffer} Heightmap contents */
   get data() { return this.__data; }
 

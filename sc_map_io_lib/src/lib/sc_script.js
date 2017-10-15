@@ -241,7 +241,9 @@ export class sc_script_scenario extends sc_script_base {
   }
 
   get name() { return this.__name; }
+  set name(value) { this.__name = value; }
   get description() { return this.__description; }
+  set description(value) { this.__description = value; }
   get map_filename() { return this.__map_filename; }
   get save_filename() { return this.__save_filename; }
   get script_filename() { return this.__script_filename; }
