@@ -7,7 +7,11 @@ import {sc_edit_view_methods} from "./sc_edit_view_methods"
  */
 export class sc_edit_patch extends sc_edit_view_base {
   /**
+   * @constructor
    * Creates an uninitialised patch
+   * @param {sc_vec2} size Width/height of the patch
+   * @param {number} subpixel_count Number of subpixels per pixel
+   * @param {number} subpixel_max Maximum value of a subpixel
    */
   constructor(size, subpixel_count, subpixel_max) {
     super();
@@ -61,7 +65,7 @@ export class sc_edit_patch extends sc_edit_view_base {
 
 
   /** Returns the default pixel value (0) */
-  __oob_pixel_value_impl(position) { return 0; }
+  __oob_pixel_value_impl(position) { return sc_edit_view_methods.make_pixel(this.subpixel_count, 0); }
 
 
   /** Returns the number of subpixels */

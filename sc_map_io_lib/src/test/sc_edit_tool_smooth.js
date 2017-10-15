@@ -20,10 +20,10 @@ describe('sc_edit_tool_smooth', function() {
   });
 
   it('moves inner region towards average', function() {
-    let tool = new sc_edit_tool_smooth(16, 8, 64);
-    tool.start(new sc_edit_tool_data(this.hm, null),
+    let tool = new sc_edit_tool_smooth(16, 8, 64, sc_edit_tool_smooth.blur_average);
+    tool.start(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(this.hm, null),
+    tool.end(new sc_edit_tool_data(this.hm, null, null),
              new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none));
 
     // Average at this region is 16 scanlines of 500 and 17 scanlines of 1000
@@ -34,10 +34,10 @@ describe('sc_edit_tool_smooth', function() {
   });
 
   it('has full effect at 255 intensity', function() {
-    let tool = new sc_edit_tool_smooth(16, 8, 255);
-    tool.start(new sc_edit_tool_data(this.hm, null),
+    let tool = new sc_edit_tool_smooth(16, 8, 255, sc_edit_tool_smooth.blur_average);
+    tool.start(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(this.hm, null),
+    tool.end(new sc_edit_tool_data(this.hm, null, null),
              new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none));
     
     // 100% intensity, so move to average of 757
@@ -46,10 +46,10 @@ describe('sc_edit_tool_smooth', function() {
   });
 
   it('has radial falloff in the effect around periphery', function() {
-    let tool = new sc_edit_tool_smooth(16, 8, 255);
-    tool.start(new sc_edit_tool_data(this.hm, null),
+    let tool = new sc_edit_tool_smooth(16, 8, 255, sc_edit_tool_smooth.blur_average);
+    tool.start(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(this.hm, null),
+    tool.end(new sc_edit_tool_data(this.hm, null, null),
              new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none));
 
     // 50% effect, so (500 + 757) / 2 = 628
@@ -59,10 +59,10 @@ describe('sc_edit_tool_smooth', function() {
   });
 
   it('has no effect at 0 intensity', function() {
-    let tool = new sc_edit_tool_smooth(16, 8, 0);
-    tool.start(new sc_edit_tool_data(this.hm, null),
+    let tool = new sc_edit_tool_smooth(16, 8, 0, sc_edit_tool_smooth.blur_average);
+    tool.start(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none));
-    tool.end(new sc_edit_tool_data(this.hm, null),
+    tool.end(new sc_edit_tool_data(this.hm, null, null),
              new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none));
 
     assert.closeTo(500, this.hm.get_pixel([128, 63])[0], 1, `Pixel at [128, 63] unchanged`); // 63- start at 500
@@ -70,22 +70,22 @@ describe('sc_edit_tool_smooth', function() {
   });
 
   it('ratchets towards smoothness', function() {
-    let tool = new sc_edit_tool_smooth(16, 8, 255);
-    tool.start(new sc_edit_tool_data(this.hm, null),
+    let tool = new sc_edit_tool_smooth(16, 8, 255, sc_edit_tool_smooth.blur_average);
+    tool.start(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none));
     // 4 pixels into falloff region on left should be 50% effect
     assert.closeTo(628, this.hm.get_pixel([128-12, 63])[0], 1, `Pixel at [128 - 12, 63] half smoothed`);
 
     // Applying again 8 pixels right doesn't un-smooth the left pixels due to ratchet
-    tool.apply(new sc_edit_tool_data(this.hm, null),
+    tool.apply(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([136, 64], sc_edit_tool_args.modifier_none));
     assert.closeTo(628, this.hm.get_pixel([128-12, 63])[0], 1, `Pixel at [128 - 12, 63] still half smoothed`);
     
     // Applying again 8 pixels left fully smooths
-    tool.apply(new sc_edit_tool_data(this.hm, null),
+    tool.apply(new sc_edit_tool_data(this.hm, null, null),
                new sc_edit_tool_args([120, 64], sc_edit_tool_args.modifier_none));
     assert.closeTo(757, this.hm.get_pixel([128-12, 63])[0], 1, `Pixel at [128 - 12, 63] still half smoothed`);
-    tool.end(new sc_edit_tool_data(this.hm, null),
+    tool.end(new sc_edit_tool_data(this.hm, null, null),
              new sc_edit_tool_args([120, 64], sc_edit_tool_args.modifier_none));
   });
 });

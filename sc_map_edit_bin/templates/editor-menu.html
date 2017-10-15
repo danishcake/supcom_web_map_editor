@@ -34,6 +34,29 @@
     <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'smooth'" uib-tooltip="Smooth terrain" tooltip-placement="right"><span class="glyphicon glyphicon-record"></span></label>
   </div>
 
+  <!-- Texture tools -->
+  <div class="btn-group-vertical" ng-show="tool.category === 'texture'">
+    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'saturate_layer'" uib-tooltip="Set layer to 100%" tooltip-placement="right"><i class="fa fa-star"></i></label>
+    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'half_layer'" uib-tooltip="Set layer to 50%" tooltip-placement="right"><i class="fa fa-star-half-o"></i></label>
+    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'clear_layer'" uib-tooltip="Set layer to 0%" tooltip-placement="right"><i class="fa fa-star-o"></i></label>
+    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'raise_layer'" uib-tooltip="Increase layer visibility" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-up"></span></label>
+    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'lower_layer'" uib-tooltip="Decrease layer visibility" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-down"></span></label>
+    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'clear_higher_layers'" uib-tooltip="Clear channels above, ensuring visibility" tooltip-placement="right"><i class="fa fa-eye-slash"></i></label>
+    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'smooth_edges'" uib-tooltip="Smooths layer transitions" tooltip-placement="right"><span class="glyphicon glyphicon-record"></span></label>
+  </div>
+  <!-- Texture layer picker -->
+  <div class="btn-group-vertical" ng-show="tool.category === 'texture'">
+    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="-1" uib-tooltip="Base" tooltip-placement="right" ng-disabled="!tool.texturemap.base_enabled">B</label>
+    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="0" uib-tooltip="Layer 0" tooltip-placement="right">0</label>
+    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="1" uib-tooltip="Layer 1" tooltip-placement="right">1</label>
+    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="2" uib-tooltip="Layer 2" tooltip-placement="right">2</label>
+    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="3" uib-tooltip="Layer 3" tooltip-placement="right">3</label>
+    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="4" uib-tooltip="Layer 4" tooltip-placement="right">4</label>
+    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="5" uib-tooltip="Layer 5" tooltip-placement="right">5</label>
+    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="6" uib-tooltip="Layer 6" tooltip-placement="right">6</label>
+    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="7" uib-tooltip="Layer 7" tooltip-placement="right">7</label>
+  </div>
+
   <!-- Marker tools -->
   <div class="btn-group-vertical" ng-show="tool.category === 'marker'">
     <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'select'" uib-tooltip="Select" tooltip-placement="right"><span class="glyphicon glyphicon-move"></span></label>

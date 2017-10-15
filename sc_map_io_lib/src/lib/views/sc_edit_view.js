@@ -46,7 +46,7 @@ export class sc_edit_view_base {
       const clamped_pixel = value.slice();
       const max = this.subpixel_max;
       for (let i = 0; i < this.subpixel_count; i++) {
-        clamped_pixel.push(Math.max(Math.min(clamped_pixel[i], max), 0));
+        clamped_pixel[i] = Math.max(Math.min(clamped_pixel[i], max), 0);
       }
       this.__set_pixel_impl(position, clamped_pixel);
     }
