@@ -44,7 +44,7 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-metadata",
     } else if (!$scope.validity.author) {
       $scope.validity.message = "Author cannot be blank";
     } else if (!$scope.validity.heightmap_scale) {
-      $scope.validity.message = "Heighmap scale must be between 0 and 1 - 1/128 (0.0078125) is common";
+      $scope.validity.message = "Heightmap scale must be between 0 and 1 - 1/128 (0.0078125) is common";
     } else {
       $scope.validity.message = "";
     }
