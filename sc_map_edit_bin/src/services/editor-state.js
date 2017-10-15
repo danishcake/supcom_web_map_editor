@@ -20,6 +20,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   service.edit_target_view = null;
   service.scripts = null;
   service.render_mode = "heightmap";
+  service.tool_position = null;
 
   /**
    * Returns the location the map was most recently saved to or loaded from

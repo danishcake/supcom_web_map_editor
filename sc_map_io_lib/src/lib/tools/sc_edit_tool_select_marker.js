@@ -37,6 +37,11 @@ export class sc_edit_tool_select_marker {
    */
   set_strength(strength) {}
 
+  /** @type {number} */
+  get outer_radius() { return 1; }
+  /** @type {number} */
+  get inner_radius() { return 1; }
+
   /**
    * Start function. This can either select a marker, or if the marker is already selected
    * start a move
