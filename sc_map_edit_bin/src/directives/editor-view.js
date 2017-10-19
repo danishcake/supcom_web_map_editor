@@ -41,9 +41,9 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     // Draw the water overlay, if enabled
     // TBD: Always enable water overlay, or rely on map metadata to show/hide?
     if (editor_state.overlays.show_water && editor_state.map.water.has_water) {
-      scope.scene.water.shallow.draw(scope.water_shader, scope.camera, editor_state.map.water.elevation);
-      scope.scene.water.deep.draw(scope.water_shader, scope.camera, editor_state.map.water.elevation_deep);
       scope.scene.water.abyssal.draw(scope.water_shader, scope.camera, editor_state.map.water.elevation_abyss);
+      scope.scene.water.deep.draw(scope.water_shader, scope.camera, editor_state.map.water.elevation_deep);
+      scope.scene.water.shallow.draw(scope.water_shader, scope.camera, editor_state.map.water.elevation);
     }
 
     // Draw the markers
