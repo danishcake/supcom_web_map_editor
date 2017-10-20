@@ -56,6 +56,9 @@ export class sc_edit_tool_water_elevation {
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
   apply(data, args) {
+    // Enable the water
+    data.map.water.has_water = true;
+
     // Find the depth under the cursor
     const height = data.edit_heightmap.get_pixel(args.heightmap_grid_position)[0] *
                    data.map.heightmap.scale;

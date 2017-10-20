@@ -255,6 +255,11 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
         break;
     }
 
+    // Enable the water overlay if a water tool is selected
+    if (tool_data.category === 'water') {
+      service.overlays.show_water = true;
+    }
+
     if (target_view_constructor !== null) {
       service.edit_target_view = target_view_constructor(service.edit_target_view);
     }

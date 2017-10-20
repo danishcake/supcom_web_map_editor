@@ -26,6 +26,21 @@ describe('sc_edit_tool_water_elevation', function() {
     this.map.heightmap.scale = 1;
   });
 
+  describe('applying tool', function() {
+    const tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.shallow);
+
+    it('enables water', function () {
+      this.map.water.has_water = false;
+
+      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null, null, this.map),
+        new sc_edit_tool_args([5, 0], sc_edit_tool_args.modifier_none));
+      tool.end(new sc_edit_tool_data(this.edit_heightmap, null, null, null, this.map),
+        new sc_edit_tool_args([5, 0], sc_edit_tool_args.modifier_none));
+
+      assert.equal(true, this.map.water.has_water);
+    });
+  });
+
 
   describe('changing shallow', function() {
     const tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.shallow);
