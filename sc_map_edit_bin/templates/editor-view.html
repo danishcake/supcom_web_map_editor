@@ -1,7 +1,12 @@
-<canvas id="editor-view"
+<div id="editor-view-container">
+  <div style="position: relative; width: 100%; height: 100%;">
+    <canvas id="editor-view"
         msd-wheel="on_wheel($event, $delta, $deltaX, $deltaY)"
         ng-mousemove="on_mousemove($event)"
         ng-mouseup="on_mouseup($event)"
         ng-mouseleave="on_mouseleave($event)"
         ng-mousedown="on_mousedown($event)">
-</canvas>
+    </canvas>
+    <div id="overlay">{{data.cursor_info}}</div>
+  </div>
+</div>

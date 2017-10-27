@@ -199,7 +199,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     restrict: 'E',
     templateUrl: 'templates/editor-view.html',
     link: function(scope, element) {
-      const canvas = element.children()[0];
+      const canvas = element.find("canvas")[0];
 
       initialiseRenderScheduleFn(scope);
       initialiseWebGl(scope, canvas);
