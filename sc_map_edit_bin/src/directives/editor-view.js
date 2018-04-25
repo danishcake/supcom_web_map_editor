@@ -55,13 +55,13 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       const marker = markers[marker_id];
       switch (marker.type) {
         case "Mass":
-          scope.scene.markers.mass.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected);
+          scope.scene.markers.mass.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected, editor_state.edit_heightmap);
           break;
         case "Hydrocarbon":
-          scope.scene.markers.energy.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected);
+          scope.scene.markers.energy.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected, editor_state.edit_heightmap);
           break;
         default:
-          scope.scene.markers.unknown.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected);
+          scope.scene.markers.unknown.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected, editor_state.edit_heightmap);
           break;
       }
     }
