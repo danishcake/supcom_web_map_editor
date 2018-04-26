@@ -68,8 +68,8 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
 
     // Draw tool highlight
     if (editor_state.tool !== null && editor_state.tool_position !== null) {
-      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.edit_heightmap, editor_state.tool.outer_radius, [1, 1, 1, 0.6]);
-      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.edit_heightmap, editor_state.tool.inner_radius, [1, 1, 1, 0.3]);
+      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.edit_heightmap, editor_state.tool.outer_radius * editor_state.tool_scale, [1, 1, 1, 0.6]);
+      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.edit_heightmap, editor_state.tool.inner_radius * editor_state.tool_scale, [1, 1, 1, 0.3]);
     }
 
     // Trigger next redraw in approximately 16ms (for 60Hz monitors)
