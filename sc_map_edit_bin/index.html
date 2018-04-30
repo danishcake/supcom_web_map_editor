@@ -56,6 +56,7 @@
     precision highp float;
     attribute vec3 aVertexPosition;
     varying highp float vHeight;
+    varying lowp float vGradient;
     uniform mat4 uVMatrix;
     uniform mat4 uPMatrix;
     uniform vec2 uMapSize;
@@ -70,6 +71,15 @@
       vec3 displacedPosition = aVertexPosition + vec3(0, 0, height * uHeightmapScale);
       gl_Position = uPMatrix * uVMatrix * vec4(displacedPosition, 1.0);
       vHeight = (height - uShadeMin) / (uShadeMax - uShadeMin);
+
+      // Calculate the gradient
+      highp vec2 delta      = vec2(1.0, 1.0) / uMapSize;
+      highp float left      = texture2D(uHeightmap, textureCoord.xy + vec2( delta.x, 0)).a;
+      highp float right     = texture2D(uHeightmap, textureCoord.xy + vec2(-delta.x, 0)).a;
+      highp float up        = texture2D(uHeightmap, textureCoord.xy + vec2(0,        delta.y)).a;
+      highp float down      = texture2D(uHeightmap, textureCoord.xy + vec2(0,        -delta.y)).a;
+      vGradient = max(max(abs(left - height), abs(right - height)),
+                      max(abs(up   - height), abs(down  - height)));
     }
   </script>
 
@@ -77,8 +87,13 @@
   <script id="fs-terrain-greyscale" type="x-shader/x-fragment">
     precision mediump float;
     varying highp float vHeight;
+    varying lowp float vGradient;
+    uniform mediump float uNavigabilityThreshold;
     void main(void) {
-      gl_FragColor = vec4(vHeight, vHeight, vHeight, 1.0);
+      vec4 op = vec4(vHeight, vHeight, vHeight, 1.0);
+      // The navigability overlay is disabled by setting the threshold very high
+      op.r += step(uNavigabilityThreshold, vGradient);
+      gl_FragColor = op;
     }
   </script>
 
@@ -93,12 +108,22 @@
     uniform highp sampler2D uHeightmap;
     uniform highp float uHeightmapScale;
     varying highp vec2 vTextureCoord;
+    varying lowp float vGradient;
 
     void main(void) {
       vTextureCoord = aVertexPosition.xy / uMapSize;
       highp float height = texture2D(uHeightmap, vTextureCoord).a;
       vec3 displacedPosition = aVertexPosition + vec3(0, 0, height * uHeightmapScale);
       gl_Position = uPMatrix * uVMatrix * vec4(displacedPosition, 1.0);
+
+      // Calculate the gradient
+      highp vec2 delta      = vec2(1.0, 1.0) / uMapSize;
+      highp float left      = texture2D(uHeightmap, vTextureCoord.xy + vec2( delta.x, 0)).a;
+      highp float right     = texture2D(uHeightmap, vTextureCoord.xy + vec2(-delta.x, 0)).a;
+      highp float up        = texture2D(uHeightmap, vTextureCoord.xy + vec2(0,        delta.y)).a;
+      highp float down      = texture2D(uHeightmap, vTextureCoord.xy + vec2(0,        -delta.y)).a;
+      vGradient = max(max(abs(left - height), abs(right - height)),
+                      max(abs(up   - height), abs(down  - height)));
     }
   </script>
 
@@ -106,6 +131,7 @@
   <script id="fs-terrain-textured" type="x-shader/x-fragment">
     precision mediump float;
     varying highp vec2 vTextureCoord;
+    varying lowp float vGradient;
     uniform mediump sampler2D uTerrainChan03;
     uniform mediump sampler2D uTerrainChan47;
     uniform lowp sampler2D uTerrainTextureBase;
@@ -128,6 +154,7 @@
     uniform mediump float uTextureScale6;
     uniform mediump float uTextureScale7;
     uniform mediump float uTextureScaleMacro;
+    uniform mediump float uNavigabilityThreshold;
     // TODO: Minimum 0.5 threshold
     // This comes from terrain.fx. Mask here is the uTerrainChan03 variable
     // float4 mask = saturate(tex2Dproj( UtilitySamplerA, inV.mTexWT  * TerrainScale)* 2 - 1 );
@@ -164,6 +191,8 @@
       // For now I'm just going to mix this in at 10%
       op = mix(op, texture2D(uTerrainTextureMacro, vTextureCoord * uTextureScaleMacro), 0.1);
 
+      // The navigability overlay is disabled by setting the threshold very high
+      op.r += step(uNavigabilityThreshold, vGradient);
       gl_FragColor = op;
     }
   </script>
