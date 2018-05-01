@@ -47,7 +47,7 @@ export class sc_edit_tool_base {
    * Setter for stength
    */
   set_strength(strength) {
-    this.__strength = strength;
+    this.__strength = Math.min(255, Math.max(0, strength));
   }
 
 
