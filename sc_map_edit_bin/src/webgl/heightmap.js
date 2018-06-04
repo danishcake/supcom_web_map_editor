@@ -308,8 +308,18 @@ class webgl_heightmap {
     effect.set_uniform_float("uTextureScaleMacro", this.__layers.albedo_data[9].texture_scale);
 
     effect.set_uniform_float("uHeightmapScale", this.__heightmap.scale);
-    effect.set_uniform_float("uShadeMin", this.__heightmap.minimum_height);
-    effect.set_uniform_float("uShadeMax", this.__heightmap.maximum_height);
+
+    let height_min = this.__heightmap.minimum_height;
+    let height_max = this.__heightmap.maximum_height;
+    // Avoid over sensitive tone mapping
+    if (height_max - height_min < 256) {
+      const mid_height = (height_max + height_min) / 2;
+      height_min = mid_height - 128;
+      height_max = mid_height + 128;
+    }
+
+    effect.set_uniform_float("uShadeMin", height_min);
+    effect.set_uniform_float("uShadeMax", height_max);
 
     if (drawNavigabilityOverlay) {
       effect.set_uniform_float("uNavigabilityThreshold", 1.0 / this.__heightmap.scale);
