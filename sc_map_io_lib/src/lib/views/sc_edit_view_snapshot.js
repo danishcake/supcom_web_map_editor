@@ -4,8 +4,9 @@ import {sc_edit_view_methods} from "./sc_edit_view_methods"
 
 
 /**
- * A lazy snapshot of the underlying view. This creates a snapshot at construction, so that if the underlying
- * view is changed it's original values are still available
+ * A lazy snapshot of the underlying view. This creates a snapshot when a pixel is read, so that if the underlying
+ * view is changed it's original values are still available. The snapshot is lazy, so you must access a pixel before it
+ * will exhibit this caching behaviour.
  *
  * Writes are passed through to the underlying view, but will not be reflected by calls
  * to get_pixel on the cache
@@ -99,6 +100,18 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
       const tile = new sc_edit_patch(this.__tilesize2d, this.subpixel_count, this.subpixel_max);
       sc_edit_view_methods.copy(tile, [0, 0], this.__wrapped_view, tile_origin, this.__tilesize2d);
       this.__tiles[tile_indices[0]][tile_indices[1]] = tile;
+    }
+  }
+
+  /**
+   * Adds the entire wrapped view to the cache, disabling lazy caching
+   */
+  cache_everything() {
+    // Initially all tiles are null, indicating no data cached
+    for (let y = 0; y < Math.ceil(this.__wrapped_view.height / this.__tilesize); y++) {
+      for (let x = 0; x < Math.ceil(this.__wrapped_view.width / this.__tilesize); x++) {
+        this.__ensure_cached([x, y])
+      }
     }
   }
 

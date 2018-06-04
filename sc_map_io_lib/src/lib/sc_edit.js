@@ -13,12 +13,14 @@ import {sc_edit_tool_clear_higher} from "./tools/sc_edit_tool_clear_higher"
 import {sc_edit_tool_select_marker} from "./tools/sc_edit_tool_select_marker"
 import {sc_edit_tool_add_marker} from "./tools/sc_edit_tool_add_marker"
 import {sc_edit_tool_water_elevation} from "./tools/sc_edit_tool_water_elevation"
+import {sc_edit_global_tool_autotexture} from './global_tools/sc_edit_global_tool_autotexture'
 import {sc_edit_symmetry} from "./sc_edit_symmetry"
 import {sc_edit_view_symmetry} from "./views/sc_edit_view_symmetry"
 import {sc_edit_patch} from "./views/sc_edit_patch"
 import {sc_edit_view_snapshot} from "./views/sc_edit_view_snapshot"
 import {sc_edit_view_mask} from "./views/sc_edit_view_mask"
 import {sc_edit_view_convolution} from "./views/sc_edit_view_convolution"
+import {sc_edit_view_oob_clamp} from "./views/sc_edit_view_oob_clamp"
 import {sc_edit_view_methods} from "./views/sc_edit_view_methods"
 
 let sc_edit = {
@@ -37,6 +39,9 @@ let sc_edit = {
     add_marker: sc_edit_tool_add_marker,
     water_elevation: sc_edit_tool_water_elevation
   },
+  global_tool: {
+    autotexture: sc_edit_global_tool_autotexture
+  },
   symmetry: sc_edit_symmetry,
   view: {
     symmetry: sc_edit_view_symmetry,
@@ -44,6 +49,7 @@ let sc_edit = {
     snapshot: sc_edit_view_snapshot,
     mask: sc_edit_view_mask,
     convolution: sc_edit_view_convolution,
+    oob_clamp: sc_edit_view_oob_clamp,
     methods: sc_edit_view_methods
   }
 };

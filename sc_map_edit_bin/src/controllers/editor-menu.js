@@ -1,5 +1,5 @@
 angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
-["$scope", "editor_state", function($scope, editor_state) {
+["$scope", "editor_state", "dialogs", function($scope, editor_state, dialogs) {
   $scope.tool = {
     category: 'heightmap',
     heightmap: {
@@ -27,6 +27,7 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
   $scope.increase_tool_strength = () => $scope.tool.strength = Math.min($scope.tool.strength + 1, 100);
   $scope.decrease_tool_strength = () => $scope.tool.strength = Math.max($scope.tool.strength - 1,   1);
 
+  // TODO: Move a global tool
   // Uses current symmetry mode to set all secondary pixels to their primary value
   $scope.enforce_symmetry = () => {
     const heightmap_size = [editor_state.edit_heightmap.width, editor_state.edit_heightmap.height];
@@ -54,6 +55,26 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
       }
     }
   };
+
+  $scope.show_autotexturing_dialog = () => {
+    let dlg = dialogs.create("templates/dialogs/auto-texture.html",
+                             "auto-texture",
+                             {
+                               edit_heightmap: editor_state.edit_heightmap
+                             },
+                             modal_dlg_opts);
+    dlg.result.then(function(signals) {
+      const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
+                                                            editor_state.edit_texturemap_view,
+                                                            editor_state.scripts.save,
+                                                            editor_state.edit_target_view,
+                                                            editor_state.map);
+
+      const autotexture_tool = new sc_map_io_lib.sc.edit.global_tool.autotexture(signals);
+      autotexture_tool.apply(tool_data);
+    });
+  };
+
 
   // On any change to the tool variables rebuild the tool
   $scope.$watch('tool', () => {

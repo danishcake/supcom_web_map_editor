@@ -7,11 +7,12 @@
     <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'water'" uib-tooltip="Water" tooltip-placement="right"><span class="glyphicon glyphicon-cloud"></span></label>
   </div>
 
-  <!-- Symmetry -->
+  <!-- Global tools -->
   <div class="btn-group-vertical">
     <label uib-popover-template="'templates/popovers/symmetry.html'" popover-title="Symmetry" popover-placement="right" popover-trigger="outsideClick" class="btn btn-default">X</label>
+    <label class="btn btn-default" ng-click="show_autotexturing_dialog()" uib-tooltip="Autotexturing" tooltip-placement="right"><span class="glyphicon glyphicon-tint"></span></label>
+    <label class="btn btn-default" ng-click="show_global_smoothing_dialog()" uib-tooltip="Global smoothing" tooltip-placement="right"><span class="glyphicon glyphicon-record"></span></label>
   </div>
-
 
   <!-- Tool size -->
   <div class="btn-group-vertical" ng-show="tool.category === 'heightmap' || tool.category === 'texture'">
@@ -24,7 +25,7 @@
   <div class="btn-group-vertical" ng-show="tool.category === 'heightmap' || tool.category === 'texture'">
     <label class="btn btn-default" ng-click="increase_tool_strength()" uib-tooltip="Increase strength" tooltip-placement="right"><span class="glyphicon glyphicon-plus"></span></label>
     <label class="btn btn-default">{{tool.strength}}</label>
-    <label class="btn btn-default"  ng-click="decrease_tool_strength()" uib-tooltip="Decrease strength" tooltip-placement="right"><span class="glyphicon glyphicon-minus"></span></label>
+    <label class="btn btn-default" ng-click="decrease_tool_strength()" uib-tooltip="Decrease strength" tooltip-placement="right"><span class="glyphicon glyphicon-minus"></span></label>
   </div>
 
   <!-- Heightmap tools -->

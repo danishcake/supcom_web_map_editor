@@ -261,6 +261,131 @@ let radial_fill = function(dest, inner_value, inner_radius, outer_value, outer_r
   }
 };
 
+/**
+ * Calculates a log domain histogram of the specified view.
+ * Each subpixel has a histogram calculated, so the result is returned as an array
+ * even if there is only one subpixel
+ * @param {sc_edit_view_base} src The view
+ */
+let calculate_histogram = function(src) {
+  const result = [];
+
+  // Create histogram storage
+  for (let subpixel = 0; subpixel < src.subpixel_count; subpixel++) {
+    const histogram = new Array(src.subpixel_max + 1);
+    histogram.fill(0);
+    result.push(histogram);
+  }
+
+
+  // Builds linear histogram
+  const h = src.height;
+  const w = src.width;
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const value = src.get_pixel([x,y]);
+      for (let subpixel = 0; subpixel < src.subpixel_count; subpixel++) {
+        // TBD: I don't think we need to apply any clamping here but I could be wrong!
+        const bin = Math.floor(value[subpixel]);
+        result[subpixel][bin]++;
+      }
+    }
+  }
+
+  // Transform into log domain
+  for (let subpixel = 0; subpixel < src.subpixel_count; subpixel++) {
+    for (let i = 0; i < result[subpixel].length; i++) {
+      result[subpixel][i] = Math.log1p(result[subpixel][i]);
+    }
+  }
+
+  return result;
+};
+
+/**
+ * Extracts the peaks from a histogram
+ * @param {Array<number>} histogram
+ * @param {number} signals_to_find The number of singals to attempt to find
+ * @param {number} min_bin The bin at which to start looking (eg to avoid looking under water)
+ * @returns {Array.<*>} Array of not more than signals_to_find signals, defined by {left_edge, right_edge, population}.
+ * The returned signals will be sorted so that the highest population signals are returned first
+ */
+let find_histogram_signals = (histogram, signals_to_find, min_bin) => {
+  // Operate on bins above the min_bin
+  min_bin = Math.round(min_bin);
+  histogram = histogram.slice(min_bin);
+
+  // We're going to calculate this only counting non-zero cells as most bins are unoccupied
+  // TBD: Does this work better if the range is max_bin - min_bin?
+  const occupied_bin_count = histogram.map(term => term !== 0 ? 1 : 0)
+    .reduce((sum, term) => sum + term);
+
+  // Early exit if occupied bins will be empty
+  if (occupied_bin_count === 0) {
+    return [];
+  }
+
+  // Calculate the mean population (which is less trivial than it sounds due to log domain)
+  const mean = histogram.reduce((sum, term) => sum + term) / occupied_bin_count;
+  // TBD: Check I can still remember how to calculate standard deviation!
+  const sd = Math.sqrt(histogram.reduce((sum, term) => sum + Math.pow(term - mean, 2))) / occupied_bin_count;
+
+  // Now walk the bins. Any time the population changes by 1sd declare an edge start
+  // Any time it drops by 1sd declare an edge end
+
+  let theshold_scalar = 0;
+  let best_result = []; // We'll keep increasing the threshold until we have too few results, then return the previous result
+  const merged_signals = [];
+
+  do {
+    best_result = [...merged_signals];
+
+    const threshold_change = sd * theshold_scalar;
+    const threshold_down = Math.max(0, mean + threshold_change);
+    const threshold_up = mean + threshold_change;
+    let left_edge = -1;
+    const signals = [];
+    merged_signals.length = 0;
+
+    for (let i = 0; i < histogram.length; i++) {
+      if (left_edge === -1) {
+        if (histogram[i] >= threshold_up) {
+          left_edge = i;
+        }
+      } else {
+        // TBD: Detect right edge if this persists for N steps?
+        if (histogram[i] <= threshold_down) {
+          const right_edge = i;
+          const population = Math.log1p(histogram.slice(left_edge, right_edge)
+            .map(p => Math.expm1(p))
+            .reduce((sum, term) => sum + term));
+          signals.push({left_edge, right_edge, population});
+          left_edge = -1;
+        }
+      }
+    }
+    theshold_scalar += 0.1;
+
+    // If left edge and right edge are closer than some small threshold (eg 5 bins) merge them
+    // FIXME: Potential bounds checking falls over here
+    merged_signals.push(signals[0]);
+    for (let i = 1; i < signals.length; i++) {
+      if (merged_signals[merged_signals.length - 1].right_edge + 5 > signals[i].left_edge) {
+        merged_signals[merged_signals.length - 1].right_edge = signals[i].right_edge;
+        merged_signals[merged_signals.length - 1].population = Math.log1p(
+          Math.expm1(merged_signals[merged_signals.length - 1].population) + Math.expm1(signals[i].population));
+      } else {
+        merged_signals.push(signals[i]);
+      }
+    }
+  } while (merged_signals.length > signals_to_find);
+
+  // Add the minimum bin back on to the results and sort by population
+  return best_result.map((v) => ({population: v.population, left_edge: v.left_edge + min_bin, right_edge: v.right_edge + min_bin}))
+    .sort((lhs, rhs) => rhs.population - lhs.population);
+};
+
 
 const sc_edit_view_methods = {
   make_pixel:               make_pixel,
@@ -271,7 +396,9 @@ const sc_edit_view_methods = {
   set:                      set,
   weighted_blend:           weighted_blend,
   ratcheted_weighted_blend: ratcheted_weighted_blend,
-  radial_fill:              radial_fill
+  radial_fill:              radial_fill,
+  calculate_histogram:      calculate_histogram,
+  find_histogram_signals:   find_histogram_signals
 };
 
 export { sc_edit_view_methods };
