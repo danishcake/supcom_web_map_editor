@@ -253,11 +253,12 @@ class webgl_heightmap {
   /**
    * Checks the effect uniform/attribute set, binds appropriately and
    * draws the heightmap
+   * @param {bool} drawNavigabilityOverlay If set, non-navigable areas are highlighted
    */
-  draw(effect, camera) {
+  draw(effect, camera, drawNavigabilityOverlay) {
     effect.start();
 
-    this.__bind_effect(effect, camera);
+    this.__bind_effect(effect, camera, drawNavigabilityOverlay);
     this.__draw_mesh();
 
     effect.stop();
@@ -270,7 +271,7 @@ class webgl_heightmap {
    * This heightmap can render is several different modes, each using a different effect. As long as everything in
    * the effect ends up bound we consider that a success.
    */
-  __bind_effect(effect, camera) {
+  __bind_effect(effect, camera, drawNavigabilityOverlay) {
     let gl = this.__gl;
 
     effect.unbind_all();
@@ -309,6 +310,13 @@ class webgl_heightmap {
     effect.set_uniform_float("uHeightmapScale", this.__heightmap.scale);
     effect.set_uniform_float("uShadeMin", this.__heightmap.minimum_height);
     effect.set_uniform_float("uShadeMax", this.__heightmap.maximum_height);
+
+    if (drawNavigabilityOverlay) {
+      effect.set_uniform_float("uNavigabilityThreshold", 1.0 / this.__heightmap.scale);
+    } else {
+      effect.set_uniform_float("uNavigabilityThreshold", 65536);
+    }
+
     effect.bind_attribute("aVertexPosition", this.__vertex_buffer);
 
     if (!effect.all_bound())

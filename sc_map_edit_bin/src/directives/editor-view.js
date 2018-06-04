@@ -31,10 +31,10 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     switch (editor_state.render_mode) {
       case 'heightmap':
       default:
-        scope.scene.heightmap.draw(scope.heightmap_shader, scope.camera);
+        scope.scene.heightmap.draw(scope.heightmap_shader, scope.camera, editor_state.overlays.show_navigability);
         break;
       case 'texturemap':
-        scope.scene.heightmap.draw(scope.terrain_texture_shader, scope.camera);
+        scope.scene.heightmap.draw(scope.terrain_texture_shader, scope.camera, editor_state.overlays.show_navigability);
         break;
     }
 
@@ -46,10 +46,11 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       scope.scene.water.shallow.draw(scope.water_shader, scope.camera, editor_state.map.water.elevation);
     }
 
-    // Draw the markers
+
     // Disable z-buffer depth test
     gl.disable(gl.DEPTH_TEST);
 
+    // Draw the markers
     const markers = editor_state.scripts.save.markers;
     for (let marker_id of Object.keys(markers)) {
       const marker = markers[marker_id];
