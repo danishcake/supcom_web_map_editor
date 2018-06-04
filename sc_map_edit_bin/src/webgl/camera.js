@@ -1,40 +1,65 @@
 
 /**
  * Represents a camera that can pan/zoom within the bounds of map
- * in a similar fashion to that within SupCom
+ * in a similar fashion to that within SupCom.
+ * When zooming the world position under the cursor is kept constant.
+ * When zooming out the centre is kept constant.
+ * The position of the camera is constrained to a bounding fulcrum
+ *
+ * At maximum zoom (1) we will define ourselves as showing 16 units down the shortest axis
+ * At minimum zoom (0) we will define ourselves as showing the entire map * 1.2 down the shortest axis
+ * In between we're initially going to just linearly interpolate the z position
+ * Assuming frustrum short edge length is sqrt(2) * z_height * 0.5
+ * z_height = 32 / sqrt(2) = 22.6ish
+ *
+ * Calculations are performed as if the terrain height is zero.
+ * @property {sc_vec2} __scene_size The size of the scene
+ * @property {number} __long_edge The largest value in __scene_size
+ * @property {number} __fov The field of view in degrees
+ * @property {sc_vec2} __screen_space_focus The screen coordinates that should remain mapped to the same world space position by zooming
+ * @property {sc_vec3} __world_space_focus The world position that should remain mapped to the same screen space position by zooming
+ * @property {sc_vec3} __camera_position The terrain relative position of the camera
+ * @property {number} __zoom The zoom level, between 0 and 1. At 1 the camera is zoomed out as far as it goes
+ * @property {number} __steps The number of zoom steps
+ *
  */
 class webgl_camera {
   constructor(gl, scene_size) {
     this.__gl = gl;
     this.__scene_size = scene_size;
     this.__long_edge = Math.max(this.__scene_size[0], this.__scene_size[1]);
-    this.__short_edge = Math.min(this.__scene_size[0], this.__scene_size[1]);
     this.__fov = 90;
-    this.__focus = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, 0);
-    this.__camera_position = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, 1);
-    this.__look_at = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, 0);
+    this.__world_space_focus = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, 0);
+
     this.__up_vector = vec3.fromValues(0, 1, 0);
     this.__zoom = 0;
     this.__steps = 128;
+
     this.__view = mat4.create();
     this.__perspective = mat4.create();
 
-    const nearest_length = 22.6;
-    const farthest_length = this.__long_edge * 1.1 / 2.0;
-    this.__camera_position[2] = nearest_length + (farthest_length - nearest_length) * this.__zoom;
+    // Define camera position. Look-at position is directly below this at z=0
+    this.__camera_position = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, 22.6);
 
     // Calculate initial view/perspective matrices
-    this.tick();
+    this.tick(0);
   }
 
 
   /**
    * Updates matrices based on current focus, zoom etc
+   * @param {number] height_datum The suggested height datum. The lookat and camera origin
+   *  will be translated vertically by this value to ensure that all terrain remains visble.
    */
-  tick() {
-    mat4.lookAt(this.__view, this.__camera_position, this.__look_at, this.__up_vector);
+  tick(height_datum) {
+    const camera_position = vec3.create();
+    vec3.add(camera_position, this.__camera_position, vec3.fromValues(0, 0, height_datum));
+    const look_at = vec3.fromValues(camera_position[0], camera_position[1], height_datum);
+
+
+    mat4.lookAt(this.__view, camera_position, look_at, this.__up_vector);
     let aspect_ratio = this.__gl.drawingBufferWidth / this.__gl.drawingBufferHeight;
-    mat4.perspective(this.__perspective, this.__fov, aspect_ratio, 0.0001, 8192);
+    mat4.perspective(this.__perspective, this.__fov, aspect_ratio, 1.0, 256*256*256);
   }
 
 
@@ -53,23 +78,6 @@ class webgl_camera {
     return this.__perspective;
   }
 
-
-  /**
-   * Zooms in a single notch
-   */
-  zoom_in() {
-    zoom_steps(1);
-  }
-
-
-  /**
-   * Zooms out by a single notch
-   */
-  zoom_out() {
-    zoom_steps(-1);
-  }
-
-
   /**
    * Zooms in or out by the specified number of steps
    */
@@ -78,45 +86,49 @@ class webgl_camera {
 
     const nearest_length = 22.6;
     const farthest_length = this.__long_edge * 1.1 / 2.0;
-    const old_position = vec3.clone(this.__camera_position);
-    const old_z = this.__camera_position[2];
-    const new_z = nearest_length + (farthest_length - nearest_length) * this.__zoom;
+    const previous_height_above_terrain = this.__camera_position[2];
+    const new_height_above_terrain = nearest_length + (farthest_length - nearest_length) * this.__zoom;
 
-    let zoom_scale_change = new_z / old_z;
-    // At maximum zoom (1) we will define ourselves as showing 16 units down the shortest axis
-    // At minimum zoom (0) we will define ourselves as showing the entire map * 1.2 down the shortest axis
-    // In between we're initially going to just linearly interpolate the z position
-    // I'm sure I can make this MUCH nicer with an easing curve
-    //
-    // Assuming frustrum short edge length is sqrt(2) * z_height * 0.5
-    // z_height = 32 / sqrt(2) = 22.6ish
-    //
-    // __focus, which is the position under the cursor, should not be
-    // changed by zooming in. This means that camera position needs to be updated so that
-    // the mouse coordinates map to the same location
-    // http://stackoverflow.com/questions/13155382/jscrollpane-zoom-relative-to-mouse-position?noredirect=1&lq=1
-    //
-    // Basically if I zoom in by 10% I set the new position to 0.1 * focus + 1.1 * old_position
-    // and if I zoom out 10% I set the new position to -0.1 * focus + 0.9 * old_position
+    // We now need to maintain the screenspace-worldspace mapping, given our new camera height
+    // we can do this by moving the xy camera offset along the line cast from the worldspace focus
+    // to the camera position
+    // TODO: Constrain by map bounds
+    const z_change = new_height_above_terrain - previous_height_above_terrain;
+    if (z_change < 0) {
+      // Find ray from focus to camera and scale so that z is z_change, then offset camera by that
+      const focus_to_camera_ray = vec3.create();
+      vec3.sub(focus_to_camera_ray, this.__camera_position, this.__world_space_focus);
+      vec3.scale(focus_to_camera_ray, focus_to_camera_ray, z_change / focus_to_camera_ray[2]);
+      vec3.add(this.__camera_position, this.__camera_position, focus_to_camera_ray);
+    } else {
+      this.__camera_position[2] += z_change;
+    }
 
-    vec3.scale(this.__camera_position, this.__focus, zoom_scale_change);
-    vec3.scale(old_position, old_position, 1 - zoom_scale_change);
-    vec3.add(this.__camera_position, this.__camera_position, old_position);
+    // Constrain to a fulcrum cast from the center at max distance
+    // Maximum distance from centre is a function of the FOV and distance from apex
+    // We allow half a screen off the edge, so the apex is moved up slightly
+
+    const distance_from_apex = farthest_length - this.__camera_position[2] + 22.6;
+    const maximum_distance_from_axis = Math.sin((this.__fov * Math.PI / 180) * 0.5) * distance_from_apex;
+    let x_axial_distance = this.__camera_position[0] - (this.__scene_size[0] / 2);
+    let y_axial_distance = this.__camera_position[1] - (this.__scene_size[1] / 2);
+
+    x_axial_distance = Math.min(maximum_distance_from_axis, Math.abs(x_axial_distance)) * Math.sign(x_axial_distance);
+    y_axial_distance = Math.min(maximum_distance_from_axis, Math.abs(y_axial_distance)) * Math.sign(y_axial_distance);
 
 
-    this.__camera_position[2] = new_z;
-    this.__look_at[0] = this.__camera_position[0];
-    this.__look_at[1] = this.__camera_position[1];
+    this.__camera_position[0] = (this.__scene_size[0] / 2) + x_axial_distance;
+    this.__camera_position[1] = (this.__scene_size[1] / 2) + y_axial_distance;
+
   }
 
 
   /**
    * Sets the centre of the zoom process
+   * @param {sc_vec2} screen_space_focus Screen-space coordinates (non-normalised) of cursor
    */
-  set_focus(focus) {
-    this.__focus[0] = focus[0];
-    this.__focus[1] = focus[1];
-    this.__focus[2] = 0;
+  set_focus(screen_space_focus) {
+    this.__world_space_focus = this.project_to_world(vec3.fromValues(...screen_space_focus, 0));
   }
 
 
@@ -172,7 +184,7 @@ class webgl_camera {
                                                -this.__view[12], -this.__view[13], -this.__view[14], this.__view[15]);
 
     let inverted_view = mat4.create();
-    mat4.mul(inverted_view, inverted_view_translation, inverted_view_rotation)
+    mat4.mul(inverted_view, inverted_view_translation, inverted_view_rotation);
 
     // Calculate inverse perspective
     // Less numerically unstable, so OK to just use inversion

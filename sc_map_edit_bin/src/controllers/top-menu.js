@@ -1,6 +1,12 @@
 angular.module('sc_map_edit_bin.controllers').controller("top-menu",
 ["$scope", "editor_state", "dialogs", function($scope, editor_state, dialogs) {
   $scope.editor_state = editor_state;
+  $scope.data = {
+    overlays: {
+      show_navigability: false,
+      show_water: false,
+    }
+  };
 
   $scope.new_map = function() {
     let dlg = dialogs.create("templates/dialogs/new-map.html", "new-map", {}, modal_dlg_opts);
@@ -8,6 +14,7 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
       editor_state.create_map(map_parameters);
     });
   };
+
   $scope.open_map = function() {
     let dlg = dialogs.create("templates/dialogs/open-map.html", "open-map", {}, modal_dlg_opts);
     dlg.result.then(function(map) {
@@ -18,6 +25,7 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
       }
     });
   };
+
   $scope.save_map = function() {
     switch(editor_state.get_save_location()) {
       case "unsaved":
@@ -37,9 +45,11 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
         break;
     }
   };
+
   $scope.save_map_as = function() {
     dialogs.create("templates/dialogs/save-as.html", "save-as", {}, modal_dlg_opts);
   };
+
   $scope.edit_metadata = function() {
     let dlg = dialogs.create("templates/dialogs/configure-metadata.html",
                              "configure-metadata",
@@ -56,6 +66,7 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
       editor_state.map.heightmap.scale = result.heightmap_scale;
     });
   };
+
   $scope.edit_textures = function() {
     let dlg = dialogs.create("templates/dialogs/configure-textures.html",
                              "configure-textures",
@@ -90,9 +101,27 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
     },
     () => {});
   };
+
   $scope.edit_water = function() {
-    dialogs.error('Water','Not implemented.');
+    let dlg = dialogs.create("templates/dialogs/configure-water.html",
+                              "configure-water",
+                              {
+                                enabled: editor_state.map.water.has_water,
+                                elevation: editor_state.map.water.elevation,
+                                elevation_deep: editor_state.map.water.elevation_deep,
+                                elevation_abyss: editor_state.map.water.elevation_abyss,
+                              },
+                              modal_dlg_opts);
+
+    dlg.result.then(water => {
+      editor_state.map.water.has_water = water.enabled;
+      editor_state.map.water.elevation = water.elevation;
+      editor_state.map.water.elevation_deep = water.elevation_deep;
+      editor_state.map.water.elevation_abyss = water.elevation_abyss;
+    },
+    () => {});
   };
+
   $scope.edit_forces = function() {
     let dlg = dialogs.create("templates/dialogs/configure-forces.html",
                              "configure-forces",
@@ -107,4 +136,8 @@ angular.module('sc_map_edit_bin.controllers').controller("top-menu",
     () => {});
   };
 
+  // Update editor state when overlay rendering options change
+  $scope.$watch('data.overlays', () => {
+    editor_state.overlays = $scope.data.overlays;
+  }, true);
 }]);

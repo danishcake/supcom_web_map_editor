@@ -12,6 +12,7 @@ import {sc_edit_tool_set} from "./tools/sc_edit_tool_set"
 import {sc_edit_tool_clear_higher} from "./tools/sc_edit_tool_clear_higher"
 import {sc_edit_tool_select_marker} from "./tools/sc_edit_tool_select_marker"
 import {sc_edit_tool_add_marker} from "./tools/sc_edit_tool_add_marker"
+import {sc_edit_tool_water_elevation} from "./tools/sc_edit_tool_water_elevation"
 import {sc_edit_symmetry} from "./sc_edit_symmetry"
 import {sc_edit_view_symmetry} from "./views/sc_edit_view_symmetry"
 import {sc_edit_patch} from "./views/sc_edit_patch"
@@ -34,6 +35,7 @@ let sc_edit = {
     smooth: sc_edit_tool_smooth,
     select_marker: sc_edit_tool_select_marker,
     add_marker: sc_edit_tool_add_marker,
+    water_elevation: sc_edit_tool_water_elevation
   },
   symmetry: sc_edit_symmetry,
   view: {

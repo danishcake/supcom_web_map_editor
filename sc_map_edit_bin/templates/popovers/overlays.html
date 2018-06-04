@@ -1,0 +1,15 @@
+<div>
+  <div class="btn-group-vertical">
+    <label class="btn btn-default"
+           ng-model="data.overlays.show_navigability"
+           uib-btn-checkbox
+           uib-tooltip="Show navigability overlay"
+           tooltip-placement="right">Show navigability</label>
+    <label class="btn btn-default"
+           ng-model="data.overlays.show_water"
+           uib-btn-checkbox
+           uib-tooltip="Show water overlay"
+           tooltip-placement="right"
+           ng-change="update_overlays()">Show water</label>
+  </div>
+</div>

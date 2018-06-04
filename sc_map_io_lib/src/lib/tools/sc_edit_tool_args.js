@@ -2,10 +2,11 @@
  * Represents the data passed to editing tool to be operated upon
  */
 export class sc_edit_tool_data {
-  constructor(edit_heightmap, edit_texturemap, save_script, target_view) {
+  constructor(edit_heightmap, edit_texturemap, save_script, target_view, map) {
     this.__edit_heightmap = edit_heightmap;
     this.__edit_texturemap = edit_texturemap;
     this.__save_script = save_script;
+    this.__map = map;
 
     // Primary target defaults to heightmap, but can be overridden
     this.__target = target_view || edit_heightmap || edit_texturemap;
@@ -24,6 +25,9 @@ export class sc_edit_tool_data {
 
   /** @return {sc_script_save} */
   get save_script() { return this.__save_script; }
+
+  /** @return {sc_map} */
+  get map() { return this.__map; }
 }
 
 

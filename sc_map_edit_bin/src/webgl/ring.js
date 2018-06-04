@@ -40,13 +40,18 @@ class webgl_ring {
    * @param {webgl_effect} effect The shader to draw with
    * @param {webgl_camera} camera The camera viewing the scene
    * @param {sc_vec3} position The world position to render the ring
+   * @param {sc_edit_heightmap} heightmap The heightmap, from which to extract render height
    * @param {number} scale The radius of tte ring
    * @param {sc_vec4} line_colour The RGB colour of the ring to render
    */
-  draw(effect, camera, position, scale, line_colour) {
+  draw(effect, camera, position, heightmap, scale, line_colour) {
     effect.start();
 
-    this.__bind_effect(effect, camera, position, scale, line_colour);
+    const grid_position = vec2.create();
+    vec2.round(grid_position, position);
+    const height_at_position = heightmap.get_pixel(grid_position)[0] * heightmap.scale;
+
+    this.__bind_effect(effect, camera, vec3.fromValues(position[0], position[1], height_at_position), scale, line_colour);
     this.__draw_mesh();
 
     effect.stop();

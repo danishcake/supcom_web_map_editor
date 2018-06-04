@@ -662,21 +662,29 @@ class sc_map_water {
 
   /** @type {boolean} **/
   get has_water() { return this.__has_water; }
+  /** @param {boolean} value **/
+  set has_water(value) { this.__has_water = value; }
   /**
    * @type {number}
    * Depth of shallow water
    */
   get elevation() { return this.__elevation; }
+  /** @param {number} value */
+  set elevation(value) { this.__elevation = value; }
   /**
    * @type {number}
    * Depth of deep water, which is rendered darker
    */
   get elevation_deep() { return this.__elevation_deep; }
+  /** @param {number} value */
+  set elevation_deep(value) { this.__elevation_deep = value; }
   /**
    * @type {number}
    * Depth of the abyssal depths where Cthulu slumbers
    */
   get elevation_abyss() { return this.__elevation_abyss; }
+  /** @param {number} value */
+  set elevation_abyss(value) { this.__elevation_abyss = value; }
   /**
    * @type {sc_vec3}
    * Surface colour of water

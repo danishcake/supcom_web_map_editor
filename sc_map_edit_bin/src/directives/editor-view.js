@@ -10,8 +10,8 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     let displayHeight = gl.canvas.clientHeight;
 
     // Check if the canvas is not the same size.
-    if (gl.canvas.width  != displayWidth ||
-        gl.canvas.height != displayHeight) {
+    if (gl.canvas.width  !== displayWidth ||
+        gl.canvas.height !== displayHeight) {
 
       // Make the canvas the same size
       gl.canvas.width  = displayWidth;
@@ -19,7 +19,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     }
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-    scope.camera.tick();
+    scope.camera.tick(editor_state.edit_heightmap.maximum_height * editor_state.edit_heightmap.scale);
 
     // Clear the color and depth buffers
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -38,9 +38,18 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
         break;
     }
 
+    // Draw the water overlay, if enabled
+    // TBD: Always enable water overlay, or rely on map metadata to show/hide?
+    if (editor_state.overlays.show_water && editor_state.map.water.has_water) {
+      scope.scene.water.abyssal.draw(scope.water_shader, scope.camera, editor_state.map.water.elevation_abyss);
+      scope.scene.water.deep.draw(scope.water_shader, scope.camera, editor_state.map.water.elevation_deep);
+      scope.scene.water.shallow.draw(scope.water_shader, scope.camera, editor_state.map.water.elevation);
+    }
+
     // Draw the markers
-    // Clear the depth buffers only
-    gl.clear(gl.DEPTH_BUFFER_BIT);
+    // Disable z-buffer depth test
+    gl.disable(gl.DEPTH_TEST);
+
     const markers = editor_state.scripts.save.markers;
     for (let marker_id of Object.keys(markers)) {
       const marker = markers[marker_id];
@@ -57,12 +66,10 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       }
     }
 
-    // Disable z-buffer depth test
-    gl.enable(gl.DEPTH_TEST);
     // Draw tool highlight
     if (editor_state.tool !== null && editor_state.tool_position !== null) {
-      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.tool.outer_radius, [1, 1, 1, 0.6]);
-      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.tool.inner_radius, [1, 1, 1, 0.3]);
+      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.edit_heightmap, editor_state.tool.outer_radius, [1, 1, 1, 0.6]);
+      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.edit_heightmap, editor_state.tool.inner_radius, [1, 1, 1, 0.3]);
     }
 
     // Trigger next redraw in approximately 16ms (for 60Hz monitors)
@@ -136,7 +143,12 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
         energy: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Energy").texture),
         unknown: new webgl_marker(scope.gl, _.find(game_resources.markers, p => p.name === "Unknown").texture)
       },
-      tool_highlight: new webgl_ring(scope.gl)
+      tool_highlight: new webgl_ring(scope.gl),
+      water: {
+        shallow: new webgl_water_overlay(scope.gl, editor_state.edit_heightmap, [.6, .85, 0.91, 0.3]),
+        deep: new webgl_water_overlay(scope.gl, editor_state.edit_heightmap, [0, .5, 0.75, 0.3]),
+        abyssal: new webgl_water_overlay(scope.gl, editor_state.edit_heightmap, [0, 0.25, 0.5, 0.3]),
+      }
     };
   };
 
@@ -172,6 +184,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       scope.terrain_texture_shader = webgl_effect.create_from_dom(gl, "vs-terrain-textured", "fs-terrain-textured");
       scope.marker_shader = webgl_effect.create_from_dom(gl, "vs-marker", "fs-marker");
       scope.line_shader = webgl_effect.create_from_dom(gl, "vs-line", "fs-line");
+      scope.water_shader = webgl_effect.create_from_dom(gl, "vs-water", "fs-water");
 
       // Save the context to scope
       scope.gl = gl;

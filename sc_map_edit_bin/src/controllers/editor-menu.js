@@ -13,6 +13,9 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
     marker: {
       type: 'select'
     },
+    water: {
+      type: 'elevation'
+    },
     size: 10,
     strength: 10,
     symmetry: 'none'
