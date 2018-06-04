@@ -21,6 +21,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   service.scripts = null;
   service.render_mode = "heightmap";
   service.tool_position = null;
+  service.tool_scale = 1;
   service.overlays = {
     show_navigability: false,
     show_water: false
@@ -249,9 +250,11 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
       case 'heightmap':
       default:
         service.edit_target_view = service.edit_heightmap_view;
+        service.tool_scale = 1.0;
         break;
       case 'texture':
         service.edit_target_view = service.edit_texturemap_view;
+        service.tool_scale = 2.0;
         break;
     }
 

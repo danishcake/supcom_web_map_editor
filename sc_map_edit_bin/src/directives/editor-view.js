@@ -55,21 +55,21 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       const marker = markers[marker_id];
       switch (marker.type) {
         case "Mass":
-          scope.scene.markers.mass.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected);
+          scope.scene.markers.mass.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected, editor_state.edit_heightmap);
           break;
         case "Hydrocarbon":
-          scope.scene.markers.energy.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected);
+          scope.scene.markers.energy.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected, editor_state.edit_heightmap);
           break;
         default:
-          scope.scene.markers.unknown.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected);
+          scope.scene.markers.unknown.draw(scope.marker_shader, scope.camera, marker.position, !!marker.selected, editor_state.edit_heightmap);
           break;
       }
     }
 
     // Draw tool highlight
     if (editor_state.tool !== null && editor_state.tool_position !== null) {
-      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.edit_heightmap, editor_state.tool.outer_radius, [1, 1, 1, 0.6]);
-      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.edit_heightmap, editor_state.tool.inner_radius, [1, 1, 1, 0.3]);
+      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.edit_heightmap, editor_state.tool.outer_radius * editor_state.tool_scale, [1, 1, 1, 0.6]);
+      scope.scene.tool_highlight.draw(scope.line_shader, scope.camera, editor_state.tool_position, editor_state.edit_heightmap, editor_state.tool.inner_radius * editor_state.tool_scale, [1, 1, 1, 0.3]);
     }
 
     // Trigger next redraw in approximately 16ms (for 60Hz monitors)

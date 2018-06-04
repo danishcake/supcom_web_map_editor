@@ -5,6 +5,11 @@
  * It can then be called to render many times
  */
 class webgl_marker {
+  /**
+   * Creates a webgl_marker
+   * @param {WebGLRenderingContext} gl The WebGL rendering context to use
+   * @param {WebGLTexture} texture The webGL texture to display here
+   */
   constructor(gl, texture) {
     this.__gl = gl;
     this.__texture = texture;
@@ -58,10 +63,22 @@ class webgl_marker {
     this.__element_count = indices.length / 3;
   }
 
-  draw(effect, camera, position, selected) {
+  /**
+   * Draws the marker
+   * @param {webgl_effect} effect The shader to draw with
+   * @param {webgl_camera} camera The camera viewing the scene
+   * @param {sc_vec3} position The world position to render the marker
+   * @param {bool} selected If the marker is selected
+   * @param {sc_edit_heightmap} heightmap The heightmap, from which to extract render height
+   */
+  draw(effect, camera, position, selected, heightmap) {
     effect.start();
 
-    this.__bind_effect(effect, camera, position, selected);
+    const grid_position = vec2.create();
+    vec2.round(grid_position, [position.x, position.z]);
+    const height_at_position = heightmap.get_pixel(grid_position)[0] * heightmap.scale;
+
+    this.__bind_effect(effect, camera, vec3.fromValues(position.x, position.z, height_at_position), selected);
     this.__draw_mesh();
 
     effect.stop();
@@ -83,7 +100,7 @@ class webgl_marker {
     // attribute vec3 aVertexPosition;
     // attribute vec2 aTextureCoordinate;
 
-    mat4.fromTranslation(this.__model_matrix, [position.x, position.z, 0]);
+    mat4.fromTranslation(this.__model_matrix, position);
 
     let tint = [0, 0, 0];
     if (selected) {
