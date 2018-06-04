@@ -148,7 +148,7 @@ export class sc_edit_heightmap extends sc_edit_view_base {
 
 
   /** Returns the maximum value of a subpixel */
-  __get_subpixel_max_impl() { return 66635; }
+  __get_subpixel_max_impl() { return 65535; }
 
 
   /** Gets the height scale */

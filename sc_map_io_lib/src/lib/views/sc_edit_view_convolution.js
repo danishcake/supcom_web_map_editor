@@ -50,10 +50,11 @@ export class sc_edit_view_convolution extends sc_edit_view_base {
     for (let ix = -this.__weight_radius; ix <= this.__weight_radius; ix++) {
       for (let iy = -this.__weight_radius; iy <= this.__weight_radius; iy++, i++) {
         const ip  = [position[0] + ix, position[1] + iy];
-        // Exclude OOB pixels
-        if (ip[0] < 0 || ip[0] > this.width || ip[1] < 0 || ip[1] > this.height) {
-          continue;
-        }
+        // Clamp OOB pixels. TBD: Just wrap this in a clamping view facade?
+        ip[0] = ip[0] < 0 ? 0 : ip[0];
+        ip[0] = ip[0] > this.width - 1 ? this.width - 1 : ip[0];
+        ip[1] = ip[1] < 0 ? 0 : ip[1];
+        ip[1] = ip[1] > this.height - 1 ? this.height - 1 : ip[1];
 
         let pixel = this.__wrapped_view.get_pixel(ip);
         for (let subpixel = 0; subpixel < this.subpixel_count; subpixel++) {
@@ -78,8 +79,13 @@ export class sc_edit_view_convolution extends sc_edit_view_base {
   }
 
 
-  /** Returns the default pixel value. Unusually, this clamps to the image edge to convolve stuff better */
-  __oob_pixel_value_impl(position) { return sc_edit_view_methods.make_pixel(this.subpixel_count, 0); }
+  /**
+   * If called outside normal region this method is unusual in that it still works, due to edge clamping
+   * applied in get_pixel
+   */
+  __oob_pixel_value_impl(position) {
+    return this.__get_pixel_impl(position);
+  }
 
 
   /** Returns the number of subpixels */
