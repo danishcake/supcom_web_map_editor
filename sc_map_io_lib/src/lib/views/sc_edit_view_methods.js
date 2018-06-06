@@ -314,7 +314,6 @@ let calculate_histogram = function(src) {
 let find_histogram_signals = (histogram, signals_to_find, min_bin) => {
   // Operate on bins above the min_bin
   min_bin = Math.round(min_bin);
-  histogram = histogram.slice(min_bin);
 
   // We're going to calculate this only counting non-zero cells as most bins are unoccupied
   // TBD: Does this work better if the range is max_bin - min_bin?
@@ -336,7 +335,7 @@ let find_histogram_signals = (histogram, signals_to_find, min_bin) => {
 
   let theshold_scalar = 0;
   let best_result = []; // We'll keep increasing the threshold until we have too few results, then return the previous result
-  const merged_signals = [];
+  let merged_signals = [];
 
   do {
     best_result = [...merged_signals];
@@ -346,7 +345,7 @@ let find_histogram_signals = (histogram, signals_to_find, min_bin) => {
     const threshold_up = mean + threshold_change;
     let left_edge = -1;
     const signals = [];
-    merged_signals.length = 0;
+    merged_signals = [];
 
     for (let i = 0; i < histogram.length; i++) {
       if (left_edge === -1) {
@@ -379,11 +378,13 @@ let find_histogram_signals = (histogram, signals_to_find, min_bin) => {
         merged_signals.push(signals[i]);
       }
     }
+
+    // Ignore signals that overlap min_bin
+    merged_signals = merged_signals.filter(signal => signal.left_edge > min_bin);
   } while (merged_signals.length > signals_to_find);
 
   // Add the minimum bin back on to the results and sort by population
-  return best_result.map((v) => ({population: v.population, left_edge: v.left_edge + min_bin, right_edge: v.right_edge + min_bin}))
-    .sort((lhs, rhs) => rhs.population - lhs.population);
+  return best_result.sort((lhs, rhs) => rhs.population - lhs.population);
 };
 
 
