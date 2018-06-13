@@ -27,33 +27,15 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
   $scope.increase_tool_strength = () => $scope.tool.strength = Math.min($scope.tool.strength + 1, 100);
   $scope.decrease_tool_strength = () => $scope.tool.strength = Math.max($scope.tool.strength - 1,   1);
 
-  // TODO: Move a global tool
   // Uses current symmetry mode to set all secondary pixels to their primary value
   $scope.enforce_symmetry = () => {
-    const heightmap_size = [editor_state.edit_heightmap.width, editor_state.edit_heightmap.height];
-    const texturemap_size = [editor_state.edit_texturemap.width, editor_state.edit_texturemap.height];
-
-    for (let y = 0; y < heightmap_size[1]; y++) {
-      for (let x = 0; x < heightmap_size[0]; x++) {
-        const current_pixel = [x, y];
-        const primary_pixel = editor_state.symmetry.get_primary_pixel(current_pixel, heightmap_size);
-        if (current_pixel[0] === primary_pixel[0] && current_pixel[1] === primary_pixel[1])
-        {
-          editor_state.edit_heightmap_view.set_pixel(current_pixel, editor_state.edit_heightmap_view.get_pixel(current_pixel));
-        }
-      }
-    }
-
-    for (let y = 0; y < texturemap_size[1]; y++) {
-      for (let x = 0; x < texturemap_size[0]; x++) {
-        const current_pixel = [x, y];
-        const primary_pixel = editor_state.symmetry.get_primary_pixel(current_pixel, texturemap_size);
-        if (current_pixel[0] === primary_pixel[0] && current_pixel[1] === primary_pixel[1])
-        {
-          editor_state.edit_texturemap_view.set_pixel(current_pixel, editor_state.edit_texturemap_view.get_pixel(current_pixel));
-        }
-      }
-    }
+    const symmetry_tool = new sc_map_io_lib.sc.edit.global_tool.enforce_symmetry(editor_state.symmetry);
+    const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
+                                                          editor_state.edit_texturemap_view,
+                                                          editor_state.scripts.save,
+                                                          editor_state.edit_target_view,
+                                                          editor_state.map);
+    symmetry_tool.apply(tool_data);
   };
 
   $scope.show_autotexturing_dialog = () => {
