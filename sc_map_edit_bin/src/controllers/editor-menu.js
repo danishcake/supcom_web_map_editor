@@ -18,7 +18,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
     },
     size: 10,
     strength: 10,
-    symmetry: 'none'
+    symmetry: 'none',
+    smoothing_radius: 5
   };
 
   $scope.increase_tool_size = () => $scope.tool.size = Math.min($scope.tool.size + 1, 100);
@@ -55,6 +56,28 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
       const autotexture_tool = new sc_map_io_lib.sc.edit.global_tool.autotexture(signals);
       autotexture_tool.apply(tool_data);
     });
+  };
+
+  $scope.smooth_texturemap = () => {
+    const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
+                                                          editor_state.edit_texturemap_view,
+                                                          editor_state.scripts.save,
+                                                          editor_state.edit_texturemap_view,
+                                                          editor_state.map);
+
+    const global_smooth_tool = new sc_map_io_lib.sc.edit.global_tool.smooth($scope.tool.smoothing_radius);
+    global_smooth_tool.apply(tool_data);
+  };
+
+  $scope.smooth_heightmap = () => {
+    const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
+                                                          editor_state.edit_texturemap_view,
+                                                          editor_state.scripts.save,
+                                                          editor_state.edit_heightmap_view,
+                                                          editor_state.map);
+
+    const global_smooth_tool = new sc_map_io_lib.sc.edit.global_tool.smooth($scope.tool.smoothing_radius);
+    global_smooth_tool.apply(tool_data);
   };
 
 

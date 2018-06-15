@@ -15,6 +15,7 @@ import {sc_edit_tool_add_marker} from "./tools/sc_edit_tool_add_marker"
 import {sc_edit_tool_water_elevation} from "./tools/sc_edit_tool_water_elevation"
 import {sc_edit_global_tool_autotexture} from './global_tools/sc_edit_global_tool_autotexture'
 import {sc_edit_global_tool_enforce_symmetry} from './global_tools/sc_edit_global_tool_enforce_symmetry'
+import {sc_edit_global_tool_smooth} from './global_tools/sc_edit_global_tool_smooth'
 import {sc_edit_symmetry} from "./sc_edit_symmetry"
 import {sc_edit_view_symmetry} from "./views/sc_edit_view_symmetry"
 import {sc_edit_patch} from "./views/sc_edit_patch"
@@ -42,7 +43,8 @@ let sc_edit = {
   },
   global_tool: {
     autotexture: sc_edit_global_tool_autotexture,
-    enforce_symmetry: sc_edit_global_tool_enforce_symmetry
+    enforce_symmetry: sc_edit_global_tool_enforce_symmetry,
+    smooth: sc_edit_global_tool_smooth
   },
   symmetry: sc_edit_symmetry,
   view: {
