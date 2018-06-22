@@ -50,6 +50,9 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     // Disable z-buffer depth test
     gl.disable(gl.DEPTH_TEST);
 
+    // Draw the symmetry outline
+    scope.scene.symmetry_outline.draw(scope.symmetry_shader, scope.camera, editor_state.symmetry, scope.scene.heightmap.heightmap_texture);
+
     // Draw the markers
     const markers = editor_state.scripts.save.markers;
     for (let marker_id of Object.keys(markers)) {
@@ -149,7 +152,8 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
         shallow: new webgl_water_overlay(scope.gl, editor_state.edit_heightmap, [.6, .85, 0.91, 0.3]),
         deep: new webgl_water_overlay(scope.gl, editor_state.edit_heightmap, [0, .5, 0.75, 0.3]),
         abyssal: new webgl_water_overlay(scope.gl, editor_state.edit_heightmap, [0, 0.25, 0.5, 0.3]),
-      }
+      },
+      symmetry_outline: new webgl_symmetry(scope.gl, editor_state.edit_heightmap, editor_state.symmetry)
     };
   };
 
@@ -186,6 +190,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
       scope.marker_shader = webgl_effect.create_from_dom(gl, "vs-marker", "fs-marker");
       scope.line_shader = webgl_effect.create_from_dom(gl, "vs-line", "fs-line");
       scope.water_shader = webgl_effect.create_from_dom(gl, "vs-water", "fs-water");
+      scope.symmetry_shader = webgl_effect.create_from_dom(gl, "vs-line-above-terrain", "fs-line");
 
       // Save the context to scope
       scope.gl = gl;

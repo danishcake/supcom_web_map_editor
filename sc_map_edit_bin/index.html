@@ -51,6 +51,7 @@
   <script src="dist/webgl/marker.js"></script>
   <script src="dist/webgl/ring.js"></script>
   <script src="dist/webgl/water_overlay.js"></script>
+  <script src="dist/webgl/symmetry.js"></script>
   <script src="lib/io_lib/sc_map.js"></script>
 
   <!-- Shaders for rendering simple greyscale heightmap -->
@@ -266,6 +267,25 @@
     uniform vec4 uWaterColour;
     void main(void) {
       gl_FragColor = uWaterColour;
+    }
+  </script>
+
+  <!-- Shaders for rendering line above terrain -->
+  <script id="vs-line-above-terrain" type="x-shader/x-vertex">
+    precision highp float;
+    attribute vec2 aVertexPosition;
+    uniform mat4 uMMatrix;
+    uniform mat4 uVMatrix;
+    uniform mat4 uPMatrix;
+    uniform vec2 uMapSize;
+    uniform highp sampler2D uHeightmap;
+    uniform highp float uHeightmapScale;
+
+    void main(void) {
+      vec2 textureCoord = aVertexPosition.xy / uMapSize;
+      highp float height = texture2D(uHeightmap, textureCoord).a;
+
+      gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, height * uHeightmapScale, 1.0);
     }
   </script>
 </html>

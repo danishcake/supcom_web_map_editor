@@ -45,6 +45,15 @@ class sc_edit_symmetry_base {
 
     return this.__get_secondary_pixels_impl(point, size);
   }
+
+  /**
+   * Obtains the points forming the outline of the primary pixel region
+   * @param {number[2]} size Size of the map
+   * @returns {number[2}[]} Set of 2D points forming the outline of the primary region
+   */
+  get_primary_bounding_points(size) {
+    return this.__get_primary_bounding_points(size);
+  }
 }
 
 /**
@@ -66,13 +75,28 @@ class sc_edit_symmetry_none extends sc_edit_symmetry_base {
 
   /**
    * Get the secondary pixels corresponding to any primary pixel.
-   * There are not secondary pixels
+   * There are no secondary pixels
    * @param {number[2]} point Position on map
    * @param {number[2]} size Size of map
    * @returns The secondary pixels
    */
   __get_secondary_pixels_impl(point, size) {
     return [];
+  }
+
+  /**
+   * The bounding region is the entire size area
+   * @param {number[2]} size Size of the map
+   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @private
+   */
+  __get_primary_bounding_points(size) {
+    return [
+      [0, 0],
+      [size[0], 0],
+      [size[0], size[1]],
+      [0, size[1]]
+    ];
   }
 }
 
@@ -96,7 +120,6 @@ class sc_edit_symmetry_matrix extends sc_edit_symmetry_base {
 
   /**
    * Get the primary pixel from any pixel inside size.
-   * This is always the input pixel
    * @param {number[2]} point Position on map
    * @param {number[2]} size Size of map
    * @returns The primary pixel
@@ -125,7 +148,6 @@ class sc_edit_symmetry_matrix extends sc_edit_symmetry_base {
 
   /**
    * Get the secondary pixels corresponding to any primary pixel.
-   * There are not secondary pixels
    * @param {number[2]} point Position on map
    * @param {number[2]} size Size of map
    * @returns The secondary pixels
@@ -161,6 +183,21 @@ class sc_edit_symmetry_horizontal extends sc_edit_symmetry_matrix {
           [[-1,  0,
              0,  1]]);
   }
+
+  /**
+   * The primary region is the left
+   * @param {number[2]} size Size of the map
+   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @private
+   */
+  __get_primary_bounding_points(size) {
+    return [
+      [0,           0],
+      [size[0] / 2, 0],
+      [size[0] / 2, size[1]],
+      [0,           size[1]]
+    ];
+  }
 }
 
 
@@ -173,6 +210,21 @@ class sc_edit_symmetry_vertical extends sc_edit_symmetry_matrix {
     super((point, size) => { return point[1] <= Math.floor((size[1] - 1) / 2); },
           [[ 1,  0,
              0, -1]]);
+  }
+
+  /**
+   * The primary region is the top
+   * @param {number[2]} size Size of the map
+   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @private
+   */
+  __get_primary_bounding_points(size) {
+    return [
+      [0,        0],
+      [size[0] , 0],
+      [size[0], size[1] / 2],
+      [0,       size[1] / 2]
+    ];
   }
 }
 
@@ -192,6 +244,21 @@ class sc_edit_symmetry_quadrants extends sc_edit_symmetry_matrix {
              0, 1],
            [-1,  0,
              0, -1]]);
+  }
+
+  /**
+   * The primary region is the top-left
+   * @param {number[2]} size Size of the map
+   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @private
+   */
+  __get_primary_bounding_points(size) {
+    return [
+      [0,           0],
+      [size[0] / 2, 0],
+      [size[0] / 2, size[1] / 2],
+      [0,           size[1] / 2]
+    ];
   }
 }
 
@@ -224,6 +291,20 @@ class sc_edit_symmetry_octants extends sc_edit_symmetry_matrix {
        [-1,  0,
          0,  1]]);
   }
+
+  /**
+   * The primary region is the bottom-left half of the top left quadrant
+   * @param {number[2]} size Size of the map
+   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @private
+   */
+  __get_primary_bounding_points(size) {
+    return [
+      [0,           0],
+      [size[0] / 2, size[1] / 2],
+      [0,           size[1] / 2]
+    ];
+  }
 }
 
 
@@ -241,18 +322,50 @@ class sc_edit_symmetry_xy extends sc_edit_symmetry_matrix {
       [[ 0,  1,
          1,  0]]);
   }
+
+  /**
+   * The primary region is the bottom-left
+   * @param {number[2]} size Size of the map
+   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @private
+   */
+  __get_primary_bounding_points(size) {
+    return [
+      [0,           0],
+      [size[0], size[1]],
+      [0,       size[1]]
+    ];
+  }
 }
 
 
 /**
  * X==-Y symmetry (ignoring translation
- * The pixels in the top-left are considered primary (x + y < size.x)
+ * The pixels in the bottom-right are considered primary (x + y < size.x)
+ *    P
+ *   PP
+ *  PPP
+ * PPPP
  */
 class sc_edit_symmetry_yx extends sc_edit_symmetry_matrix {
     constructor() {
     super((point, size) => { return point[0] + point[1] < size[0]; },
       [[ 0, -1,
         -1,  0]]);
+  }
+
+  /**
+   * The primary region is the top-left
+   * @param {number[2]} size Size of the map
+   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @private
+   */
+  __get_primary_bounding_points(size) {
+    return [
+      [size[0], 0],
+      [size[0], size[1]],
+      [0,       size[1]]
+    ];
   }
 }
 

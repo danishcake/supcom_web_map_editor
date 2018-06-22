@@ -196,6 +196,14 @@ class webgl_heightmap {
     this.__heightmap.reset_dirty_region();
   }
 
+  /**
+   * Obtains a copy of the heightmap texture
+   * @returns {*}
+   */
+  get heightmap_texture() {
+    return this.__height_texture;
+  }
+
 
   /**
    * Incremental update to the texturemap
