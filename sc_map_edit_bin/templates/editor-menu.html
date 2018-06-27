@@ -1,78 +1,78 @@
 <div id="editor-menu">
   <!-- Tool category -->
   <div class="btn-group-vertical">
-    <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'heightmap'" uib-tooltip="Heightmap tools" tooltip-placement="right"><span class="glyphicon glyphicon-resize-vertical"></span></label>
-    <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'texture'" uib-tooltip="Texture tools" tooltip-placement="right"><span class="glyphicon glyphicon-tint"></span></label>
-    <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'marker'" uib-tooltip="Markers" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
-    <label class="btn btn-default" ng-model="tool.category" uib-btn-radio="'water'" uib-tooltip="Water" tooltip-placement="right"><span class="glyphicon glyphicon-cloud"></span></label>
+    <label class="btn btn-default small-vertical-btn " ng-model="tool.category" uib-btn-radio="'heightmap'" uib-tooltip="Heightmap tools" tooltip-placement="right"><span class="glyphicon glyphicon-resize-vertical"></span></label>
+    <label class="btn btn-default small-vertical-btn " ng-model="tool.category" uib-btn-radio="'texture'" uib-tooltip="Texture tools" tooltip-placement="right"><span class="glyphicon glyphicon-tint"></span></label>
+    <label class="btn btn-default small-vertical-btn " ng-model="tool.category" uib-btn-radio="'marker'" uib-tooltip="Markers" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
+    <label class="btn btn-default small-vertical-btn " ng-model="tool.category" uib-btn-radio="'water'" uib-tooltip="Water" tooltip-placement="right"><span class="glyphicon glyphicon-cloud"></span></label>
   </div>
 
   <!-- Global tools -->
   <div class="btn-group-vertical">
-    <label uib-popover-template="'templates/popovers/symmetry.html'" popover-title="Symmetry" popover-placement="right" popover-trigger="outsideClick" class="btn btn-default">X</label>
-    <label class="btn btn-default" ng-click="show_autotexturing_dialog()" uib-tooltip="Autotexturing" tooltip-placement="right"><span class="glyphicon glyphicon-tint"></span></label>
-    <label uib-popover-template="'templates/popovers/global_smoothing.html'" popover-title="Global smoothing" popover-placement="right" popover-trigger="outsideClick" class="btn btn-default"><span class="glyphicon glyphicon-record"></span></label>
+    <label class="btn btn-default small-vertical-btn" uib-popover-template="'templates/popovers/symmetry.html'" uib-tooltip="Symmetry" tooltip-placement="right" popover-title="Symmetry" popover-placement="right" popover-trigger="outsideClick" class="btn btn-default">X</label>
+    <label class="btn btn-default small-vertical-btn" ng-click="show_autotexturing_dialog()" uib-tooltip="Autotexturing" tooltip-placement="right"><span class="glyphicon glyphicon-tint"></span></label>
+    <label class="btn btn-default small-vertical-btn" uib-popover-template="'templates/popovers/global_smoothing.html'" uib-tooltip="Global smoothing" tooltip-placement="right" popover-title="Global smoothing" popover-placement="right" popover-trigger="outsideClick" class="btn btn-default"><span class="glyphicon glyphicon-record"></span></label>
   </div>
 
   <!-- Tool size -->
   <div class="btn-group-vertical" ng-show="tool.category === 'heightmap' || tool.category === 'texture'">
-    <label class="btn btn-default" ng-click="increase_tool_size()" uib-tooltip="Increase size" tooltip-placement="right"><span class="glyphicon glyphicon-plus"></span></label>
-    <label class="btn btn-default">{{tool.size}}</label>
-    <label class="btn btn-default"  ng-click="decrease_tool_size()" uib-tooltip="Decrease size" tooltip-placement="right"><span class="glyphicon glyphicon-minus"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-click="increase_tool_size()" uib-tooltip="Increase size" tooltip-placement="right"><span class="glyphicon glyphicon-plus"></span></label>
+    <label class="btn btn-default small-vertical-btn">{{tool.size}}</label>
+    <label class="btn btn-default small-vertical-btn"  ng-click="decrease_tool_size()" uib-tooltip="Decrease size" tooltip-placement="right"><span class="glyphicon glyphicon-minus"></span></label>
   </div>
 
   <!-- Tool strength -->
   <div class="btn-group-vertical" ng-show="tool.category === 'heightmap' || tool.category === 'texture'">
-    <label class="btn btn-default" ng-click="increase_tool_strength()" uib-tooltip="Increase strength" tooltip-placement="right"><span class="glyphicon glyphicon-plus"></span></label>
-    <label class="btn btn-default">{{tool.strength}}</label>
-    <label class="btn btn-default" ng-click="decrease_tool_strength()" uib-tooltip="Decrease strength" tooltip-placement="right"><span class="glyphicon glyphicon-minus"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-click="increase_tool_strength()" uib-tooltip="Increase strength" tooltip-placement="right"><span class="glyphicon glyphicon-plus"></span></label>
+    <label class="btn btn-default small-vertical-btn">{{tool.strength}}</label>
+    <label class="btn btn-default small-vertical-btn" ng-click="decrease_tool_strength()" uib-tooltip="Decrease strength" tooltip-placement="right"><span class="glyphicon glyphicon-minus"></span></label>
   </div>
 
   <!-- Heightmap tools -->
   <div class="btn-group-vertical" ng-show="tool.category === 'heightmap'">
-    <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'raise'" uib-tooltip="Raise terrain" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-up"></span></label>
-    <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'lower'" uib-tooltip="Lower terrain" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-down"></span></label>
-    <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'raise_peak'" uib-tooltip="Raise peak" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-up"></span></label>
-    <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'lower_peak'" uib-tooltip="Lower peak" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-down"></span></label>
-    <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'flatten'" uib-tooltip="Flatten terrain" tooltip-placement="right"><span class="glyphicon glyphicon-object-align-horizontal"></span></label>
-    <label class="btn btn-default" ng-model="tool.heightmap.type" uib-btn-radio="'smooth'" uib-tooltip="Smooth terrain" tooltip-placement="right"><span class="glyphicon glyphicon-record"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.heightmap.type" uib-btn-radio="'raise'" uib-tooltip="Raise terrain" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-up"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.heightmap.type" uib-btn-radio="'lower'" uib-tooltip="Lower terrain" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-down"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.heightmap.type" uib-btn-radio="'raise_peak'" uib-tooltip="Raise peak" tooltip-placement="right"><span class="glyphicon glyphicon-chevron-up"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.heightmap.type" uib-btn-radio="'lower_peak'" uib-tooltip="Lower peak" tooltip-placement="right"><span class="glyphicon glyphicon-chevron-down"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.heightmap.type" uib-btn-radio="'flatten'" uib-tooltip="Flatten terrain" tooltip-placement="right"><span class="glyphicon glyphicon-object-align-horizontal"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.heightmap.type" uib-btn-radio="'smooth'" uib-tooltip="Smooth terrain" tooltip-placement="right"><span class="glyphicon glyphicon-record"></span></label>
   </div>
 
   <!-- Texture tools -->
   <div class="btn-group-vertical" ng-show="tool.category === 'texture'">
-    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'saturate_layer'" uib-tooltip="Set layer to 100%" tooltip-placement="right"><i class="fa fa-star"></i></label>
-    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'half_layer'" uib-tooltip="Set layer to 50%" tooltip-placement="right"><i class="fa fa-star-half-o"></i></label>
-    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'clear_layer'" uib-tooltip="Set layer to 0%" tooltip-placement="right"><i class="fa fa-star-o"></i></label>
-    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'raise_layer'" uib-tooltip="Increase layer visibility" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-up"></span></label>
-    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'lower_layer'" uib-tooltip="Decrease layer visibility" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-down"></span></label>
-    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'clear_higher_layers'" uib-tooltip="Clear channels above, ensuring visibility" tooltip-placement="right"><i class="fa fa-eye-slash"></i></label>
-    <label class="btn btn-default" ng-model="tool.texturemap.type" uib-btn-radio="'smooth_edges'" uib-tooltip="Smooths layer transitions" tooltip-placement="right"><span class="glyphicon glyphicon-record"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.texturemap.type" uib-btn-radio="'saturate_layer'" uib-tooltip="Set layer to 100%" tooltip-placement="right"><i class="fa fa-star"></i></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.texturemap.type" uib-btn-radio="'half_layer'" uib-tooltip="Set layer to 50%" tooltip-placement="right"><i class="fa fa-star-half-o"></i></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.texturemap.type" uib-btn-radio="'clear_layer'" uib-tooltip="Set layer to 0%" tooltip-placement="right"><i class="fa fa-star-o"></i></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.texturemap.type" uib-btn-radio="'raise_layer'" uib-tooltip="Increase layer visibility" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-up"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.texturemap.type" uib-btn-radio="'lower_layer'" uib-tooltip="Decrease layer visibility" tooltip-placement="right"><span class="glyphicon glyphicon-arrow-down"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.texturemap.type" uib-btn-radio="'clear_higher_layers'" uib-tooltip="Clear channels above, ensuring visibility" tooltip-placement="right"><i class="fa fa-eye-slash"></i></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.texturemap.type" uib-btn-radio="'smooth_edges'" uib-tooltip="Smooths layer transitions" tooltip-placement="right"><span class="glyphicon glyphicon-record"></span></label>
   </div>
   <!-- Texture layer picker -->
   <div class="btn-group-vertical" ng-show="tool.category === 'texture'">
-    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="-1" uib-tooltip="Base" tooltip-placement="right" ng-disabled="!tool.texturemap.base_enabled">B</label>
-    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="0" uib-tooltip="Layer 0" tooltip-placement="right">0</label>
-    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="1" uib-tooltip="Layer 1" tooltip-placement="right">1</label>
-    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="2" uib-tooltip="Layer 2" tooltip-placement="right">2</label>
-    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="3" uib-tooltip="Layer 3" tooltip-placement="right">3</label>
-    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="4" uib-tooltip="Layer 4" tooltip-placement="right">4</label>
-    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="5" uib-tooltip="Layer 5" tooltip-placement="right">5</label>
-    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="6" uib-tooltip="Layer 6" tooltip-placement="right">6</label>
-    <label class="btn btn-default btn-tiny" ng-model="tool.texturemap.layer" uib-btn-radio="7" uib-tooltip="Layer 7" tooltip-placement="right">7</label>
+    <label class="btn btn-default btn-tiny small-vertical-btn" ng-model="tool.texturemap.layer" uib-btn-radio="-1" uib-tooltip="Base" tooltip-placement="right" ng-disabled="!tool.texturemap.base_enabled">B</label>
+    <label class="btn btn-default btn-tiny small-vertical-btn" ng-model="tool.texturemap.layer" uib-btn-radio="0" uib-tooltip="Layer 0" tooltip-placement="right">0</label>
+    <label class="btn btn-default btn-tiny small-vertical-btn" ng-model="tool.texturemap.layer" uib-btn-radio="1" uib-tooltip="Layer 1" tooltip-placement="right">1</label>
+    <label class="btn btn-default btn-tiny small-vertical-btn" ng-model="tool.texturemap.layer" uib-btn-radio="2" uib-tooltip="Layer 2" tooltip-placement="right">2</label>
+    <label class="btn btn-default btn-tiny small-vertical-btn" ng-model="tool.texturemap.layer" uib-btn-radio="3" uib-tooltip="Layer 3" tooltip-placement="right">3</label>
+    <label class="btn btn-default btn-tiny small-vertical-btn" ng-model="tool.texturemap.layer" uib-btn-radio="4" uib-tooltip="Layer 4" tooltip-placement="right">4</label>
+    <label class="btn btn-default btn-tiny small-vertical-btn" ng-model="tool.texturemap.layer" uib-btn-radio="5" uib-tooltip="Layer 5" tooltip-placement="right">5</label>
+    <label class="btn btn-default btn-tiny small-vertical-btn" ng-model="tool.texturemap.layer" uib-btn-radio="6" uib-tooltip="Layer 6" tooltip-placement="right">6</label>
+    <label class="btn btn-default btn-tiny small-vertical-btn" ng-model="tool.texturemap.layer" uib-btn-radio="7" uib-tooltip="Layer 7" tooltip-placement="right">7</label>
   </div>
 
   <!-- Marker tools -->
   <div class="btn-group-vertical" ng-show="tool.category === 'marker'">
-    <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'select'" uib-tooltip="Select" tooltip-placement="right"><span class="glyphicon glyphicon-move"></span></label>
-    <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'army'" uib-tooltip="Army spawn" tooltip-placement="right"><span class="glyphicon glyphicon-home"></span></label>
-    <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'mass'" uib-tooltip="Mass point" tooltip-placement="right"><img src="/gamedata/editor_icons/Mass_icon.png"></label>
-    <label class="btn btn-default" ng-model="tool.marker.type" uib-btn-radio="'hydro'" uib-tooltip="Hydrocarbons" tooltip-placement="right"><img src="/gamedata/editor_icons/Energy_icon.png"></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.marker.type" uib-btn-radio="'select'" uib-tooltip="Select" tooltip-placement="right"><span class="glyphicon glyphicon-move"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.marker.type" uib-btn-radio="'army'" uib-tooltip="Army spawn" tooltip-placement="right"><span class="glyphicon glyphicon-home"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.marker.type" uib-btn-radio="'mass'" uib-tooltip="Mass point" tooltip-placement="right"><img src="/gamedata/editor_icons/Mass_icon.png"></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.marker.type" uib-btn-radio="'hydro'" uib-tooltip="Hydrocarbons" tooltip-placement="right"><img src="/gamedata/editor_icons/Energy_icon.png"></label>
   </div>
 
   <!-- Water tools -->
   <div class="btn-group-vertical" ng-show="tool.category === 'water'">
-    <label class="btn btn-default" ng-model="tool.water.type" uib-btn-radio="'elevation'" uib-tooltip="Shallow water" tooltip-placement="right"><span class="glyphicon glyphicon-volume-up"></span></label>
-    <label class="btn btn-default" ng-model="tool.water.type" uib-btn-radio="'elevation_deep'" uib-tooltip="Deep water" tooltip-placement="right"><span class="glyphicon glyphicon-volume-down"></span></label>
-    <label class="btn btn-default" ng-model="tool.water.type" uib-btn-radio="'elevation_abyss'" uib-tooltip="Abyssal depths" tooltip-placement="right"><span class="glyphicon glyphicon-volume-off"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.water.type" uib-btn-radio="'elevation'" uib-tooltip="Shallow water" tooltip-placement="right"><span class="glyphicon glyphicon-volume-up"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.water.type" uib-btn-radio="'elevation_deep'" uib-tooltip="Deep water" tooltip-placement="right"><span class="glyphicon glyphicon-volume-down"></span></label>
+    <label class="btn btn-default small-vertical-btn" ng-model="tool.water.type" uib-btn-radio="'elevation_abyss'" uib-tooltip="Abyssal depths" tooltip-placement="right"><span class="glyphicon glyphicon-volume-off"></span></label>
   </div>
 </div>

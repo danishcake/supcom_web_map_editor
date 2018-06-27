@@ -29,7 +29,7 @@
   border-right: 1px solid #444;
 }
 
-#editor-menu label {
+.small-vertical-btn {
   height: 30px;
   width: 40px;
 }
