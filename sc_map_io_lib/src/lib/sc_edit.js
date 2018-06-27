@@ -5,7 +5,7 @@
 import {sc_edit_heightmap} from "./sc_edit_heightmap"
 import {sc_edit_texturemap} from "./sc_edit_texturemap"
 import {sc_edit_tool_args, sc_edit_tool_data} from "./tools/sc_edit_tool_args"
-import {sc_edit_tool_raise, sc_edit_tool_lower} from "./tools/sc_edit_tool_raise"
+import {sc_edit_tool_raise, sc_edit_tool_lower, sc_edit_tool_raise_peak, sc_edit_tool_lower_peak} from "./tools/sc_edit_tool_raise"
 import {sc_edit_tool_flatten} from "./tools/sc_edit_tool_flatten"
 import {sc_edit_tool_smooth} from "./tools/sc_edit_tool_smooth"
 import {sc_edit_tool_set} from "./tools/sc_edit_tool_set"
@@ -33,6 +33,8 @@ let sc_edit = {
     data: sc_edit_tool_data,
     raise: sc_edit_tool_raise,
     lower: sc_edit_tool_lower,
+    raise_peak: sc_edit_tool_raise_peak,
+    lower_peak: sc_edit_tool_lower_peak,
     flatten: sc_edit_tool_flatten,
     set: sc_edit_tool_set,
     clear_higher: sc_edit_tool_clear_higher,

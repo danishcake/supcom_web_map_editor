@@ -9,10 +9,12 @@ class sc_edit_tool_height_change extends sc_edit_tool_base {
   /**
    * Height changing tool
    * @param {boolean} raise true to increase height
+   * @param {number} power The power to which the tool is raised. Values > 1 are peakier
    */
-  constructor(outer_radius, inner_radius, strength, raise) {
+  constructor(outer_radius, inner_radius, strength, raise, power) {
     super(outer_radius, inner_radius, strength);
     this.__raise = raise ? 1 : -1;
+    this.__power = power;
   }
 
 
@@ -27,6 +29,10 @@ class sc_edit_tool_height_change extends sc_edit_tool_base {
     const inner_strength = sc_edit_view_methods.make_pixel(target_view.subpixel_count, this.__strength);
     const outer_strength = sc_edit_view_methods.make_pixel(target_view.subpixel_count, 0);
     sc_edit_view_methods.radial_fill(this.__patch, inner_strength, this.__inner_radius, outer_strength, this.__outer_radius);
+    if (this.__power !== 1.0) {
+      const scalar = inner_strength / Math.pow(inner_strength, this.__power);
+      sc_edit_view_methods.transform(this.__patch, (subpixel, pixel) => Math.pow(subpixel, this.__power) / scalar);
+    }
   }
 
 
@@ -52,16 +58,33 @@ class sc_edit_tool_height_change extends sc_edit_tool_base {
  */
 export class sc_edit_tool_raise extends sc_edit_tool_height_change {
   constructor(outer_radius, inner_radius, strength) {
-    super(outer_radius, inner_radius, strength, true);
+    super(outer_radius, inner_radius, strength, true, 1);
   }
 }
-
 
 /**
  * Specialisation of the un-exported sc_edit_tool_height_change for lowering terrain
  */
 export class sc_edit_tool_lower extends sc_edit_tool_height_change {
   constructor(outer_radius, inner_radius, strength) {
-    super(outer_radius, inner_radius, strength, false);
+    super(outer_radius, inner_radius, strength, false, 1);
+  }
+}
+
+/**
+ * Specialisation of the un-exported sc_edit_tool_height_change for raising a peak
+ */
+export class sc_edit_tool_raise_peak extends sc_edit_tool_height_change {
+  constructor(outer_radius, inner_radius, strength) {
+    super(outer_radius, inner_radius, strength, true, 4);
+  }
+}
+
+/**
+ * Specialisation of the un-exported sc_edit_tool_height_change for lowering a peak
+ */
+export class sc_edit_tool_lower_peak extends sc_edit_tool_height_change {
+  constructor(outer_radius, inner_radius, strength) {
+    super(outer_radius, inner_radius, strength, false, 4);
   }
 }

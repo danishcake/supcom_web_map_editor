@@ -262,6 +262,23 @@ let radial_fill = function(dest, inner_value, inner_radius, outer_value, outer_r
 };
 
 /**
+ * Applies the provided operation to all subpixels. The operation will be called
+ * with the value of the subpixel and the value of the entire pixel (prior to changes)
+ * @param {sc_edit_view_base} dest Destination view
+ * @param {function} operation
+ */
+let transform = function(dest, operation) {
+  for (let y = 0; y < dest.height; y++) {
+    for (let x = 0; x < dest.width; x++) {
+      const p = [x, y];
+      const input_pixel = dest.get_pixel(p);
+      const output_pixel = _.map(input_pixel, (subpixel) => operation(subpixel, input_pixel));
+      dest.set_pixel(p, output_pixel);
+    }
+  }
+};
+
+/**
  * Calculates a log domain histogram of the specified view.
  * Each subpixel has a histogram calculated, so the result is returned as an array
  * even if there is only one subpixel
@@ -398,6 +415,7 @@ const sc_edit_view_methods = {
   weighted_blend:           weighted_blend,
   ratcheted_weighted_blend: ratcheted_weighted_blend,
   radial_fill:              radial_fill,
+  transform:                transform,
   calculate_histogram:      calculate_histogram,
   find_histogram_signals:   find_histogram_signals
 };
