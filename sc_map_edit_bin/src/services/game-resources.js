@@ -1,3 +1,6 @@
+const angular = require('angular');
+const _ = require('underscore');
+
 /**
  * Contains definitions of various resources extracted from the Forged Alliance installer
  * This includes

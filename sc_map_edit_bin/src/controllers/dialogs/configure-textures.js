@@ -1,3 +1,6 @@
+const angular = require('angular');
+const _ = require('underscore');
+
 angular.module('sc_map_edit_bin.controllers').controller("configure-textures",
 ["$scope", "$uibModalInstance", "dialogs", "game_resources", "data", function($scope, $uibModalInstance, dialogs, game_resources, data) {
 

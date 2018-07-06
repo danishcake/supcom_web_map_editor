@@ -1,3 +1,7 @@
+const angular = require('angular');
+const sc_map_io_lib = require('../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+const _ = require('underscore');
+
 /**
  * Contains the state of the editor that is shared between different views
  * Key parts are:

@@ -1,3 +1,4 @@
+const angular = require('angular');
 
 /**
  * Generic progress dialog. Handles the following broadcasts:

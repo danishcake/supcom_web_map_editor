@@ -1,3 +1,5 @@
+const angular = require('angular');
+
 angular.module('sc_map_edit_bin.controllers').controller("save-as",
 ["$scope", "$rootScope", "$timeout", "$uibModalInstance", "editor_state", "dialogs", "data", function($scope, $rootScope, $timeout, $uibModalInstance, editor_state, dialogs, data) {
 

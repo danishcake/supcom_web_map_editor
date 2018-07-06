@@ -1,3 +1,6 @@
+const angular = require('angular');
+const _ = require('underscore');
+
 angular.module('sc_map_edit_bin.controllers').controller("top-menu",
 ["$scope", "editor_state", "dialogs", function($scope, editor_state, dialogs) {
   $scope.editor_state = editor_state;

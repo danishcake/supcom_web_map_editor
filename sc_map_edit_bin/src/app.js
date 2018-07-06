@@ -1,3 +1,19 @@
+require('jquery'); // Expose loader configured to shove this into global namespace
+const angular = require('angular');
+require('angular-dialog-service');
+require('angular-ui-bootstrap');
+require('angular-mousewheel');
+require('angular-sanitize');
+require('bootstrap');
+
+//require('angular-ui-bootstrap/dist/ui-bootstrap-csp.css'); // Not needed
+require('bootstrap/dist/css/bootstrap.css');
+require('font-awesome/css/font-awesome.css');
+require('../css/main.css');
+
+
+
+
 /**
  * Angular application
  * Stitches together all the different application modules

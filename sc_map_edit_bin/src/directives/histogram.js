@@ -1,3 +1,6 @@
+const angular = require('angular');
+const sc_map_io_lib = require('../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+
 // TODO: Pass in edit_heightmap via attribute
 angular.module('sc_map_edit_bin.directives').directive('histogram', ["editor_state", function(editor_state) {
   /**

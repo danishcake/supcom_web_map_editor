@@ -1,3 +1,6 @@
+const angular = require('angular');
+const _ = require('underscore');
+
 angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_state", "game_resources", "dialogs", "$rootScope", function(editor_state, game_resources, dialogs, $rootScope) {
 
   /**

@@ -1,3 +1,5 @@
+const angular = require('angular');
+
 /**
  * Angular file picker button
  *

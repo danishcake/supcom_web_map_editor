@@ -1,3 +1,5 @@
+const angular = require('angular');
+
 angular.module('sc_map_edit_bin.controllers').controller("configure-metadata",
 ["$scope", "$uibModalInstance", "data", function($scope, $uibModalInstance, data) {
 

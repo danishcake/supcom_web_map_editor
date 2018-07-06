@@ -1,3 +1,6 @@
+const angular = require('angular');
+const sc_map_io_lib = require('../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+
 angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
 ["$scope", "editor_state", "dialogs", function($scope, editor_state, dialogs) {
   $scope.tool = {

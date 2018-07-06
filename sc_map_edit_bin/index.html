@@ -2,57 +2,14 @@
   <head>
     <title>Supreme Commander Map Editor</title>
     <style href="css/main.css"></style>
-    <link rel="stylesheet" href="css/main.css" type="text/css">
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css" type="text/css">
-    <link rel="stylesheet" href="node_modules/angular-dialog-service/dist/dialogs.css" type="text/css">
-    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css" type="text/css">
   </head>
   <body ng-app="sc_map_edit_bin">
     <top-menu ng-controller="top-menu"></top-menu>
     <editor-menu ng-controller="editor-menu"></editor-menu>
     <editor-view ng-controller="editor-view"></editor-view>
   </body>
-  <script src="node_modules/angular/angular.js"></script>
-  <script src="node_modules/angular-sanitize/angular-sanitize.js"></script>
-  <script src="node_modules/angular-dialog-service/dist/dialogs.js"></script>
-  <script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
-  <script src="node_modules/file-saver/FileSaver.js"></script>
-  <script src="node_modules/hamsterjs/hamster.js"></script>
-  <script src="node_modules/angular-mousewheel/mousewheel.js"></script>
-  <script src="node_modules/bytebuffer/dist/bytebuffer.js"></script>
-  <script src="node_modules/gl-matrix/dist/gl-matrix-min.js"></script>
-  <script src="node_modules/async/dist/async.min.js"></script>
-  <script src="node_modules/underscore/underscore.js"></script>
-  <script src="dist/app.js"></script>
-  <script src="dist/controllers/editor-menu.js"></script>
-  <script src="dist/controllers/editor-view.js"></script>
-  <script src="dist/controllers/top-menu.js"></script>
-  <script src="dist/controllers/dialogs/auto-texture.js"></script>
-  <script src="dist/controllers/dialogs/new-map.js"></script>
-  <script src="dist/controllers/dialogs/open-map.js"></script>
-  <script src="dist/controllers/dialogs/save-as.js"></script>
-  <script src="dist/controllers/dialogs/save-progress.js"></script>
-  <script src="dist/controllers/dialogs/configure-forces.js"></script>
-  <script src="dist/controllers/dialogs/configure-metadata.js"></script>
-  <script src="dist/controllers/dialogs/configure-textures.js"></script>
-  <script src="dist/controllers/dialogs/configure-water.js"></script>
-  <script src="dist/controllers/dialogs/progress.js"></script>
-  <script src="dist/directives/top-menu.js"></script>
-  <script src="dist/directives/editor-menu.js"></script>
-  <script src="dist/directives/editor-view.js"></script>
-  <script src="dist/directives/file-picker.js"></script>
-  <script src="dist/directives/histogram.js"></script>
-  <script src="dist/services/editor-state.js"></script>
-  <script src="dist/services/game-resources.js"></script>
-  <script src="dist/webgl/effect.js"></script>
-  <script src="dist/webgl/camera.js"></script>
-  <script src="dist/webgl/texture.js"></script>
-  <script src="dist/webgl/heightmap.js"></script>
-  <script src="dist/webgl/marker.js"></script>
-  <script src="dist/webgl/ring.js"></script>
-  <script src="dist/webgl/water_overlay.js"></script>
-  <script src="dist/webgl/symmetry.js"></script>
-  <script src="lib/io_lib/sc_map.js"></script>
+
+  <script src="dist/app.bundle.js"></script>
 
   <!-- Shaders for rendering simple greyscale heightmap -->
   <script id="vs-terrain-greyscale" type="x-shader/x-vertex">

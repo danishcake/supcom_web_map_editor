@@ -1,3 +1,5 @@
+const angular = require('angular');
+const _ = require('underscore');
 
 /**
  * String used to represent an army with no allocated spawn position

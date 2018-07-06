@@ -1,3 +1,5 @@
+const angular = require('angular');
+
 angular.module('sc_map_edit_bin.directives').directive('topMenu', function() {
   return {
     restrict: 'E',
