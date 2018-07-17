@@ -18,4 +18,6 @@ angular.module('sc_map_edit_bin.controllers').controller("auto-texture",
 
     $uibModalInstance.close(sorted_signals);
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/auto-texture.html', require('../../../templates/dialogs/auto-texture.html'));
 }]);

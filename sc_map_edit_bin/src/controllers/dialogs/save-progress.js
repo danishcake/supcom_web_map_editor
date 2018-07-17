@@ -1,5 +1,6 @@
 const angular = require('angular');
 const sc_map_io_lib = require('../../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+const async = require('async');
 
 angular.module('sc_map_edit_bin.controllers').controller("save-progress",
 ["$scope", "$timeout", "$uibModalInstance", "data", function($scope, $timeout, $uibModalInstance, data) {
@@ -144,4 +145,6 @@ angular.module('sc_map_edit_bin.controllers').controller("save-progress",
   $scope.ok = function() {
     $uibModalInstance.close();
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/save-progress.html', require('../../../templates/dialogs/save-progress.html'));
 }]);

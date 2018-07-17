@@ -1,10 +1,15 @@
+const vec2 = require('gl-matrix').vec2;
+const vec3 = require('gl-matrix').vec3;
+const vec4 = require('gl-matrix').vec4;
+const mat4 = require('gl-matrix').mat4;
+
 /**
  * Symmetry outline
  * Renders a line around a set of points denoting the current symmetry region
  * @property {sc_edit_heightmap} __heightmap
  * @property {sc_edit_symmetry_base} __symmetry
  */
-class webgl_symmetry {
+export class webgl_symmetry {
   constructor(gl, heightmap, symmetry) {
     this.__gl = gl;
     this.__model_matrix = mat4.create();

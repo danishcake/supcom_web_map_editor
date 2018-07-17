@@ -13,7 +13,7 @@ const angular = require('angular');
 angular.module('sc_map_edit_bin.directives').directive('fileUpload', function() {
   return {
     restrict: 'E',
-    templateUrl: 'templates/file-picker.html',
+    template: require('../../templates/file-picker.html'),
     transclude: true,
     scope: {onopen: '&'},
     link: function(scope, element, attributes) {

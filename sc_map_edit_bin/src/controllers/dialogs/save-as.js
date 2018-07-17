@@ -1,4 +1,5 @@
 const angular = require('angular');
+const modal_dlg_opts = require('../../constants').modal_dlg_opts;
 
 angular.module('sc_map_edit_bin.controllers').controller("save-as",
 ["$scope", "$rootScope", "$timeout", "$uibModalInstance", "editor_state", "dialogs", "data", function($scope, $rootScope, $timeout, $uibModalInstance, editor_state, dialogs, data) {
@@ -57,4 +58,6 @@ angular.module('sc_map_edit_bin.controllers').controller("save-as",
     }
     $uibModalInstance.close();
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/save-as.html', require('../../../templates/dialogs/save-as.html'));
 }]);

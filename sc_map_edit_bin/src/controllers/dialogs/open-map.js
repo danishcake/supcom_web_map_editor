@@ -133,4 +133,6 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
       dialogs.error('Error parsing .scmap', error.message);
     }
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/open-map.html', require('../../../templates/dialogs/open-map.html'));
 }]);

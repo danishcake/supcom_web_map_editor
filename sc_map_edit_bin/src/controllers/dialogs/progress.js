@@ -50,4 +50,6 @@ angular.module('sc_map_edit_bin.controllers').controller("progress",
   $scope.ok = function() {
     $uibModalInstance.close();
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/progress.html', require('../../../templates/dialogs/progress.html'));
 }]);

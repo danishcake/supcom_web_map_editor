@@ -64,4 +64,6 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-metadata",
   $scope.ok = function() {
     $uibModalInstance.close($scope.data);
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/configure-metadata.html', require('../../../templates/dialogs/configure-metadata.html'));
 }]);

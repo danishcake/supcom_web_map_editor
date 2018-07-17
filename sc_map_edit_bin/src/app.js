@@ -1,4 +1,5 @@
-require('jquery'); // Expose loader configured to shove this into global namespace
+require('jquery');    // Expose loader configured to shove this into global namespace (for bootstrap)
+require('hamsterjs'); // Expose loader configured to shove this into global namespace (for angular-mousewheel)
 const angular = require('angular');
 require('angular-dialog-service');
 require('angular-ui-bootstrap');
@@ -30,9 +31,3 @@ angular.module('sc_map_edit_bin.controllers', ['sc_map_edit_bin.services',
                                                'dialogs.main']);
 angular.module('sc_map_edit_bin.directives', []);
 angular.module('sc_map_edit_bin.services', []);
-
-// Standard modal dialog options used all over the place
-const modal_dlg_opts = {
-  backdrop: 'static',
-  size: 'lg'
-};

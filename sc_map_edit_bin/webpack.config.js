@@ -49,6 +49,22 @@ module.exports = {
         }]
       },
       {
+        test: /\.html$/,
+        use: [{
+          loader: 'html-loader'
+        }]
+      },
+      {
+        test: /\.(png|jp(e*)g|svg)$/,
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 8000, // Convert images < 8kb to base64 strings
+            name: 'images/[hash]-[name].[ext]'
+          }
+        }]
+      },
+      {
         test: require.resolve('jquery'),
         use: [{
           loader: 'expose-loader',
@@ -56,6 +72,13 @@ module.exports = {
         },{
           loader: 'expose-loader',
           options: '$'
+        }]
+      },
+      {
+        test: require.resolve('hamsterjs'),
+        use: [{
+          loader: 'expose-loader',
+          options: 'Hamster'
         }]
       }
     ]

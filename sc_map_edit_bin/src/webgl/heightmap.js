@@ -1,3 +1,5 @@
+const webgl_texture = require('./texture').webgl_texture;
+
 /**
  * @class webgl_heightmap
  * Heightmap mesh class.
@@ -15,7 +17,7 @@
  * @property {webgl_texture[]} __texturemap_textures Pair of WebGL textures containing the 8 texture channels
  * @property {} __game_resources Game resources service
  */
-class webgl_heightmap {
+export class webgl_heightmap {
   /**
    * Creates a webgl_heightmap
    * @param {WebGLRenderingContext} gl The WebGL rendering context to use

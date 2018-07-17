@@ -12,9 +12,11 @@
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-mocha-test": "^0.12.7",
+    "html-loader": "^0.5.5",
     "jquery": "^3.3.1",
     "mini-css-extract-plugin": "^0.4.1",
     "mocha": "^2.4.5",
+    "url-loader": "^1.0.1",
     "webpack": "^4.12.2",
     "webpack-cli": "^3.0.8"
   },

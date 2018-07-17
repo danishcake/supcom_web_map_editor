@@ -130,4 +130,6 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-textures",
       layers: $scope.data.layers
     });
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/configure-textures.html', require('../../../templates/dialogs/configure-textures.html'));
 }]);

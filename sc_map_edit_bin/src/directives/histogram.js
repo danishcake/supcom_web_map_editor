@@ -82,7 +82,7 @@ angular.module('sc_map_edit_bin.directives').directive('histogram', ["editor_sta
 
   return {
     restrict: 'E',
-    templateUrl: 'templates/histogram.html',
+    template: require('../../templates/histogram.html'),
     scope: {
       layers: "@"
     },

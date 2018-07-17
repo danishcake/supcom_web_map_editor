@@ -1,5 +1,6 @@
 const angular = require('angular');
 const _ = require('underscore');
+const modal_dlg_opts = require('../constants').modal_dlg_opts;
 
 angular.module('sc_map_edit_bin.controllers').controller("top-menu",
 ["$scope", "editor_state", "dialogs", function($scope, editor_state, dialogs) {
