@@ -3,30 +3,15 @@ const glob = require('glob');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-  entry: { 
+  entry: {
     app : [
       ...glob.sync('./sc_map_edit_bin/src/**/*.js')
     ]
-    /*
-    vendor: [
-      'angular',
-      'angular-sanitize',
-      'angular-dialog-service/dist/dialogs.min.js', // TODO: Add CSS bundler
-      'angular-ui-bootstrap',
-      'file-saver',
-      'hamsterjs',
-      'angular-mousewheel',
-      'bytebuffer',
-      'gl-matrix',
-      'async',
-      'underscore'
-    ],*/
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].bundle.js'
   },
-  devtool: "source-map",
   target: "web",
   plugins: [
     new MiniCssExtractPlugin({})
@@ -55,11 +40,11 @@ module.exports = {
         }]
       },
       {
-        test: /\.(png|jp(e*)g|svg)$/,
+        test: /\.(png|jp(e*)g)$/,
         use: [{
           loader: 'url-loader',
           options: {
-            limit: 8000, // Convert images < 8kb to base64 strings
+            limit: 16000, // Threshold chosen as it's larger than everything in game-resources.js
             name: 'images/[hash]-[name].[ext]'
           }
         }]

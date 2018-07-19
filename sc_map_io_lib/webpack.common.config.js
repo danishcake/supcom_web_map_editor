@@ -12,6 +12,5 @@ module.exports = {
       fs: path.resolve(__dirname, 'src/lib/thirdparty/dummy-fs.js')
     }
   },
-  devtool: "source-map",
   target: "web"
 };

@@ -18,7 +18,8 @@
     "mocha": "^2.4.5",
     "url-loader": "^1.0.1",
     "webpack": "^4.12.2",
-    "webpack-cli": "^3.0.8"
+    "webpack-cli": "^3.0.8",
+    "webpack-merge": "^4.1.3"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -41,7 +42,9 @@
     "underscore": "^1.8.3"
   },
   "scripts": {
-    "build_lib": "webpack --mode=development --config=./sc_map_io_lib/webpack.config.js",
-    "build_ui": "webpack --mode=development --config=./sc_map_edit_bin/webpack.config.js"
+    "build_lib": "webpack --config=./sc_map_io_lib/webpack.dev.config.js",
+    "build_ui": "webpack --config=./sc_map_edit_bin/webpack.dev.config.js",
+    "build_prod": "webpack --config=./sc_map_io_lib/webpack.prod.config.js && webpack --config=./sc_map_edit_bin/webpack.prod.config.js",
+    "build_dev": "webpack --config=./sc_map_io_lib/webpack.dev.config.js && webpack --config=./sc_map_edit_bin/webpack.dev.config.js"
   }
 }
