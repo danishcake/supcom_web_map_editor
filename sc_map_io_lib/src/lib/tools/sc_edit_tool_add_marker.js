@@ -1,4 +1,5 @@
 import {_} from "underscore";
+import { sc } from "../sc";
 
 
 /**
@@ -59,20 +60,29 @@ export class sc_edit_tool_add_marker {
         .pluck('name')
         .value();
 
+      // Determine name of new marker by stripping the trailing number and adding the next free one
       // Dumb linear search for first free index.
       // Fine for small N, which is what we have
-      let marker_name_stem = this.__marker_template.name;
+      const match = /(.+)_[0-9]+/.exec(this.__marker_template.name);
+      let marker_name_stem;
+      if (match) {
+        marker_name_stem = match[1];
+      } else {
+        marker_name_stem = this.__marker_template.name
+      }
 
-      // God do I hate Javascript. Give me value sematics or give me death!
-      let marker = JSON.parse(JSON.stringify(this.__marker_template));
-
+      let marker_name;
       for (let i = 0;; i++) {
-        const candidate_marker_name = `${this.__marker_template.name}_${i}`;
+        const candidate_marker_name = `${marker_name_stem}_${i}`;
         if (!_.contains(marker_names, candidate_marker_name)) {
-          marker.name = candidate_marker_name;
+          marker_name = candidate_marker_name;
           break;
         }
       }
+
+      // Load fields from template
+      const marker = new sc.script.marker();
+      marker.load(marker_name, this.__marker_template);
 
       // Position marker under cursor
       marker.position.x = args.grid_position[0];

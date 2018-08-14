@@ -413,7 +413,7 @@ export class sc_script_scenario extends sc_script_base {
  *              'Rally Point': AI marker
  *              'Protected Experimental Construction': AI marker
  */
-class sc_script_marker {
+export class sc_script_marker {
   constructor() {
     this.__name = undefined;
     this.__color = undefined;
@@ -445,8 +445,8 @@ class sc_script_marker {
     this.__name = name;
     this.__color = input.color;
     this.__type = input.type;
-    this.__orientation = input.orientation;
-    this.__position = input.position;
+    this.__orientation = {x: input.orientation.x, y: input.orientation.y, z: input.orientation.z};
+    this.__position = {x: input.position.x, y: input.position.y, z: input.position.z};
     this.__prop = input.prop;
 
     // Load uncommon fields
@@ -494,6 +494,7 @@ class sc_script_marker {
 
     return output;
   }
+
 
   create(script_args) {}
 }

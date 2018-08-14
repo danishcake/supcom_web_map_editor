@@ -20,7 +20,11 @@ describe('sc_edit_tool_add_marker', function() {
     this.marker_template = {
       name: "MASSPOINT",
       type: "mass",
-      position: {x: 0, y: 0, z: 0}
+      position: {x: 0, y: 0, z: 0},
+      color: "ff000000",
+      orientation: {x: 0, y: 0, z: 0},
+      position: {x: 0, y: 0, z: 0},
+      prop: '/env/common/props/markers/M_Mass_prop.bp'
     };
   });
 
