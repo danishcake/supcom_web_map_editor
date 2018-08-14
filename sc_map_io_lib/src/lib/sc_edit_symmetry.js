@@ -340,11 +340,11 @@ class sc_edit_symmetry_xy extends sc_edit_symmetry_matrix {
 
 
 /**
- * X==-Y symmetry (ignoring translation
+ * X==-Y symmetry (ignoring translation)
  * The pixels in the bottom-right are considered primary (x + y < size.x)
- *    P
- *   PP
- *  PPP
+ * P
+ * PP
+ * PPP
  * PPPP
  */
 class sc_edit_symmetry_yx extends sc_edit_symmetry_matrix {
@@ -363,8 +363,8 @@ class sc_edit_symmetry_yx extends sc_edit_symmetry_matrix {
   __get_primary_bounding_points(size) {
     return [
       [size[0], 0],
-      [size[0], size[1]],
-      [0,       size[1]]
+      [0,       size[1]],
+      [0,       0]
     ];
   }
 }
