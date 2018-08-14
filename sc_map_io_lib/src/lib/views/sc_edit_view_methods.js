@@ -272,7 +272,7 @@ let transform = function(dest, operation) {
     for (let x = 0; x < dest.width; x++) {
       const p = [x, y];
       const input_pixel = dest.get_pixel(p);
-      const output_pixel = _.map(input_pixel, (subpixel) => operation(subpixel, input_pixel));
+      const output_pixel = input_pixel.map((subpixel) => operation(subpixel, input_pixel));
       dest.set_pixel(p, output_pixel);
     }
   }

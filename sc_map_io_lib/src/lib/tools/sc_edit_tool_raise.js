@@ -31,7 +31,7 @@ class sc_edit_tool_height_change extends sc_edit_tool_base {
     sc_edit_view_methods.radial_fill(this.__patch, inner_strength, this.__inner_radius, outer_strength, this.__outer_radius);
     if (this.__power !== 1.0) {
       const scalar = inner_strength / Math.pow(inner_strength, this.__power);
-      sc_edit_view_methods.transform(this.__patch, (subpixel, pixel) => Math.pow(subpixel, this.__power) / scalar);
+      sc_edit_view_methods.transform(this.__patch, (subpixel, pixel) => Math.pow(subpixel, this.__power) * scalar);
     }
   }
 
