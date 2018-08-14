@@ -11,7 +11,11 @@
         {
             "type": "npm",
             "script": "build_dev",
-            "problemMatcher": []
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }
