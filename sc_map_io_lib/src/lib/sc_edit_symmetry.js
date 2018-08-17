@@ -54,6 +54,22 @@ class sc_edit_symmetry_base {
   get_primary_bounding_points(size) {
     return this.__get_primary_bounding_points(size);
   }
+
+  /**
+   * Determines if the passed position is the primary pixel
+   * @param {number[2]} pixel Position to test
+   * @param {number[2]} size Size of the map
+   * @returns {boolean} True if pixel is primary
+   * Doesn't throw if pixel is outside map bounds, but instead returns false
+   */
+  is_primary_pixel(pixel, size) {
+    try {
+      const primary_pixel = this.get_primary_pixel(pixel, size);
+      return primary_pixel[0] === pixel[0] && primary_pixel[1] === pixel[1];
+    } catch(e) {
+      return false;
+    }
+  }
 }
 
 /**

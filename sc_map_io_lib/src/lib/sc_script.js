@@ -497,6 +497,37 @@ export class sc_script_marker {
 
 
   create(script_args) {}
+
+  /**
+   * Given a list of markers, and a marker type, finds a unique name for that type of marker
+   * eg (["mass_1", "mass_2", "mass_3"], "mass_1") => "mass_4"
+   * eg (["mass_1", "mass_2", "mass_3"], "mass")   => "mass_4"
+   */
+  static find_unique_name(markers, marker_type_or_name) {
+    const marker_names = Object.values(markers).map(marker => marker.name);
+
+    // Determine name of new marker by stripping the trailing number
+    const match = /(.+)_[0-9]+/.exec(marker_type_or_name);
+    let marker_name_stem;
+    if (match) {
+      marker_name_stem = match[1];
+    } else {
+      marker_name_stem = marker_type_or_name;
+    }
+
+    // Dumb linear search for first free index.
+    // Fine for small N, which is what we have
+    let marker_name;
+    for (let i = 0;; i++) {
+      const candidate_marker_name = `${marker_name_stem}_${i}`;
+      if (marker_names.find(name => name === candidate_marker_name) == null) {
+        marker_name = candidate_marker_name;
+        break;
+      }
+    }
+
+    return marker_name;
+  }
 }
 
 
@@ -507,6 +538,7 @@ export class sc_script_save extends sc_script_base {
   }
 
   get markers() { return this.__markers; }
+  set markers(value) { this.__markers = value; }
 
   /**
    * Executes input as a Lua script and extracts save fields

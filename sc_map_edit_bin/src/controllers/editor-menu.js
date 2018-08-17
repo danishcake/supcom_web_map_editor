@@ -33,8 +33,18 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
   $scope.decrease_tool_strength = () => $scope.tool.strength = Math.max($scope.tool.strength - 1,   1);
 
   // Uses current symmetry mode to set all secondary pixels to their primary value
-  $scope.enforce_symmetry = () => {
+  $scope.enforce_terrain_symmetry = () => {
     const symmetry_tool = new sc_map_io_lib.sc.edit.global_tool.enforce_symmetry(editor_state.symmetry);
+    const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
+                                                          editor_state.edit_texturemap_view,
+                                                          editor_state.scripts.save,
+                                                          editor_state.edit_target_view,
+                                                          editor_state.map);
+    symmetry_tool.apply(tool_data);
+  };
+
+  $scope.enforce_marker_symmetry = () => {
+    const symmetry_tool = new sc_map_io_lib.sc.edit.global_tool.enforce_marker_symmetry(editor_state.symmetry);
     const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
                                                           editor_state.edit_texturemap_view,
                                                           editor_state.scripts.save,

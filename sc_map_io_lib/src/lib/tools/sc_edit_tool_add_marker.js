@@ -53,32 +53,8 @@ export class sc_edit_tool_add_marker {
 
     if (!this.__active) {
       // First application, so place marker at current position
-      const marker_names = _.chain(data.save_script.markers)
-        .filter((marker, marker_name) => {
-          return marker.type === this.__marker_template.type;
-        })
-        .pluck('name')
-        .value();
-
-      // Determine name of new marker by stripping the trailing number and adding the next free one
-      // Dumb linear search for first free index.
-      // Fine for small N, which is what we have
-      const match = /(.+)_[0-9]+/.exec(this.__marker_template.name);
-      let marker_name_stem;
-      if (match) {
-        marker_name_stem = match[1];
-      } else {
-        marker_name_stem = this.__marker_template.name
-      }
-
-      let marker_name;
-      for (let i = 0;; i++) {
-        const candidate_marker_name = `${marker_name_stem}_${i}`;
-        if (!_.contains(marker_names, candidate_marker_name)) {
-          marker_name = candidate_marker_name;
-          break;
-        }
-      }
+      // Find a unique name
+      const marker_name = sc.script.marker.find_unique_name(data.save_script.markers, this.__marker_template.name);
 
       // Load fields from template
       const marker = new sc.script.marker();
