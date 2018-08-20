@@ -39,10 +39,12 @@ export class sc_edit_tool_args {
   static get modifier_none() { return 0; }
   static get modifier_shift() { return 1; }
 
-  constructor(position, modifiers) {
+  constructor(position, modifiers, symmetry) {
     this.__position = position;
     this.__shift = (modifiers & sc_edit_tool_args.modifier_shift) !== 0;
     this.__heightmap_target = true;
+    this.__symmetry = symmetry;
+
   }
 
   /**
@@ -130,4 +132,10 @@ export class sc_edit_tool_args {
       this.__heightmap_target = true;
     }
   }
+
+  /**
+   * Gets the current symmetry mode. This is usually only of interest
+   * to the marker tools, as the other tools can rely on the symmetry view target
+   */
+  get symmetry() { return this.__symmetry; }
 }

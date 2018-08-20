@@ -52,20 +52,27 @@ export class sc_edit_tool_add_marker {
     args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
 
     if (!this.__active) {
-      // First application, so place marker at current position
-      // Find a unique name
-      const marker_name = sc.script.marker.find_unique_name(data.save_script.markers, this.__marker_template.name);
+      const size = [data.edit_heightmap.width, data.edit_heightmap.height];
+      const primary_position = args.symmetry.get_primary_pixel(args.grid_position, size);
+      const secondary_positions = args.symmetry.get_secondary_pixels(primary_position, size);
+      const all_positions = [primary_position].concat(secondary_positions);
 
-      // Load fields from template
-      const marker = new sc.script.marker();
-      marker.load(marker_name, this.__marker_template);
+      for (const position of all_positions) {
+        // First application, so place marker at current position
+        // Find a unique name
+        const marker_name = sc.script.marker.find_unique_name(data.save_script.markers, this.__marker_template.name);
 
-      // Position marker under cursor
-      marker.position.x = args.grid_position[0];
-      marker.position.z = args.grid_position[1];
+        // Load fields from template
+        const marker = new sc.script.marker();
+        marker.load(marker_name, this.__marker_template);
 
-      // Add the marker
-      data.save_script.markers[marker.name] = marker;
+        // Position marker under cursor
+        marker.position.x = position[0];
+        marker.position.z = position[1];
+
+        // Add the marker
+        data.save_script.markers[marker.name] = marker;
+      }
 
       this.__active = true;
     }

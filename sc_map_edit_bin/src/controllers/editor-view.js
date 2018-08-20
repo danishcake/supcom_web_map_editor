@@ -37,7 +37,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
                                                             editor_state.map);
       const tool_args = new sc_map_io_lib.sc.edit.tool.args(world_position,
                                                             evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
-                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none);
+                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none,
+                                                            editor_state.symmetry);
 
       editor_state.tool.apply(tool_data, tool_args);
 
@@ -57,7 +58,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
                                                             editor_state.map);
       const tool_args = new sc_map_io_lib.sc.edit.tool.args(world_position,
                                                             evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
-                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none);
+                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none,
+                                                            editor_state.symmetry);
 
       editor_state.tool.start(tool_data, tool_args);
     }
@@ -78,7 +80,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
                                                             editor_state.map);
       const tool_args = new sc_map_io_lib.sc.edit.tool.args(world_position,
                                                             evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
-                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none);
+                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none,
+                                                            editor_state.symmetry);
       editor_state.tool.end(tool_data, tool_args);
     }
   };
@@ -98,7 +101,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
                                                             editor_state.map);
       const tool_args = new sc_map_io_lib.sc.edit.tool.args([0, 0],
                                                             evt.shiftKey ? sc_map_io_lib.sc.edit.tool.args.modifier_shift :
-                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none);
+                                                                           sc_map_io_lib.sc.edit.tool.args.modifier_none,
+                                                            editor_state.symmetry);
 
       editor_state.tool.end(tool_data, tool_args);
     }
