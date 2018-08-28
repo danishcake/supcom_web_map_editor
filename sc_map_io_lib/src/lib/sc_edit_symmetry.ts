@@ -3,11 +3,14 @@
  * These define the following interface:
  * 1. get_primary_pixel()
  * 2. get_secondary_pixels()
+ * 3. get_primary_bounding_points()
  */
 
 import {sc_rect} from "./sc_rect"
-import {_} from "underscore"
+import * as _ from "underscore"
 import * as glm from 'gl-matrix';
+import { sc_vec2, sc_mat2 } from "./sc_vec";
+import { mat2 } from "gl-matrix";
 
 /**
  * Symmetry class. Subclasses should implement
@@ -15,15 +18,15 @@ import * as glm from 'gl-matrix';
  * __get_primary_pixel_impl: Returns the primary pixel given any pixel
  * __get_secondary_pixels_impl: Returns array of secondary pixels if provided a primary pixel
  */
-class sc_edit_symmetry_base {
+abstract class sc_edit_symmetry_base {
   /**
    * Get the primary pixel from any pixel inside size
-   * @param {number[2]} point Position on map
-   * @param {number[2]} size Size of map
+   * @param {sc_vec2} point Position on map
+   * @param {sc_vec2} size Size of map
    * @returns The primary pixel
    * @throws If point is outside [0,0]-size
    */
-  get_primary_pixel(point, size) {
+  get_primary_pixel(point: sc_vec2, size: sc_vec2): sc_vec2 {
     if (!(new sc_rect(0, 0, size[0], size[1])).contains(point[0], point[1])) {
       throw new Error(`[${point[0]}, ${point[1]}] does not lie inside [0,0]-[${size[0]}, ${size[1]}]`)
     }
@@ -33,12 +36,12 @@ class sc_edit_symmetry_base {
 
 
   /**
-   * @param {number[2]} point Position on map
-   * @param {number[2]} size Size of map
+   * @param {sc_vec2} point Position on map
+   * @param {sc_vec2} size Size of map
    * @returns The secondary pixels corresponding to the primary pixel
    * @throws If point is outside [0,0]-size
    */
-  get_secondary_pixels(point, size) {
+  get_secondary_pixels(point: sc_vec2, size: sc_vec2): sc_vec2[] {
     if (!(new sc_rect(0, 0, size[0], size[1])).contains(point[0], point[1])) {
       throw new Error(`[${point[0]}, ${point[1]}] does not lie inside [0,0]-[${size[0]}, ${size[1]}]`)
     }
@@ -48,28 +51,32 @@ class sc_edit_symmetry_base {
 
   /**
    * Obtains the points forming the outline of the primary pixel region
-   * @param {number[2]} size Size of the map
-   * @returns {number[2}[]} Set of 2D points forming the outline of the primary region
+   * @param {sc_vec2} size Size of the map
+   * @returns {sc_vec2[]} Set of 2D points forming the outline of the primary region
    */
-  get_primary_bounding_points(size) {
+  get_primary_bounding_points(size: sc_vec2): sc_vec2[] {
     return this.__get_primary_bounding_points(size);
   }
 
   /**
    * Determines if the passed position is the primary pixel
-   * @param {number[2]} pixel Position to test
-   * @param {number[2]} size Size of the map
+   * @param {sc_vec2} pixel Position to test
+   * @param {sc_vec2} size Size of the map
    * @returns {boolean} True if pixel is primary
    * Doesn't throw if pixel is outside map bounds, but instead returns false
    */
-  is_primary_pixel(pixel, size) {
+  is_primary_pixel(pixel: sc_vec2, size: sc_vec2): boolean {
     try {
-      const primary_pixel = this.get_primary_pixel(pixel, size);
+      const primary_pixel: sc_vec2 = this.get_primary_pixel(pixel, size);
       return primary_pixel[0] === pixel[0] && primary_pixel[1] === pixel[1];
     } catch(e) {
       return false;
     }
   }
+
+  protected abstract __get_primary_pixel_impl(point: sc_vec2, size: sc_vec2): sc_vec2;
+  protected abstract __get_secondary_pixels_impl(point: sc_vec2, size: sc_vec2): sc_vec2[];
+  protected abstract __get_primary_bounding_points(size: sc_vec2): sc_vec2[];
 }
 
 /**
@@ -80,11 +87,11 @@ class sc_edit_symmetry_none extends sc_edit_symmetry_base {
   /**
    * Get the primary pixel from any pixel inside size.
    * This is always the input pixel
-   * @param {number[2]} point Position on map
-   * @param {number[2]} size Size of map
+   * @param {sc_vec2} point Position on map
+   * @param {sc_vec2} size Size of map
    * @returns The primary pixel
    */
-  __get_primary_pixel_impl(point, size) {
+  protected __get_primary_pixel_impl(point: sc_vec2, size: sc_vec2): sc_vec2 {
     return point;
   }
 
@@ -92,21 +99,21 @@ class sc_edit_symmetry_none extends sc_edit_symmetry_base {
   /**
    * Get the secondary pixels corresponding to any primary pixel.
    * There are no secondary pixels
-   * @param {number[2]} point Position on map
-   * @param {number[2]} size Size of map
+   * @param {sc_vec2} point Position on map
+   * @param {sc_vec2} size Size of map
    * @returns The secondary pixels
    */
-  __get_secondary_pixels_impl(point, size) {
+  protected __get_secondary_pixels_impl(point: sc_vec2, size: sc_vec2): sc_vec2[] {
     return [];
   }
 
   /**
    * The bounding region is the entire size area
-   * @param {number[2]} size Size of the map
-   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @param {sc_vec2} size Size of the map
+   * @returns {sc_vec2[]} Set of 2D points forming the outline of the primary region
    * @private
    */
-  __get_primary_bounding_points(size) {
+  protected __get_primary_bounding_points(size: sc_vec2): sc_vec2[] {
     return [
       [0, 0],
       [size[0], 0],
@@ -122,13 +129,16 @@ class sc_edit_symmetry_none extends sc_edit_symmetry_base {
  * This is a convenience subclass that allows symmetries that can be expressed using a 2x2 matrix
  * to be easily expressed
  */
-class sc_edit_symmetry_matrix extends sc_edit_symmetry_base {
+abstract class sc_edit_symmetry_matrix extends sc_edit_symmetry_base {
+  private __primary_predicate: (point: sc_vec2, size: sc_vec2) => boolean;
+  private __matrices: sc_mat2[];
+
   /**
    * Stores the matrices that transform a secondary pixel to primary
    * @param primary_predicate {Function} Returns true if the point provided is a primary pixel
-   * @param matrices {Array} Array to 2x2 matrices that map primary pixels to secondary
+   * @param matrices {sc_mat2[]} Array to 2x2 matrices that map primary pixels to secondary
    */
-  constructor(primary_predicate, matrices) {
+  constructor(primary_predicate: (point: sc_vec2, size: sc_vec2) => boolean, matrices: sc_mat2[]) {
     super();
     this.__primary_predicate = primary_predicate;
     this.__matrices = matrices;
@@ -136,11 +146,11 @@ class sc_edit_symmetry_matrix extends sc_edit_symmetry_base {
 
   /**
    * Get the primary pixel from any pixel inside size.
-   * @param {number[2]} point Position on map
-   * @param {number[2]} size Size of map
+   * @param {sc_vec2} point Position on map
+   * @param {sc_vec2} size Size of map
    * @returns The primary pixel
    */
-  __get_primary_pixel_impl(point, size) {
+  protected __get_primary_pixel_impl(point: sc_vec2, size: sc_vec2): sc_vec2 {
     if (this.__primary_predicate(point, size)) {
       return point;
     }
@@ -164,25 +174,28 @@ class sc_edit_symmetry_matrix extends sc_edit_symmetry_base {
 
   /**
    * Get the secondary pixels corresponding to any primary pixel.
-   * @param {number[2]} point Position on map
-   * @param {number[2]} size Size of map
+   * @param {sc_vec2} point Position on map
+   * @param {sc_vec2} size Size of map
    * @returns The secondary pixels
    */
-  __get_secondary_pixels_impl(point, size) {
+  protected __get_secondary_pixels_impl(point: sc_vec2, size: sc_vec2): sc_vec2[] {
     let mid_indices = glm.vec2.fromValues((size[0] - 1) / 2, (size[1] - 1) / 2);
 
     // Find all the secondary pixels
-    let secondary_pixels = _.map(this.__matrices, (transform) => {
+    let secondary_pixels: sc_vec2[] = _.map(this.__matrices, (transform: sc_mat2): sc_vec2 => {
       let secondary_pixel  = glm.vec2.clone(point);
       glm.vec2.sub(secondary_pixel, secondary_pixel, mid_indices);
-      glm.vec2.transformMat2(secondary_pixel, secondary_pixel, transform);
+      glm.vec2.transformMat2(secondary_pixel,
+                             secondary_pixel,
+                             mat2.fromValues(transform[0], transform[1], transform[2], transform[3]));
       glm.vec2.add(secondary_pixel, secondary_pixel, mid_indices);
-      return [secondary_pixel[0], secondary_pixel[1]]; // TBD: glm produces {'0': x, '1': y} objects...
+      return [secondary_pixel[0], secondary_pixel[1]];
+      // Note: glm produces {'0': x, '1': y} objects
       // TODO: If I start using non-integer matrices I'll need to use a Math.round here
     });
 
     // If any secondary pixel has mapped to a primary pixel then cull it
-    return _.filter(secondary_pixels, (secondary_pixel) => {
+    return _.filter(secondary_pixels, (secondary_pixel: sc_vec2): boolean => {
       return secondary_pixel[0] != point[0] || secondary_pixel[1] != point[1];
     });
   }
@@ -202,11 +215,11 @@ class sc_edit_symmetry_horizontal extends sc_edit_symmetry_matrix {
 
   /**
    * The primary region is the left
-   * @param {number[2]} size Size of the map
-   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @param {sc_vec2} size Size of the map
+   * @returns {sc_vec2[]} Set of 2D points forming the outline of the primary region
    * @private
    */
-  __get_primary_bounding_points(size) {
+  protected __get_primary_bounding_points(size: sc_vec2): sc_vec2[] {
     return [
       [0,           0],
       [size[0] / 2, 0],
@@ -230,11 +243,11 @@ class sc_edit_symmetry_vertical extends sc_edit_symmetry_matrix {
 
   /**
    * The primary region is the top
-   * @param {number[2]} size Size of the map
-   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @param {sc_vec2} size Size of the map
+   * @returns {sc_vec2[]} Set of 2D points forming the outline of the primary region
    * @private
    */
-  __get_primary_bounding_points(size) {
+  protected __get_primary_bounding_points(size: sc_vec2): sc_vec2[] {
     return [
       [0,        0],
       [size[0] , 0],
@@ -264,11 +277,11 @@ class sc_edit_symmetry_quadrants extends sc_edit_symmetry_matrix {
 
   /**
    * The primary region is the top-left
-   * @param {number[2]} size Size of the map
-   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @param {sc_vec2} size Size of the map
+   * @returns {sc_vec2[]} Set of 2D points forming the outline of the primary region
    * @private
    */
-  __get_primary_bounding_points(size) {
+  protected __get_primary_bounding_points(size: sc_vec2): sc_vec2[] {
     return [
       [0,           0],
       [size[0] / 2, 0],
@@ -310,11 +323,11 @@ class sc_edit_symmetry_octants extends sc_edit_symmetry_matrix {
 
   /**
    * The primary region is the bottom-left half of the top left quadrant
-   * @param {number[2]} size Size of the map
-   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @param {sc_vec2} size Size of the map
+   * @returns {sc_vec2[]} Set of 2D points forming the outline of the primary region
    * @private
    */
-  __get_primary_bounding_points(size) {
+  protected __get_primary_bounding_points(size: sc_vec2): sc_vec2[] {
     return [
       [0,           0],
       [size[0] / 2, size[1] / 2],
@@ -341,11 +354,11 @@ class sc_edit_symmetry_xy extends sc_edit_symmetry_matrix {
 
   /**
    * The primary region is the bottom-left
-   * @param {number[2]} size Size of the map
-   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @param {sc_vec2} size Size of the map
+   * @returns {sc_vec2[]} Set of 2D points forming the outline of the primary region
    * @private
    */
-  __get_primary_bounding_points(size) {
+  protected __get_primary_bounding_points(size: sc_vec2): sc_vec2[] {
     return [
       [0,           0],
       [size[0], size[1]],
@@ -372,11 +385,11 @@ class sc_edit_symmetry_yx extends sc_edit_symmetry_matrix {
 
   /**
    * The primary region is the top-left
-   * @param {number[2]} size Size of the map
-   * @returns {number[2][]} Set of 2D points forming the outline of the primary region
+   * @param {sc_vec2} size Size of the map
+   * @returns {sc_vec2[]} Set of 2D points forming the outline of the primary region
    * @private
    */
-  __get_primary_bounding_points(size) {
+  protected __get_primary_bounding_points(size: sc_vec2): sc_vec2[] {
     return [
       [size[0], 0],
       [0,       size[1]],
