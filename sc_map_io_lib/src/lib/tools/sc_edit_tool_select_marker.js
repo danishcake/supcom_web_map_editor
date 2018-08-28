@@ -1,4 +1,5 @@
 import {_} from "underscore"
+import { sc_script_marker } from "../sc_script";
 
 /**
  * Selection and marker movement tool
@@ -53,30 +54,33 @@ export class sc_edit_tool_select_marker {
     args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
 
     if (!this.__active) {
+      const size = [data.edit_heightmap.width, data.edit_heightmap.height];
       // First application, so toggle selection of what's under the cursor
       const clicked_marker = this.__get_clicked_marker(data.save_script, args.position);
 
       this.__started_over_selected_marker = false;
       if (clicked_marker) {
-        // Deselect currently selected marker if shift held
+        const reflected_markers = this.__get_secondary_markers(clicked_marker, data.save_script, args.symmetry, size);
+        const all_markers = [clicked_marker].concat(reflected_markers);
+
+        // Deselect markers currently selected marker if shift held
         if (args.shift) {
           if (clicked_marker.selected) {
-            delete clicked_marker.selected;
+            all_markers.forEach(marker => delete marker.selected);
           } else {
-            clicked_marker.selected = true;
+            all_markers.forEach(marker => marker.selected = true);
           }
-
         } else {
           // Otherwise start moving
           if (clicked_marker.selected) {
             this.__started_over_selected_marker = true;
           } else {
-            clicked_marker.selected = true;
+            all_markers.forEach(marker => marker.selected = true);
 
             // If shift not held then deselect all other markers
             _.chain(data.save_script.markers)
               .filter((marker) => {
-                return marker !== clicked_marker;
+                return !_.contains(all_markers, marker);
               })
               .each((marker) => {
                 delete marker.selected;
@@ -86,7 +90,7 @@ export class sc_edit_tool_select_marker {
       } else {
         // If shift not held then deselect all markers
         if (!args.shift) {
-          _.each(data.save_script.markers, (marker) => {
+          Object.values(data.save_script.markers).forEach(marker => {
             delete marker.selected;
           });
         }
@@ -107,6 +111,7 @@ export class sc_edit_tool_select_marker {
   apply(data, args) {
     // Adjust scale to account for different targets
     args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
+    const size = [data.edit_heightmap.width, data.edit_heightmap.height];
 
     const delta = [args.grid_position[0] - this.__last_position[0], args.grid_position[1] - this.__last_position[1]];
 
@@ -118,15 +123,57 @@ export class sc_edit_tool_select_marker {
       }
     }
 
+
     // Once movement has been detected start shifting the markers
     if (this.__moved && this.__started_over_selected_marker) {
-      _.chain(data.save_script.markers)
-        .filter((marker) => { return !!marker.selected; })
-        .each((marker) => {
-          marker.position.x += delta[0];
-          marker.position.z += delta[1];
-        });
       this.__last_position = args.grid_position;
+
+      // Now: Find the markers in the primary region
+      // Move those. All others should then reflected
+      // Any leftover should be moved as per primary
+      const moved_markers = [];
+      const selected_markers = Object.values(data.save_script.markers)
+                                     .filter((marker) => marker.selected);
+      const primary_markers = selected_markers.filter((marker) => args.symmetry.is_primary_pixel([marker.position.x, marker.position.z], size));
+
+      for (const primary_marker of primary_markers) {
+        // Calculate pre-move secondary positions
+        const pre_move_secondary_positions = args.symmetry.get_secondary_pixels([primary_marker.position.x, primary_marker.position.z], size);
+
+        // Move primary
+        primary_marker.position.x += delta[0];
+        primary_marker.position.z += delta[1];
+        moved_markers.push(primary_marker);
+
+        // Calculate post-move secondary positions
+        const post_move_secondary_positions = args.symmetry.get_secondary_pixels([primary_marker.position.x, primary_marker.position.z], size);
+
+        for (let i = 0; i < pre_move_secondary_positions.length; i++) {
+          const pre_move_secondary_position = pre_move_secondary_positions[i];
+          const post_move_secondary_position = post_move_secondary_positions[i];
+
+          // Find the nearest marker
+          const secondary_marker = this.__get_marker_of_same_type_near(primary_marker.type,
+                                                                       data.save_script,
+                                                                       pre_move_secondary_position);
+
+          if (secondary_marker) {
+            secondary_marker.position.x = post_move_secondary_position[0];
+            secondary_marker.position.z = post_move_secondary_position[1];
+            moved_markers.push(secondary_marker);
+          }
+        }
+      }
+
+      // Any selected markers that were not moved by movement of reflected markers should be moved
+      // as per primary
+
+      const unmoved_markers = _.without(selected_markers, ...moved_markers);
+      //const unmoved_markers = selected_markers.filter(p => moved_markers.find(p) == null);
+      for (const unmoved_marker of unmoved_markers) {
+        unmoved_marker.position.x += delta[0];
+        unmoved_marker.position.z += delta[1];
+      }
     }
   }
 
@@ -139,6 +186,7 @@ export class sc_edit_tool_select_marker {
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
   end(data, args) {
+    // TBD: At end of application I should snap moved markers to grid
     this.__active = false;
   }
 
@@ -175,5 +223,72 @@ export class sc_edit_tool_select_marker {
       } else {
         return null;
       }
+  }
+
+
+  /**
+   * Given a marker and symmetry, find the markers that were probably created as reflections
+   * @param {sc_script_marker} primary_marker The primary (eg just clicked) marker
+   * @param {sc_script_save} save_script The save script containing all markers
+   * @param {sc_edit_symmetry_base} symmetry The symmetry in use
+   * @param {Array<number>[2]} size Heightmap/marker units size
+   */
+  __get_secondary_markers(primary_marker, save_script, symmetry, size) {
+    if (primary_marker == null) {
+      return [];
+    }
+
+    const markers = Object.values(save_script.markers);
+    const primary_position = symmetry.get_primary_pixel([primary_marker.position.x, primary_marker.position.z], size);
+    const secondary_positions = symmetry.get_secondary_pixels(primary_position, size);
+    const all_positions = [primary_position].concat(secondary_positions);
+
+    const secondary_markers = [];
+
+    // TODO: Express in terms of __get_marker_of_same_type_near
+    for (const position of all_positions) {
+      for (const marker of markers) {
+        // If a marker is not the primary marker, and it is very close to a secondary position then return it
+        const delta = [position[0] - marker.position.x,
+                       position[1] - marker.position.z];
+        const distance_sq = delta[0] * delta[0] + delta[1] * delta[1];
+        if (marker != primary_marker && distance_sq < 0.1 && marker.type === primary_marker.type) {
+          secondary_markers.push(marker);
+
+          // Only pick a single marker from each secondary position
+          break;
+        }
+      }
+    }
+
+    return secondary_markers;
+  }
+
+
+  __get_marker_of_same_type_near(marker_type, save_script, position) {
+    const markers = Object.values(save_script.markers);
+
+    const distance_sorted_markers_of_same_type = markers
+      .filter((marker) => marker.type === marker_type)
+      .map((marker) => {
+        const delta = [position[0] - marker.position.x,
+                      position[1] - marker.position.z];
+        const distance_sq = delta[0] * delta[0] + delta[1] * delta[1];
+        return {
+          distance_sq,
+          marker
+        }
+      })
+      .sort((lhs, rhs) => lhs.distance_sq - rhs.distance_sq);
+
+    if (distance_sorted_markers_of_same_type.length > 0) {
+      if (distance_sorted_markers_of_same_type[0].distance_sq <= 0.5) {
+        // Distance threshold: We want the closest marker, where aligning to a rotated grid position may have moved it.
+        // Maximum distance in each axis is 0.5, so assume (0.5*0.5) * 2 = 0.5
+        return distance_sorted_markers_of_same_type[0].marker;
+      }
+    }
+
+    return null;
   }
 }
