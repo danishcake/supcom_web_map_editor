@@ -67,6 +67,13 @@ export abstract class sc_edit_view_base {
     return this.__get_subpixel_max_impl();
   }
 
+  /**
+   * Gets the out-of-bounds pixel value
+   */
+  oob_pixel_value(position: sc_vec2): sc_pixel {
+    return this.__oob_pixel_value_impl(position);
+  }
+
   /** Implementors should provide these methods */
   protected abstract __get_width_impl(): number;
   protected abstract __get_height_impl(): number;
