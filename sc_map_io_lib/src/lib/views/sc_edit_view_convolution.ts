@@ -1,15 +1,17 @@
 import {sc_edit_view_base} from "./sc_edit_view"
 import {sc_edit_view_methods} from "./sc_edit_view_methods"
+import { sc_vec2, sc_pixel } from "../sc_vec";
 
 /**
  * A facade around another view that uses a inserts a convolution filter in the path of get_pixel
  * This can be used to perform averaging, blurring, edge enhancing etc
- * @property {number} __weights Array of convolution elements. Interpreted as a square array starting at the
- *                              top left
- * @property {number} __weight_radius Number of bins to check on each side of the central bin
- * @property {number} __divisor Scalar factor to apply post convolution
  */
 export class sc_edit_view_convolution extends sc_edit_view_base {
+  private __wrapped_view: sc_edit_view_base;
+  private __weights: number[]; // Array of convolution elements. Interpreted as a square array starting at the top left
+  private __weight_radius: number; // Number of bins to check on each side of the central bin
+  private __divisor: number;  // Scalar factor to apply post convolution
+
   /**
    * @constructor
    * Creates a convolution view
@@ -17,7 +19,7 @@ export class sc_edit_view_convolution extends sc_edit_view_base {
    * @param {number[]} weights An array of weights. Must be the square of an odd number in size (1x1, 3x3, 5x5)
    * @param {number} divisor A scalar to divide final convolution by
    */
-  constructor(wrapped_view, weights, divisor) {
+  constructor(wrapped_view: sc_edit_view_base, weights: number[], divisor: number) {
     super();
     this.__wrapped_view = wrapped_view;
     if  (!weights) {
@@ -37,20 +39,20 @@ export class sc_edit_view_convolution extends sc_edit_view_base {
 
 
   /** Gets the width */
-  __get_width_impl() { return this.__wrapped_view.width; }
+  protected __get_width_impl(): number { return this.__wrapped_view.width; }
 
 
   /** Gets the height  */
-  __get_height_impl() { return this.__wrapped_view.height; }
+  protected __get_height_impl(): number { return this.__wrapped_view.height; }
 
 
   /** Returns the value of a pixel at the given coordinate, after convolution */
-  __get_pixel_impl(position) {
-    let i = 0;
-    let sum = sc_edit_view_methods.make_pixel(this.subpixel_count, 0);
+  protected __get_pixel_impl(position: sc_vec2): sc_pixel {
+    let i: number = 0;
+    let sum: sc_pixel = sc_edit_view_methods.make_pixel(this.subpixel_count, 0);
     for (let ix = -this.__weight_radius; ix <= this.__weight_radius; ix++) {
       for (let iy = -this.__weight_radius; iy <= this.__weight_radius; iy++, i++) {
-        const ip  = [position[0] + ix, position[1] + iy];
+        const ip:sc_vec2 = [position[0] + ix, position[1] + iy];
         // Clamp OOB pixels. TBD: Just wrap this in a clamping view facade?
         ip[0] = ip[0] < 0 ? 0 : ip[0];
         ip[0] = ip[0] > this.width - 1 ? this.width - 1 : ip[0];
@@ -75,7 +77,7 @@ export class sc_edit_view_convolution extends sc_edit_view_base {
 
 
   /** Sets the value of a pixel at the given coordinate */
-  __set_pixel_impl(position, value) {
+  protected __set_pixel_impl(position: sc_vec2, value: sc_pixel): void {
     this.__wrapped_view.set_pixel(position, value);
   }
 
@@ -84,15 +86,15 @@ export class sc_edit_view_convolution extends sc_edit_view_base {
    * If called outside normal region this method is unusual in that it still works, due to edge clamping
    * applied in get_pixel
    */
-  __oob_pixel_value_impl(position) {
+  protected __oob_pixel_value_impl(position: sc_vec2): sc_pixel {
     return this.__get_pixel_impl(position);
   }
 
 
   /** Returns the number of subpixels */
-  __get_subpixel_count_impl() { return this.__wrapped_view.subpixel_count; }
+  protected __get_subpixel_count_impl() { return this.__wrapped_view.subpixel_count; }
 
 
   /** Returns the maximum value of a subpixel */
-  __get_subpixel_max_impl() { return this.__wrapped_view.subpixel_max; }
+  protected __get_subpixel_max_impl() { return this.__wrapped_view.subpixel_max; }
 }
