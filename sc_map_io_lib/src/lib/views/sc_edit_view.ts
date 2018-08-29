@@ -1,3 +1,5 @@
+import { sc_vec2, sc_pixel } from "../sc_vec";
+
 /**
  * Base view class. Defines the interface that all views should implement
  * via NVO pattern
@@ -10,18 +12,17 @@
  * __get_subpixel_count_impl() - returns the number of subpixels
  * __get_subpixel_max_impl() - return the maximum value of a subpixel
  */
-export class sc_edit_view_base {
-  constructor(wrapped_view) {
-    this.__wrapped_view = wrapped_view;
+export abstract class sc_edit_view_base {
+  constructor() {
   }
 
   /** Gets the width of this view */
-  get width() {
+  get width(): number {
     return this.__get_width_impl();
   }
 
   /** Gets the height of this view */
-  get height() {
+  get height(): number {
     return this.__get_height_impl();
   }
 
@@ -29,7 +30,7 @@ export class sc_edit_view_base {
    * Gets the pixel at this coordinate within the view
    * If outside bounds zero will be returned
    */
-  get_pixel(position) {
+  get_pixel(position: sc_vec2): sc_pixel {
     if (position[0] >= 0 && position[0] < this.width && position[1] >= 0 && position[1] < this.height) {
       return this.__get_pixel_impl(position);
     } else {
@@ -41,7 +42,7 @@ export class sc_edit_view_base {
    * Set the pixel at this coordinate within the view
    * If outside bounds no change will be made
    */
-  set_pixel(position, value) {
+  set_pixel(position: sc_vec2, value: sc_pixel): void {
     if (position[0] >= 0 && position[0] < this.width && position[1] >= 0 && position[1] < this.height) {
       const clamped_pixel = value.slice();
       const max = this.subpixel_max;
@@ -55,14 +56,23 @@ export class sc_edit_view_base {
   /**
    * Gets the number of subpixels
    */
-  get subpixel_count() {
+  get subpixel_count(): number {
     return this.__get_subpixel_count_impl();
   }
 
   /**
     * Gets the maximum value of a subpixel. The minimum is always 0
     */
-  get subpixel_max() {
+  get subpixel_max(): number {
     return this.__get_subpixel_max_impl();
   }
+
+  /** Implementors should provide these methods */
+  protected abstract __get_width_impl(): number;
+  protected abstract __get_height_impl(): number;
+  protected abstract __oob_pixel_value_impl(position: sc_vec2): sc_pixel;
+  protected abstract __get_pixel_impl(position: sc_vec2): sc_pixel;
+  protected abstract __set_pixel_impl(position: sc_vec2, value: sc_pixel): void;
+  protected abstract __get_subpixel_count_impl(): number;
+  protected abstract __get_subpixel_max_impl(): number;
 }

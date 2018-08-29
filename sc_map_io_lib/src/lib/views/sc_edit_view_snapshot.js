@@ -15,8 +15,10 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
   /**
    * Creates a snapshot with no initial cache tiles
    */
-  constructor(inner_view) {
-    super(inner_view);
+  constructor(wrapped_view) {
+    super();
+    this.__wrapped_view = wrapped_view;
+
     this.__tilesize = 16;
     this.__tiles = [];
     this.__tilesize2d = [this.__tilesize, this.__tilesize];

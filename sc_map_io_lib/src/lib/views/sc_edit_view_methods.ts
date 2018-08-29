@@ -1,3 +1,6 @@
+import { sc_pixel, sc_vec2 } from "../sc_vec";
+import { sc_edit_view_base } from "./sc_edit_view";
+
 /**
  * Contains methods for manipulating views
  */
@@ -7,10 +10,10 @@
  * Makes a pixel of given channel depth and fills it with the specified value
  * @param {number} subpixel_count The number of subpixels/channels
  * @param {number} value The value to fill each pixel with
- * @return {array} An array filled with subpixel_count instance of value
+ * @return {sc_pixel} An array filled with subpixel_count instance of value
  */
-let make_pixel = function(subpixel_count, value) {
-  const result = [];
+let make_pixel = function(subpixel_count: number, value: number): sc_pixel {
+  const result: number[] = [];
   for (let i = 0; i < subpixel_count; i++) {
     result.push(value);
   }
@@ -23,7 +26,7 @@ let make_pixel = function(subpixel_count, value) {
  * @param {sc_edit_view_base} dest Destination view
  * @param {number} value Value with which to fill
  */
-let fill = function(dest, value) {
+let fill = function(dest: sc_edit_view_base, value: sc_pixel): void {
   if (dest.subpixel_count != value.length) {
     throw new Error(`Inconsistent subpixel_count in fill(dest[${dest.subpixel_count}], value[${value.length}])`);
   }
@@ -41,9 +44,9 @@ let fill = function(dest, value) {
  * Pixels that fall outside dest will be ignored
  * @param {sc_edit_view_base} dest Destination view
  * @param {sc_edit_view_base} src Source view
- * @param {position} offset Top-left position in dest that src will be applied to
+ * @param {sc_vec2} offset Top-left position in dest that src will be applied to
  */
-let add = function(dest, offset, src) {
+let add = function(dest: sc_edit_view_base, offset: sc_vec2, src: sc_edit_view_base): void {
   if (dest.subpixel_count != src.subpixel_count) {
     throw new Error(`Inconsistent subpixel_count in add(dest[${dest.subpixel_count}], src[${src.subpixel_count}])`);
   }
@@ -69,9 +72,9 @@ let add = function(dest, offset, src) {
  * Pixels that fall outside dest will be ignored
  * @param {sc_edit_view_base} dest Destination view
  * @param {sc_edit_view_base} src Source view
- * @param {position} offset Top-left position in dest that src will be applied to
+ * @param {sc_vec2} offset Top-left position in dest that src will be applied to
  */
-let sub = function(dest, offset, src) {
+let sub = function(dest: sc_edit_view_base, offset: sc_vec2, src: sc_edit_view_base): void {
   if (dest.subpixel_count != src.subpixel_count) {
     throw new Error(`Inconsistent subpixel_count in sub(dest[${dest.subpixel_count}], src[${src.subpixel_count}])`);
   }
@@ -97,11 +100,11 @@ let sub = function(dest, offset, src) {
  * Pixels that fall outside src will be ignored
  * @param {sc_edit_view_base} dest Destination view
  * @param {sc_edit_view_base} src Source view
- * @param {position} dest_offset Top-left position in dest that src will be applied to
- * @param {position} src_offset Top-left position in src that forms origin of copying
- * @param {position} size Width and height of region to copy between
+ * @param {sc_vec2} dest_offset Top-left position in dest that src will be applied to
+ * @param {sc_vec2} src_offset Top-left position in src that forms origin of copying
+ * @param {sc_vec2} size Width and height of region to copy between
  */
-let copy = function(dest, dest_offset, src, src_offset, size) {
+let copy = function(dest: sc_edit_view_base, dest_offset: sc_vec2, src: sc_edit_view_base, src_offset: sc_vec2, size: sc_vec2): void {
   if (dest.subpixel_count != src.subpixel_count) {
     throw new Error(`Inconsistent subpixel_count in copy(dest[${dest.subpixel_count}], src[${src.subpixel_count}])`);
   }
@@ -126,9 +129,9 @@ let copy = function(dest, dest_offset, src, src_offset, size) {
  * Pixels that fall outside dest will be ignored
  * @param {sc_edit_view_base} dest Destination view
  * @param {sc_edit_view_base} src Source view
- * @param {position} offset Top-left position in dest that src will be applied to
+ * @param {sc_vec2} offset Top-left position in dest that src will be applied to
  */
-let set = function(dest, offset, src) {
+let set = function(dest: sc_edit_view_base, offset: sc_vec2, src: sc_edit_view_base): void {
   if (dest.subpixel_count != src.subpixel_count) {
     throw new Error(`Inconsistent subpixel_count in set(dest[${dest.subpixel_count}], src[${src.subpixel_count}])`);
   }
@@ -146,16 +149,16 @@ let set = function(dest, offset, src) {
 /**
  * Blends two inputs into the output using a third input as weights
  * @param {sc_edit_view_base} dest Destination view
- * @param {position} offset The offset into destionat/src2 to use
+ * @param {sc_vec2} offset The offset into destionat/src2 to use
  * @param {sc_edit_view_base} src1 A region with which to blend (usually smaller than dest)
  * @param {sc_edit_view_base} src2 The second source to blend with. Typically the same size as dest, or may be dest
  * @param {sc_edit_view_base} weights Weighting array. Should be same size of src1
  */
-let weighted_blend = function(dest, offset, src1, src2, weights) {
+let weighted_blend = function(dest: sc_edit_view_base, offset: sc_vec2, src1: sc_edit_view_base, src2: sc_edit_view_base, weights: sc_edit_view_base): void {
   if (dest.subpixel_count != src1.subpixel_count ||
       dest.subpixel_count != src2.subpixel_count ||
       dest.subpixel_count != weights.subpixel_count) {
-    throw new Error(`Inconsistent subpixel_count in weighted_blend(dest[${dest.subpixel_count}], src1[${src.subpixel_count}], src2[${src.subpixel_count}], weights[${src.subpixel_count}])`);
+    throw new Error(`Inconsistent subpixel_count in weighted_blend(dest[${dest.subpixel_count}], src1[${src1.subpixel_count}], src2[${src2.subpixel_count}], weights[${weights.subpixel_count}])`);
   }
 
   for (let iy = 0; iy < src1.height; iy++) {
@@ -181,16 +184,16 @@ let weighted_blend = function(dest, offset, src1, src2, weights) {
  * before application then no change is made to that pixel. This determination is made at the
  * sub-pixel level.
  * @param {sc_edit_view_base} dest Destination view
- * @param {position} offset The offset into destionat/src2 to use
+ * @param {sc_vec2} offset The offset into destionat/src2 to use
  * @param {sc_edit_view_base} src1 A region with which to blend (usually smaller than dest)
  * @param {sc_edit_view_base} src2 The second source to blend with. Typically the same size as dest, or may be dest
  * @param {sc_edit_view_base} weights Weighting array. Should be same size of src1
  */
-let ratcheted_weighted_blend = function(dest, offset, src1, src2, weights) {
+let ratcheted_weighted_blend = function(dest: sc_edit_view_base, offset: sc_vec2, src1: sc_edit_view_base, src2: sc_edit_view_base, weights: sc_edit_view_base): void {
   if (dest.subpixel_count != src1.subpixel_count ||
       dest.subpixel_count != src2.subpixel_count ||
       dest.subpixel_count != weights.subpixel_count) {
-    throw new Error(`Inconsistent subpixel_count in ratcheted_weighted_blend(dest[${dest.subpixel_count}], src1[${src.subpixel_count}], src2[${src.subpixel_count}], weights[${src.subpixel_count}])`);
+    throw new Error(`Inconsistent subpixel_count in ratcheted_weighted_blend(dest[${dest.subpixel_count}], src1[${src1.subpixel_count}], src2[${src2.subpixel_count}], weights[${weights.subpixel_count}])`);
   }
 
   for (let iy = 0; iy < src1.height; iy++) {
@@ -230,10 +233,10 @@ let ratcheted_weighted_blend = function(dest, offset, src1, src2, weights) {
  * @param {number} outer_value The value to user outside the outer_radius
  * @param {number} outer_radius The outer radius
  */
-let radial_fill = function(dest, inner_value, inner_radius, outer_value, outer_radius) {
+let radial_fill = function(dest: sc_edit_view_base, inner_value: sc_pixel, inner_radius: number, outer_value: sc_pixel, outer_radius: number): void {
   if (dest.subpixel_count != inner_value.length ||
       dest.subpixel_count != outer_value.length) {
-    throw new Error(`Inconsistent subpixel_count in radial_fill(dest[${dest.subpixel_count}], inner_radius[${inner_radius.length}], outer_radius[${outer_radius.length}])`);
+    throw new Error(`Inconsistent subpixel_count in radial_fill(dest[${dest.subpixel_count}], inner_value[${inner_value.length}], outer_value[${outer_value.length}])`);
   }
 
   // A patch 33 pixels across has centre bin at 16
@@ -267,10 +270,10 @@ let radial_fill = function(dest, inner_value, inner_radius, outer_value, outer_r
  * @param {sc_edit_view_base} dest Destination view
  * @param {function} operation
  */
-let transform = function(dest, operation) {
+let transform = function(dest: sc_edit_view_base, operation: (subpixel: number, pixel: sc_pixel) => number) {
   for (let y = 0; y < dest.height; y++) {
     for (let x = 0; x < dest.width; x++) {
-      const p = [x, y];
+      const p: sc_vec2 = [x, y];
       const input_pixel = dest.get_pixel(p);
       const output_pixel = input_pixel.map((subpixel) => operation(subpixel, input_pixel));
       dest.set_pixel(p, output_pixel);
@@ -279,17 +282,39 @@ let transform = function(dest, operation) {
 };
 
 /**
+ * A single channel of a histogram
+ * TBD: Could I constrain or template this?
+ */
+export type sc_histogram_channel = number[];
+
+/**
+ * A histogram calculated over multiple subchanels
+ * TBD: Could I constrain or template this?
+ */
+export type sc_histogram_array = sc_histogram_channel[];
+
+/**
+ * A signal extracted from a histogram channel
+ */
+export interface histogram_signal {
+  left_edge: number;
+  right_edge: number;
+  population: number;
+}
+
+/**
  * Calculates a log domain histogram of the specified view.
  * Each subpixel has a histogram calculated, so the result is returned as an array
  * even if there is only one subpixel
  * @param {sc_edit_view_base} src The view
+ * @return {sc_histogram_array} Array of histograms, one per sub-pixel
  */
-let calculate_histogram = function(src) {
-  const result = [];
+let calculate_histogram = function(src: sc_edit_view_base): sc_histogram_array {
+  const result: number[][] = [];
 
   // Create histogram storage
   for (let subpixel = 0; subpixel < src.subpixel_count; subpixel++) {
-    const histogram = new Array(src.subpixel_max + 1);
+    const histogram: number[] = new Array<number>(src.subpixel_max + 1);
     histogram.fill(0);
     result.push(histogram);
   }
@@ -320,22 +345,23 @@ let calculate_histogram = function(src) {
   return result;
 };
 
+
 /**
  * Extracts the peaks from a histogram
- * @param {Array<number>} histogram
+ * @param {sc_histogram_channel} histogram
  * @param {number} signals_to_find The number of singals to attempt to find
  * @param {number} min_bin The bin at which to start looking (eg to avoid looking under water)
- * @returns {Array.<*>} Array of not more than signals_to_find signals, defined by {left_edge, right_edge, population}.
+ * @returns {histogram_signal[]} Array of not more than signals_to_find signals.
  * The returned signals will be sorted so that the highest population signals are returned first
  */
-let find_histogram_signals = (histogram, signals_to_find, min_bin) => {
+let find_histogram_signals = (histogram: sc_histogram_channel, signals_to_find: number, min_bin: number): histogram_signal[] => {
   // Operate on bins above the min_bin
   min_bin = Math.round(min_bin);
 
   // We're going to calculate this only counting non-zero cells as most bins are unoccupied
   // TBD: Does this work better if the range is max_bin - min_bin?
-  const occupied_bin_count = histogram.map(term => term !== 0 ? 1 : 0)
-    .reduce((sum, term) => sum + term);
+  const occupied_bin_count: number = histogram.map(term => term !== 0 ? 1 : 0)
+    .reduce((sum: number, term: number) => sum + term, 0);
 
   // Early exit if occupied bins will be empty
   if (occupied_bin_count === 0) {
@@ -343,25 +369,24 @@ let find_histogram_signals = (histogram, signals_to_find, min_bin) => {
   }
 
   // Calculate the mean population (which is less trivial than it sounds due to log domain)
-  const mean = histogram.reduce((sum, term) => sum + term) / occupied_bin_count;
+  const mean: number = histogram.reduce((sum, term) => sum + term) / occupied_bin_count;
   // TBD: Check I can still remember how to calculate standard deviation!
-  const sd = Math.sqrt(histogram.reduce((sum, term) => sum + Math.pow(term - mean, 2))) / occupied_bin_count;
+  const sd: number = Math.sqrt(histogram.reduce((sum, term) => sum + Math.pow(term - mean, 2))) / occupied_bin_count;
 
   // Now walk the bins. Any time the population changes by 1sd declare an edge start
   // Any time it drops by 1sd declare an edge end
-
-  let theshold_scalar = 0;
-  let best_result = []; // We'll keep increasing the threshold until we have too few results, then return the previous result
-  let merged_signals = [];
+  let theshold_scalar: number = 0;
+  let best_result: histogram_signal[] = []; // We'll keep increasing the threshold until we have too few results, then return the previous result
+  let merged_signals: histogram_signal[] = [];
 
   do {
     best_result = [...merged_signals];
 
-    const threshold_change = sd * theshold_scalar;
-    const threshold_down = Math.max(0, mean + threshold_change);
-    const threshold_up = mean + threshold_change;
-    let left_edge = -1;
-    const signals = [];
+    const threshold_change: number = sd * theshold_scalar;
+    const threshold_down: number = Math.max(0, mean + threshold_change);
+    const threshold_up: number = mean + threshold_change;
+    let left_edge: number = -1;
+    const signals: histogram_signal[] = [];
     merged_signals = [];
 
     for (let i = 0; i < histogram.length; i++) {
@@ -372,8 +397,8 @@ let find_histogram_signals = (histogram, signals_to_find, min_bin) => {
       } else {
         // TBD: Detect right edge if this persists for N steps?
         if (histogram[i] <= threshold_down) {
-          const right_edge = i;
-          const population = Math.log1p(histogram.slice(left_edge, right_edge)
+          const right_edge: number = i;
+          const population: number = Math.log1p(histogram.slice(left_edge, right_edge)
             .map(p => Math.expm1(p))
             .reduce((sum, term) => sum + term));
           signals.push({left_edge, right_edge, population});

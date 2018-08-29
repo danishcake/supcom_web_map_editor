@@ -18,7 +18,8 @@ export class sc_edit_view_convolution extends sc_edit_view_base {
    * @param {number} divisor A scalar to divide final convolution by
    */
   constructor(wrapped_view, weights, divisor) {
-    super(wrapped_view);
+    super();
+    this.__wrapped_view = wrapped_view;
     if  (!weights) {
       throw new Error(`sc_edit_view_convolution weights argument cannot be null`);
     }

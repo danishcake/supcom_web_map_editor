@@ -6,7 +6,8 @@ import {sc_edit_view_methods} from "./sc_edit_view_methods"
  */
 export class sc_edit_view_mask extends sc_edit_view_base {
   constructor(wrapped_view, mask) {
-    super(wrapped_view);
+    super();
+    this.__wrapped_view = wrapped_view;
     this.__mask = mask;
   }
 

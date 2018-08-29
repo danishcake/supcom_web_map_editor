@@ -5,7 +5,8 @@ import {sc_edit_view_base} from "./sc_edit_view"
  */
 export class sc_edit_view_oob_clamp extends sc_edit_view_base {
   constructor(wrapped_view) {
-    super(wrapped_view);
+    super();
+    this.__wrapped_view = __wrapped_view;
   }
 
 
