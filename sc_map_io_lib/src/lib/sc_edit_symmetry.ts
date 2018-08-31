@@ -18,7 +18,7 @@ import { mat2 } from "gl-matrix";
  * __get_primary_pixel_impl: Returns the primary pixel given any pixel
  * __get_secondary_pixels_impl: Returns array of secondary pixels if provided a primary pixel
  */
-abstract class sc_edit_symmetry_base {
+export abstract class sc_edit_symmetry_base {
   /**
    * Get the primary pixel from any pixel inside size
    * @param {sc_vec2} point Position on map
