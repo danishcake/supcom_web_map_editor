@@ -1,6 +1,7 @@
 import {sc_edit_view_base} from "./sc_edit_view"
 import {sc_edit_patch} from "./sc_edit_patch"
 import {sc_edit_view_methods} from "./sc_edit_view_methods"
+import { sc_vec2, sc_pixel } from "../sc_vec";
 
 
 /**
@@ -12,10 +13,15 @@ import {sc_edit_view_methods} from "./sc_edit_view_methods"
  * to get_pixel on the cache
  */
 export class sc_edit_view_snapshot extends sc_edit_view_base {
+  private __wrapped_view: sc_edit_view_base;
+  private __tilesize: number;
+  private __tiles: sc_edit_view_base[][];
+  private __tilesize2d: sc_vec2;
+
   /**
    * Creates a snapshot with no initial cache tiles
    */
-  constructor(wrapped_view) {
+  constructor(wrapped_view: sc_edit_view_base) {
     super();
     this.__wrapped_view = wrapped_view;
 
@@ -25,25 +31,22 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
 
     // Initially all tiles are null, indicating no data cached
     for (let y = 0; y < Math.ceil(this.__wrapped_view.height / this.__tilesize); y++) {
-      let row = [];
-      for (let x = 0; x < Math.ceil(this.__wrapped_view.width / this.__tilesize); x++) {
-        row.push(null);
-      }
+      let row: sc_edit_view_base[] = new Array<sc_edit_view_base>(Math.ceil(this.__wrapped_view.width / this.__tilesize));
       this.__tiles.push(row);
     }
   }
 
 
   /** Gets the width */
-  __get_width_impl() { return this.__wrapped_view.width; }
+  protected __get_width_impl(): number { return this.__wrapped_view.width; }
 
 
   /** Gets the height  */
-  __get_height_impl() { return this.__wrapped_view.height; }
+  protected __get_height_impl(): number { return this.__wrapped_view.height; }
 
 
   /** Returns the value of a pixel at the given coordinate */
-  __get_pixel_impl(position) {
+  protected __get_pixel_impl(position: sc_vec2): sc_pixel {
     // TODO: Reduce duplicate calculations in this
     this.__ensure_cached(position);
     const tile_indices = this.__get_tile_indices(position);
@@ -53,32 +56,38 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
 
 
   /** Sets the value of a pixel at the given coordinate */
-  __set_pixel_impl(position, value) {
+  protected __set_pixel_impl(position: sc_vec2, value: sc_pixel): void {
     this.__ensure_cached(position);
     this.__wrapped_view.set_pixel(position, value);
   }
 
 
   /** Returns the default pixel value (0) */
-  __oob_pixel_value_impl(position) { return sc_edit_view_methods.make_pixel(this.subpixel_count, 0); }
+  protected __oob_pixel_value_impl(position: sc_vec2): sc_pixel {
+    return sc_edit_view_methods.make_pixel(this.subpixel_count, 0);
+  }
 
 
   /** Returns the number of subpixels */
-  __get_subpixel_count_impl() { return this.__wrapped_view.subpixel_count; }
+  protected __get_subpixel_count_impl(): number {
+    return this.__wrapped_view.subpixel_count;
+  }
 
 
   /** Returns the maximum value of a subpixel */
-  __get_subpixel_max_impl() { return this.__wrapped_view.subpixel_max; }
+  protected __get_subpixel_max_impl(): number {
+    return this.__wrapped_view.subpixel_max;
+  }
 
 
   /** Gets the [x,y] index of the tile corresponding to the pixel position */
-  __get_tile_indices(position) {
+  private __get_tile_indices(position: sc_vec2): sc_vec2 {
     return [Math.floor(position[0] / this.__tilesize), Math.floor(position[1] / this.__tilesize)];
   }
 
 
   /** Gets the [x,y] pixel coordinate of the start of the tile */
-  __get_tile_origin(position) {
+  private __get_tile_origin(position: sc_vec2): sc_vec2 {
     let tile_indices = this.__get_tile_indices(position);
     tile_indices[0] *= this.__tilesize;
     tile_indices[1] *= this.__tilesize;
@@ -87,14 +96,14 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
 
 
   /** Gets the [x,y] pixel coordinate of pixel within its tile */
-  __get_position_in_tile(position) {
+  private __get_position_in_tile(position: sc_vec2): sc_vec2 {
     let tile_origin = this.__get_tile_origin(position);
     return [position[0] - tile_origin[0], position[1] - tile_origin[1]];
   }
 
 
   /** Ensures a tile is cached, but makes no change if already cached */
-  __ensure_cached(position) {
+  private __ensure_cached(position: sc_vec2): void {
     const tile_indices = this.__get_tile_indices(position);
 
     if (!this.__tiles[tile_indices[0]][tile_indices[1]]) {
@@ -108,7 +117,7 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
   /**
    * Adds the entire wrapped view to the cache, disabling lazy caching
    */
-  cache_everything() {
+  cache_everything(): void {
     // Initially all tiles are null, indicating no data cached
     for (let y = 0; y < Math.ceil(this.__wrapped_view.height / this.__tilesize); y++) {
       for (let x = 0; x < Math.ceil(this.__wrapped_view.width / this.__tilesize); x++) {
@@ -119,7 +128,7 @@ export class sc_edit_view_snapshot extends sc_edit_view_base {
 
 
   /** Gets the number of stored tiles. Primarily for unit testing */
-  get tile_count() {
+  get tile_count(): number {
     let count = 0;
     for (let y = 0; y < Math.ceil(this.__wrapped_view.height / this.__tilesize); y++) {
       for (let x = 0; x < Math.ceil(this.__wrapped_view.width / this.__tilesize); x++) {
