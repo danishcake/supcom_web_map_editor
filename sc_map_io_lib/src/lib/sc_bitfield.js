@@ -37,7 +37,7 @@ export class sc_bitfield {
     } else if (typeof(data) === 'number') {
       this.__data = [(data & 0x000000FF) >> 0,  (data & 0x0000FF00) >> 8,
                      (data & 0x00FF0000) >> 16, (data & 0xFF000000) >> 24];
-    } else if ((ByteBuffer && data instanceof ByteBuffer) || (dcodeIO && dcodeIO.ByteBuffer && data instanceof dcodeIO.ByteBuffer)) {
+    } else if (data instanceof ByteBuffer) {
       // The above is a nasty hack to get this working in the browser
       // It would be better to not have a second version of ByteBuffer kicking around!
       this.__data = [];

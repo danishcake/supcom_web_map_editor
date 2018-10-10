@@ -1,6 +1,5 @@
-import {_} from "underscore";
-import { sc } from "../sc";
-
+import { _ } from "underscore";
+import { sc_script_marker } from "../sc_script";
 
 /**
  * Marker creation tool
@@ -22,19 +21,19 @@ export class sc_edit_tool_add_marker {
   /**
    * Setter for outer radius
    */
-  set_outer_radius(outer_radius) {}
+  set_outer_radius(outer_radius) { }
 
 
   /**
    * Setter for inner radius
    */
-  set_inner_radius(inner_radius) {}
+  set_inner_radius(inner_radius) { }
 
 
   /**
    * Setter for stength
    */
-  set_strength(strength) {}
+  set_strength(strength) { }
 
   /** @type {number} */
   get outer_radius() { return 1; }
@@ -60,10 +59,10 @@ export class sc_edit_tool_add_marker {
       for (const position of all_positions) {
         // First application, so place marker at current position
         // Find a unique name
-        const marker_name = sc.script.marker.find_unique_name(data.save_script.markers, this.__marker_template.name);
+        const marker_name = sc_script_marker.find_unique_name(data.save_script.markers, this.__marker_template.name);
 
         // Load fields from template
-        const marker = new sc.script.marker();
+        const marker = new sc_script_marker();
         marker.load(marker_name, this.__marker_template);
 
         // Position marker under cursor
@@ -84,7 +83,7 @@ export class sc_edit_tool_add_marker {
    * @param {sc_edit_tool_data} data Data to edit
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
-  apply(data, args) {}
+  apply(data, args) { }
 
 
   /**

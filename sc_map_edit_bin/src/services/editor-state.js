@@ -1,5 +1,21 @@
 const angular = require('angular');
-const sc_map_io_lib = require('../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+import { sc_edit_view_methods } from '../../../sc_map_io_lib/src/lib/views/sc_edit_view_methods';
+import { sc_edit_tool_lower, sc_edit_tool_lower_peak, sc_edit_tool_raise, sc_edit_tool_raise_peak }
+  from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_raise';
+import { sc_edit_tool_flatten } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_flatten';
+import { sc_edit_tool_smooth } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_smooth';
+import { sc_edit_tool_set } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_set';
+import { sc_edit_tool_water_elevation } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_water_elevation';
+import { sc_edit_tool_select_marker } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_select_marker';
+import { sc_edit_tool_add_marker } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_add_marker';
+import { sc_edit_symmetry } from '../../../sc_map_io_lib/src/lib/sc_edit_symmetry';
+import { sc_edit_view_mask } from '../../../sc_map_io_lib/src/lib/views/sc_edit_view_mask';
+import { sc_edit_view_symmetry } from '../../../sc_map_io_lib/src/lib/views/sc_edit_view_symmetry';
+import { sc_edit_heightmap } from '../../../sc_map_io_lib/src/lib/sc_edit_heightmap';
+import { sc_edit_texturemap } from '../../../sc_map_io_lib/src/lib/sc_edit_texturemap';
+import { sc_script_scenario, sc_script_save } from '../../../sc_map_io_lib/src/lib/sc_script';
+import { sc_map } from '../../../sc_map_io_lib/src/lib/sc_map';
+
 const _ = require('underscore');
 
 /**
@@ -47,7 +63,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
    * @param {number} tool_layer Layer to leave unmasked
    */
   const mask_from_tool_layer = function(tool_layer) {
-    const mask = sc_map_io_lib.sc.edit.view.methods.make_pixel(8, 0);
+    const mask = sc_edit_view_methods.make_pixel(8, 0);
     mask[tool_layer] = 1;
     return mask;
   };
@@ -76,27 +92,27 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
         service.render_mode = 'heightmap';
         switch(tool_data.heightmap.type) {
           case 'raise':
-            service.tool = new sc_map_io_lib.sc.edit.tool.raise(outer, inner, strength);
+            service.tool = new sc_edit_tool_raise(outer, inner, strength);
             break;
 
           case 'lower':
-            service.tool = new sc_map_io_lib.sc.edit.tool.lower(outer, inner, strength);
+            service.tool = new sc_edit_tool_lower(outer, inner, strength);
             break;
 
           case 'raise_peak':
-            service.tool = new sc_map_io_lib.sc.edit.tool.raise_peak(outer, 1.0, strength / inner);
+            service.tool = new sc_edit_tool_raise_peak(outer, 1.0, strength / inner);
             break;
 
           case 'lower_peak':
-            service.tool = new sc_map_io_lib.sc.edit.tool.lower_peak(outer, 1.0, strength / inner);
+            service.tool = new sc_edit_tool_lower_peak(outer, 1.0, strength / inner);
             break;
 
           case 'flatten':
-            service.tool = new sc_map_io_lib.sc.edit.tool.flatten(outer, inner, strength);
+            service.tool = new sc_edit_tool_flatten(outer, inner, strength);
             break;
 
           case 'smooth':
-            service.tool = new sc_map_io_lib.sc.edit.tool.smooth(outer, inner, strength * 5, sc_map_io_lib.sc.edit.tool.smooth.blur_average);
+            service.tool = new sc_edit_tool_smooth(outer, inner, strength * 5, sc_edit_tool_smooth.blur_average);
             break;
 
           default:
@@ -109,36 +125,36 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
         service.render_mode = 'texturemap';
         switch(tool_data.texturemap.type) {
           case 'saturate_layer':
-            service.tool = new sc_map_io_lib.sc.edit.tool.set(outer, outer, 255);
-            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
+            service.tool = new sc_edit_tool_set(outer, outer, 255);
+            target_view_constructor = (target_view) => new sc_edit_view_mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
             break;
 
           case 'half_layer':
-            service.tool = new sc_map_io_lib.sc.edit.tool.set(outer, outer, 192);
-            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
+            service.tool = new sc_edit_tool_set(outer, outer, 192);
+            target_view_constructor = (target_view) => new sc_edit_view_mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
             break;
 
           case 'clear_layer':
-            service.tool = new sc_map_io_lib.sc.edit.tool.set(outer, outer, 0);
-            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
+            service.tool = new sc_edit_tool_set(outer, outer, 0);
+            target_view_constructor = (target_view) => new sc_edit_view_mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
             break;
 
           case 'clear_higher_layers':
-            service.tool = new sc_map_io_lib.sc.edit.tool.clear_higher(outer, inner, tool_data.texturemap.layer);
+            service.tool = new sc_edit_tool_clear_higher(outer, inner, tool_data.texturemap.layer);
             break;
 
           case 'raise_layer':
-            service.tool = new sc_map_io_lib.sc.edit.tool.raise(outer, inner, strength);
-            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
+            service.tool = new sc_edit_tool_raise(outer, inner, strength);
+            target_view_constructor = (target_view) => new sc_edit_view_mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
             break;
 
           case 'lower_layer':
-            service.tool = new sc_map_io_lib.sc.edit.tool.lower(outer, inner, strength);
-            target_view_constructor = (target_view) => new sc_map_io_lib.sc.edit.view.mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
+            service.tool = new sc_edit_tool_lower(outer, inner, strength);
+            target_view_constructor = (target_view) => new sc_edit_view_mask(target_view, mask_from_tool_layer(tool_data.texturemap.layer));
             break;
 
           case 'smooth_edges':
-            service.tool = new sc_map_io_lib.sc.edit.tool.smooth(outer, inner, strength * 5, sc_map_io_lib.sc.edit.tool.smooth.blur_average);
+            service.tool = new sc_edit_tool_smooth(outer, inner, strength * 5, sc_edit_tool_smooth.blur_average);
             break;
 
           default:
@@ -152,10 +168,10 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
       case 'marker':
         switch (tool_data.marker.type) {
           case 'select':
-            service.tool = new sc_map_io_lib.sc.edit.tool.select_marker();
+            service.tool = new sc_edit_tool_select_marker();
             break;
           case 'army':
-            service.tool = new sc_map_io_lib.sc.edit.tool.add_marker( {
+            service.tool = new sc_edit_tool_add_marker( {
               type: 'Blank Marker',
               name: 'ARMY', // _${index}
               position: {x: 0, y: 0, z: 0}, // Will be replaced
@@ -165,7 +181,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
             });
             break;
           case 'mass':
-            service.tool = new sc_map_io_lib.sc.edit.tool.add_marker( {
+            service.tool = new sc_edit_tool_add_marker( {
               type: 'Mass',
               name: 'Mass', // _${index}
               position: {x: 0, y: 0, z: 0}, // Will be replaced
@@ -179,7 +195,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
             });
             break;
           case 'hydro':
-            service.tool = new sc_map_io_lib.sc.edit.tool.add_marker( {
+            service.tool = new sc_edit_tool_add_marker( {
               type: 'Hydrocarbon',
               name: 'Hydrocarbon', // _${index}
               position: {x: 0, y: 0, z: 0}, // Will be replaced
@@ -200,15 +216,15 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
       case 'water':
         switch (tool_data.water.type) {
           case 'elevation':
-            service.tool = new sc_map_io_lib.sc.edit.tool.water_elevation(sc_map_io_lib.sc.edit.tool.water_elevation.shallow);
+            service.tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.shallow);
             break;
 
           case 'elevation_deep':
-            service.tool = new sc_map_io_lib.sc.edit.tool.water_elevation(sc_map_io_lib.sc.edit.tool.water_elevation.deep);
+            service.tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.deep);
             break;
 
           case 'elevation_abyss':
-            service.tool = new sc_map_io_lib.sc.edit.tool.water_elevation(sc_map_io_lib.sc.edit.tool.water_elevation.abyssal);
+            service.tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.abyssal);
             break;
 
           default:
@@ -226,36 +242,36 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     switch(tool_data.symmetry) {
       case 'none':
       default:
-        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.none();
+        service.symmetry = new sc_edit_symmetry.none();
         break;
 
       case 'horizontal':
-        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.horizontal();
+        service.symmetry = new sc_edit_symmetry.horizontal();
         break;
 
       case 'vertical':
-        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.vertical();
+        service.symmetry = new sc_edit_symmetry.vertical();
         break;
 
       case 'xy':
-        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.xy();
+        service.symmetry = new sc_edit_symmetry.xy();
         break;
 
       case 'yx':
-        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.yx();
+        service.symmetry = new sc_edit_symmetry.yx();
         break;
 
       case 'quadrants':
-        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.quadrants();
+        service.symmetry = new sc_edit_symmetry.quadrants();
         break;
 
       case 'octants':
-        service.symmetry = new sc_map_io_lib.sc.edit.symmetry.octants();
+        service.symmetry = new sc_edit_symmetry.octants();
         break;
     }
 
-    service.edit_heightmap_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_heightmap, service.symmetry);
-    service.edit_texturemap_view = new sc_map_io_lib.sc.edit.view.symmetry(service.edit_texturemap, service.symmetry);
+    service.edit_heightmap_view = new sc_edit_view_symmetry(service.edit_heightmap, service.symmetry);
+    service.edit_texturemap_view = new sc_edit_view_symmetry(service.edit_texturemap, service.symmetry);
 
     // Set the primary target view for the tool based on the tool
     switch(tool_data.category) {
@@ -307,8 +323,8 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     service.save_location = map.save_location;
 
     // Build editable heightmap/texturemap
-    service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);
-    service.edit_texturemap = new sc_map_io_lib.sc.edit.texturemap(service.map.texturemap)
+    service.edit_heightmap = new sc_edit_heightmap(service.map.heightmap);
+    service.edit_texturemap = new sc_edit_texturemap(service.map.texturemap)
 
     // Call each registered map change subscriber
     _.each(service.callbacks.on_new_map, callback => callback());
@@ -319,10 +335,10 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
    * Create a new map
    */
   service.create_map = function(map_params) {
-    service.map = new sc_map_io_lib.sc.map();
+    service.map = new sc_map();
     service.scripts = {
-      scenario: new sc_map_io_lib.sc.script.scenario(),
-      save: new sc_map_io_lib.sc.script.save()
+      scenario: new sc_script_scenario(),
+      save: new sc_script_save()
     };
 
     service.map.create(map_params);
@@ -330,8 +346,8 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     service.scripts.save.create(map_params);
 
     // Build editable heightmap/texturemap
-    service.edit_heightmap = new sc_map_io_lib.sc.edit.heightmap(service.map.heightmap);
-    service.edit_texturemap = new sc_map_io_lib.sc.edit.texturemap(service.map.texturemap);
+    service.edit_heightmap = new sc_edit_heightmap(service.map.heightmap);
+    service.edit_texturemap = new sc_edit_texturemap(service.map.texturemap);
 
     // Call each registered map change subscriber
     _.each(service.callbacks.on_new_map, callback => callback());

@@ -1,5 +1,8 @@
 const angular = require('angular');
-const sc_map_io_lib = require('../../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+import { sc_map } from '../../../../sc_map_io_lib/src/lib/sc_map';
+import { sc_zip } from '../../../../sc_map_io_lib/src/lib/sc_zip';
+import { sc_script_save, sc_script_scenario } from '../../../../sc_map_io_lib/src/lib/sc_script';
+const ByteBuffer = require('bytebuffer');
 
 angular.module('sc_map_edit_bin.controllers').controller("open-map",
 ["$scope", "$uibModalInstance", "dialogs", "data", function($scope, $uibModalInstance, dialogs, data) {
@@ -40,18 +43,18 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
     try {
       // Retrive scmap from localstorage and load
       const b64_serialised_scmap = localStorage.getItem("sc_map_edit_bin.save.scmap");
-      const serialised_scmap = dcodeIO.ByteBuffer.wrap(b64_serialised_scmap, "base64", dcodeIO.ByteBuffer.LITTLE_ENDIAN);
-      const scmap = new sc_map_io_lib.sc.map();
+      const serialised_scmap = ByteBuffer.wrap(b64_serialised_scmap, "base64", ByteBuffer.LITTLE_ENDIAN);
+      const scmap = new sc_map();
       scmap.load(serialised_scmap);
 
       const b64_serialised_script_scenario = localStorage.getItem("sc_map_edit_bin.save.scenario");
-      const serialised_script_scenario = dcodeIO.ByteBuffer.wrap(b64_serialised_script_scenario, "base64", dcodeIO.ByteBuffer.LITTLE_ENDIAN);
-      const script_scenario = new sc_map_io_lib.sc.script.scenario();
+      const serialised_script_scenario = ByteBuffer.wrap(b64_serialised_script_scenario, "base64", ByteBuffer.LITTLE_ENDIAN);
+      const script_scenario = new sc_script_scenario();
       script_scenario.load(serialised_script_scenario);
 
       const b64_serialised_script_save = localStorage.getItem("sc_map_edit_bin.save.save");
-      const serialised_script_save = dcodeIO.ByteBuffer.wrap(b64_serialised_script_save, "base64", dcodeIO.ByteBuffer.LITTLE_ENDIAN);
-      const script_save = new sc_map_io_lib.sc.script.save();
+      const serialised_script_save = ByteBuffer.wrap(b64_serialised_script_save, "base64", ByteBuffer.LITTLE_ENDIAN);
+      const script_save = new sc_script_save();
       script_save.load(serialised_script_save);
 
       // Sucessfully loaded .scmap
@@ -67,7 +70,7 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
   }
 
   $scope.load_archive = function(archive_buffer) {
-    sc_map_io_lib.sc.zip.load(archive_buffer)
+    sc_zip.load(archive_buffer)
     .then((map) => {
       $scope.data.map.scmap = map.scmap;
       $scope.data.map.scripts.scenario = map.scripts.scenario;
@@ -88,8 +91,8 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
 
   $scope.open_scenario = function(scenario_buffer) {
     try {
-      let scenario = new sc_map_io_lib.sc.script.scenario()
-      scenario.load(dcodeIO.ByteBuffer.wrap(scenario_buffer, dcodeIO.ByteBuffer.LITTLE_ENDIAN));
+      let scenario = new sc_script_scenario()
+      scenario.load(ByteBuffer.wrap(scenario_buffer, ByteBuffer.LITTLE_ENDIAN));
 
       // Sucessfully loaded .scmap
       $scope.data.map.scripts.scenario = scenario;
@@ -104,8 +107,8 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
 
   $scope.open_save = function(save_buffer) {
     try {
-      let save = new sc_map_io_lib.sc.script.save()
-      save.load(dcodeIO.ByteBuffer.wrap(save_buffer, dcodeIO.ByteBuffer.LITTLE_ENDIAN));
+      let save = new sc_script_save();
+      save.load(ByteBuffer.wrap(save_buffer, ByteBuffer.LITTLE_ENDIAN));
 
       // Sucessfully loaded .scmap
       $scope.data.map.scripts.save = save;
@@ -120,8 +123,8 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
 
   $scope.open_scmap = function(scmap_buffer) {
     try {
-      let scmap = new sc_map_io_lib.sc.map();
-      scmap.load(dcodeIO.ByteBuffer.wrap(scmap_buffer, dcodeIO.ByteBuffer.LITTLE_ENDIAN));
+      let scmap = new sc_map();
+      scmap.load(ByteBuffer.wrap(scmap_buffer, ByteBuffer.LITTLE_ENDIAN));
 
       // Sucessfully loaded .scmap
       $scope.data.map.scmap = scmap;

@@ -1,6 +1,7 @@
-import {sc_rect} from "./sc_rect"
-import {sc_edit_view_base} from "./views/sc_edit_view"
-import {_} from "underscore";
+import { sc_rect } from "./sc_rect"
+import { sc_edit_view_base } from "./views/sc_edit_view"
+import { sc_vec2, sc_pixel } from "./sc_vec"
+import * as _ from "underscore";
 
 /**
  * @class sc_edit_heightmap
@@ -13,14 +14,25 @@ import {_} from "underscore";
  *     using glTexSubImage2d/glPixelStorei
  */
 export class sc_edit_heightmap extends sc_edit_view_base {
+  private __source_heightmap: any; // sc_map_heightmap
+  private __working_heightmap: Float32Array;
+  private __scanline_range: { min: number, max: number }[];
+  private __dirty_region: sc_rect | null;
+  private __minimum: number;
+  private __maximum: number;
+
   /**
    * Constructor
    * @param {sc_map_heightmap} heightmap Wrapped heightmap
    */
-  constructor(heightmap) {
-    // TODO: Check type of heightmap
-    super(null);
+  constructor(heightmap: any) {
+    super();
     this.__source_heightmap = heightmap;
+    this.__working_heightmap = new Float32Array(this.width * this.height);
+    this.__scanline_range = [];
+    this.__dirty_region = null;
+    this.__minimum = 0;
+    this.__maximum = 65535;
     this.__import_heightmap();
     this.mark_dirty_region(new sc_rect(0, 0, this.width, this.height));
     this.update_range_stats();
@@ -31,7 +43,7 @@ export class sc_edit_heightmap extends sc_edit_view_base {
    * Convert heightmap to equal sized Float32 array and extract data range
    * Data range is stored per-scanline to allow fast incremental updates
    */
-  __import_heightmap() {
+  private __import_heightmap(): void {
     this.__working_heightmap = new Float32Array(this.width * this.height);
     this.__scanline_range = [];
 
@@ -47,9 +59,9 @@ export class sc_edit_heightmap extends sc_edit_view_base {
   /**
    * Exports the working heightmap to a serialisable heightmap,
    * clamping values to  Uint16 values
-   * @param {sc_edit_heightmap} heightmap Heightmap to export back to
+   * @param {sc_map_heightmap} heightmap Heightmap to export back to
    */
-  export_to_heightmap(heightmap) {
+  public export_to_heightmap(heightmap: any): void {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
         let height = Math.floor(this.get_pixel([x, y])[0]);
@@ -62,7 +74,7 @@ export class sc_edit_heightmap extends sc_edit_view_base {
   /**
    * Clears the dirty region
    */
-  reset_dirty_region() {
+  public reset_dirty_region(): void {
     this.__dirty_region = null;
   }
 
@@ -71,7 +83,7 @@ export class sc_edit_heightmap extends sc_edit_view_base {
    * Mark a region as dirty. This will expand any previous dirty region
    * @param {sc_rect} rect Region to mark dirty
    */
-  mark_dirty_region(rect) {
+  public mark_dirty_region(rect: sc_rect): void {
     this.__dirty_region = (this.__dirty_region || rect).expand(rect);
   }
 
@@ -80,7 +92,7 @@ export class sc_edit_heightmap extends sc_edit_view_base {
    * Updates the high/low stats.
    * Fairly heavyweight operation, but operates only on the dirty region
    */
-  update_range_stats() {
+  public update_range_stats(): void {
     // Calculate the min/max values of the dirty rows
     if (this.__dirty_region) {
       for (let y = this.__dirty_region.top; y <= this.__dirty_region.bottom; y++) {
@@ -106,14 +118,18 @@ export class sc_edit_heightmap extends sc_edit_view_base {
    * Gets the width. Note that this is the actual width in pixels, which is one larger than the
    * width stored in the heightmap section of the underlying heightmap due to fence post problem.
    */
-  __get_width_impl() { return this.__source_heightmap.width + 1; }
+  protected __get_width_impl(): number {
+    return this.__source_heightmap.width + 1;
+  }
 
 
   /**
    * Gets the height. Note that this is the actual height in pixels, which is one larger than the
    * height stored in the heightmap section of the underlying heightmap due to fence post problem.
    */
-  __get_height_impl() { return this.__source_heightmap.height + 1; }
+  protected __get_height_impl(): number {
+    return this.__source_heightmap.height + 1;
+  }
 
 
   /**
@@ -121,7 +137,9 @@ export class sc_edit_heightmap extends sc_edit_view_base {
    * @param {sc_point} position X/Y coordinate of pixel
    * @return {sc_pixel} Value at X/Y
    */
-  __get_pixel_impl(position) { return [this.__working_heightmap[position[0] + position[1] * this.width]]; }
+  protected __get_pixel_impl(position: sc_vec2): sc_pixel {
+    return [this.__working_heightmap[position[0] + position[1] * this.width]];
+  }
 
 
   /**
@@ -129,7 +147,7 @@ export class sc_edit_heightmap extends sc_edit_view_base {
    * @param {sc_point} position X/Y coordinate of pixel
    * @param {sc_pixel} value Pixel value to write
    */
-  __set_pixel_impl(position, value) {
+  protected __set_pixel_impl(position: sc_vec2, value: sc_pixel): void {
     this.__working_heightmap[position[0] + position[1] * this.width] = value[0];
     if (this.__dirty_region != null) {
       this.__dirty_region.expand_point(position);
@@ -140,33 +158,33 @@ export class sc_edit_heightmap extends sc_edit_view_base {
 
 
   /** Returns the default pixel value (0) */
-  __oob_pixel_value_impl(position) { return 0; }
+  protected __oob_pixel_value_impl(position: sc_vec2): sc_pixel { return [0]; }
 
 
   /** Returns the number of subpixels */
-  __get_subpixel_count_impl() { return 1; }
+  protected __get_subpixel_count_impl(): number { return 1; }
 
 
   /** Returns the maximum value of a subpixel */
-  __get_subpixel_max_impl() { return 65535; }
+  protected __get_subpixel_max_impl(): number { return 65535; }
 
 
   /** Gets the height scale */
-  get scale() { return this.__source_heightmap.scale; }
+  public get scale(): number { return this.__source_heightmap.scale; }
 
 
   /** Get the region marked as region since it was last reset */
-  get dirty_region() { return this.__dirty_region; }
+  public get dirty_region(): sc_rect | null { return this.__dirty_region; }
 
 
   /** Gets the heightmap as a Float32Array */
-  get working_heightmap() { return this.__working_heightmap; }
+  public get working_heightmap(): Float32Array { return this.__working_heightmap; }
 
 
   /** Gets the minimum height in the entire heightmap */
-  get minimum_height() { return this.__minimum; }
+  public get minimum_height(): number { return this.__minimum; }
 
 
   /** Gets the maximum height in the entire heightmap */
-  get maximum_height() { return this.__maximum; }
+  public get maximum_height(): number { return this.__maximum; }
 };

@@ -108,7 +108,7 @@ export const sc_zip = {
 
     const map_bb = map_data.map.save();
     const script_bb = map_data.scripts.script.save();
-    const save_bb = map_data.scripts.save.save();
+    const save_bb = map_data.scripts.save.save(map_data.edit_heightmap);
     const scenario_bb = map_data.scripts.scenario.save();
 
     let zip = new JSZip();

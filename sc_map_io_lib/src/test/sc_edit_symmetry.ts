@@ -1,5 +1,6 @@
-import { sc_edit_symmetry } from '../lib/sc_edit_symmetry';
-import {_} from 'underscore';
+import { sc_edit_symmetry, sc_edit_symmetry_base } from '../lib/sc_edit_symmetry';
+import * as _ from 'underscore';
+import { sc_vec2 } from '../lib/sc_vec';
 const assert = require('chai').assert;
 
 /**
@@ -9,7 +10,7 @@ const assert = require('chai').assert;
  *
  * Checks every point maps is considered primary
  */
-const all_map_to_primary = function(symmetry, size, points) {
+const all_map_to_primary = function(symmetry: sc_edit_symmetry_base, size: sc_vec2, points: sc_vec2[]) {
   _.each(points, (point) => {
     assert.deepEqual(symmetry.get_primary_pixel(point, size), point);
   });
@@ -23,7 +24,7 @@ const all_map_to_primary = function(symmetry, size, points) {
  *
  * Checks every point maps is considered non-primary
  */
-const none_map_to_primary = function(symmetry, size, points) {
+const none_map_to_primary = function(symmetry: sc_edit_symmetry_base, size: sc_vec2, points: sc_vec2[]) {
   _.each(points, (point) => {
     assert.notDeepEqual(symmetry.get_primary_pixel(point, size), point);
   });
@@ -38,7 +39,7 @@ const none_map_to_primary = function(symmetry, size, points) {
  *
  * Checks a single point maps to all expected outputs
  */
-const maps_to_all = function(symmetry, size, point, results) {
+const maps_to_all = function(symmetry: sc_edit_symmetry_base, size: sc_vec2, point: sc_vec2, results: sc_vec2[]) {
   const secondary_pixels = symmetry.get_secondary_pixels(point, size);
 
   for (let i = 0; i < results.length; i++) {
@@ -216,7 +217,7 @@ describe('sc_edit_symmetry', function() {
 
     describe('get_primary_pixel', function() {
       describe('odd dimensions', function() {
-        const size = [257, 257];
+        const size: sc_vec2 = [257, 257];
         it('should consider coordinates < half as primary', function() {
           all_map_to_primary(sym, size, [
             [0,     0],
@@ -245,7 +246,7 @@ describe('sc_edit_symmetry', function() {
 
 
       describe('even dimensions', function() {
-        const size = [256, 256];
+        const size: sc_vec2 = [256, 256];
         it('should consider coordinates < half as primary', function() {
           all_map_to_primary(sym, size, [
             [0,     0],
@@ -267,7 +268,7 @@ describe('sc_edit_symmetry', function() {
 
     describe('get_secondary_pixels', function() {
       describe('odd dimensions', function() {
-        const size = [257, 257];
+        const size: sc_vec2 = [257, 257];
 
         it('should map to the other quadrants', function() {
           maps_to_all(sym, size, [0, 0], [
@@ -297,7 +298,7 @@ describe('sc_edit_symmetry', function() {
 
 
       describe('even dimensions', function() {
-        const size = [256, 256];
+        const size: sc_vec2 = [256, 256];
         it('should map to the other quadrants', function() {
           maps_to_all(sym, size, [0, 0], [
             [0,   255],
@@ -342,7 +343,7 @@ describe('sc_edit_symmetry', function() {
     const sym = new sc_edit_symmetry.octants();
     describe('get_primary_pixel', function() {
       describe('odd dimensions', function() {
-        const size = [257, 257];
+        const size: sc_vec2 = [257, 257];
 
         it('should consider the top-left octant primary', function() {
           all_map_to_primary(sym, size, [
@@ -369,7 +370,7 @@ describe('sc_edit_symmetry', function() {
 
 
       describe('even dimensions', function() {
-        const size = [256, 256];
+        const size: sc_vec2 = [256, 256];
 
         it('should consider the top-left octant as primary', function() {
           all_map_to_primary(sym, size, [
@@ -391,7 +392,7 @@ describe('sc_edit_symmetry', function() {
 
     describe('get_secondary_pixels', function() {
       describe('odd dimensions', function() {
-        const size = [257, 257];
+        const size: sc_vec2 = [257, 257];
 
         it('should map corners to other corners', function() {
           maps_to_all(sym, size, [0, 0], [
@@ -439,7 +440,7 @@ describe('sc_edit_symmetry', function() {
        * MNOPQRS
        */
       describe('odd dimensions', function() {
-        const size = [257, 257];
+        const size: sc_vec2 = [257, 257];
 
         it('should consider x <= y primary', function() {
           all_map_to_primary(sym, size, [
@@ -463,7 +464,7 @@ describe('sc_edit_symmetry', function() {
 
 
       describe('even dimensions', function() {
-        const size = [256, 256];
+        const size: sc_vec2 = [256, 256];
 
         it('should consider x <= y primary', function() {
           all_map_to_primary(sym, size, [
@@ -489,7 +490,7 @@ describe('sc_edit_symmetry', function() {
 
     describe('get_secondary_pixels', function() {
       describe('odd dimensions', function() {
-        const size = [257, 257];
+        const size: sc_vec2 = [257, 257];
 
         it('should mirror about x==y', function() {
           maps_to_all(sym, size, [0,   5], [[5,     0]]);
@@ -505,7 +506,7 @@ describe('sc_edit_symmetry', function() {
 
 
       describe('even dimensions', function() {
-        const size = [256, 256];
+        const size: sc_vec2 = [256, 256];
 
         it('should mirror about x==y', function() {
           maps_to_all(sym, size, [0,   5], [[5,     0]]);
@@ -527,7 +528,7 @@ describe('sc_edit_symmetry', function() {
 
     describe('get_primary_pixel', function() {
       describe('odd dimensions', function() {
-        let size = [257, 257];
+        let size: sc_vec2 = [257, 257];
 
         // Note title ignores a translation
         // Although untested, the line runs through [size.x, 0]
@@ -550,7 +551,7 @@ describe('sc_edit_symmetry', function() {
 
 
       describe('even dimensions', function() {
-        let size = [256, 256];
+        let size: sc_vec2 = [256, 256];
 
         it('should consider x + y < size.x primary', function() {
           all_map_to_primary(sym, size, [
@@ -573,7 +574,7 @@ describe('sc_edit_symmetry', function() {
 
     describe('get_secondary_pixels', function() {
       describe('odd dimensions', function() {
-        let size = [257, 257];
+        let size: sc_vec2 = [257, 257];
 
         it('should mirror about x + y = size.x', function() {
           maps_to_all(sym, size, [0,    0], [[256, 256]]);
@@ -590,7 +591,7 @@ describe('sc_edit_symmetry', function() {
 
 
       describe('even dimensions', function() {
-        let size = [256, 256];
+        let size: sc_vec2 = [256, 256];
 
         it('should mirror about x + y = size.x', function() {
           maps_to_all(sym, size, [0,    0], [[255, 255]]);

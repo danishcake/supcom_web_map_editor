@@ -1,5 +1,6 @@
 const angular = require('angular');
-const sc_map_io_lib = require('../../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+import { sc_script_script } from '../../../../sc_map_io_lib/src/lib/sc_script';
+import { sc_zip } from '../../../../sc_map_io_lib/src/lib/sc_zip';
 const async = require('async');
 const saveAs = require('file-saver').saveAs;
 
@@ -29,7 +30,7 @@ angular.module('sc_map_edit_bin.controllers').controller("save-progress",
       (next) => {
         const serialised_scripts = {
           scenario: $scope.data.scripts.scenario.save(),
-          save:     $scope.data.scripts.save.save()
+          save:     $scope.data.scripts.save.save($scope.data.edit_heightmap)
         };
         $timeout(() => { next(null, serialised_scripts); }, 50);
       },
@@ -104,13 +105,14 @@ angular.module('sc_map_edit_bin.controllers').controller("save-progress",
       scripts: {
         scenario: $scope.data.scripts.scenario,
         save: $scope.data.scripts.save,
-        script: new sc_map_io_lib.sc.script.script()
-      }
+        script: new sc_script_script()
+      },
+      edit_heightmap: $scope.data.edit_heightmap
     };
 
     // Start the actual saving in a callback so dialog is shown faster
     $timeout(() => {
-      sc_map_io_lib.sc.zip.save(map_data)
+      sc_zip.save(map_data)
         .then((zip_arraybuffer) => {
           $timeout(() => {
             $scope.data.progress_text = `Success`;

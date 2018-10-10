@@ -74,10 +74,14 @@ describe('sc_edit_texturemap', function() {
     let edit_texturemap = new sc_edit_texturemap(map.texturemap);
 
     it('should initially be entirely dirty', function() {
-      assert.equal(0, edit_texturemap.dirty_region.top);
-      assert.equal(0, edit_texturemap.dirty_region.left);
-      assert.equal(127, edit_texturemap.dirty_region.bottom);
-      assert.equal(127, edit_texturemap.dirty_region.right);
+      if (edit_texturemap.dirty_region != null) {
+        assert.equal(0, edit_texturemap.dirty_region.top);
+        assert.equal(0, edit_texturemap.dirty_region.left);
+        assert.equal(127, edit_texturemap.dirty_region.bottom);
+        assert.equal(127, edit_texturemap.dirty_region.right);
+      } else {
+        assert.fail('Empty dirty region');
+      }
     });
 
     it('should be clean after reset is called', function() {
@@ -87,18 +91,26 @@ describe('sc_edit_texturemap', function() {
 
     it('should track dirty regions when marked', function() {
       edit_texturemap.mark_dirty_region(new sc_rect(0, 0, 10, 10));
-      assert.equal(0, edit_texturemap.dirty_region.top);
-      assert.equal(0, edit_texturemap.dirty_region.left);
-      assert.equal(9, edit_texturemap.dirty_region.bottom);
-      assert.equal(9, edit_texturemap.dirty_region.right);
+      if (edit_texturemap.dirty_region != null) {
+        assert.equal(0, edit_texturemap.dirty_region.top);
+        assert.equal(0, edit_texturemap.dirty_region.left);
+        assert.equal(9, edit_texturemap.dirty_region.bottom);
+        assert.equal(9, edit_texturemap.dirty_region.right);
+      } else {
+        assert.fail('Empty dirty region');
+      }
     });
 
     it('should merge dirty regions', function() {
       edit_texturemap.mark_dirty_region(new sc_rect(100, 100, 20, 20));
-      assert.equal(0, edit_texturemap.dirty_region.top);
-      assert.equal(0, edit_texturemap.dirty_region.left);
-      assert.equal(119, edit_texturemap.dirty_region.bottom);
-      assert.equal(119, edit_texturemap.dirty_region.right);
+      if (edit_texturemap.dirty_region != null) {
+        assert.equal(0, edit_texturemap.dirty_region.top);
+        assert.equal(0, edit_texturemap.dirty_region.left);
+        assert.equal(119, edit_texturemap.dirty_region.bottom);
+        assert.equal(119, edit_texturemap.dirty_region.right);
+      } else {
+        assert.fail('Empty dirty region');
+      }
     });
   });
 });

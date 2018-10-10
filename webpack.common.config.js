@@ -12,12 +12,30 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].bundle.js'
   },
+  resolve: {
+    extensions: [".ts", ".js"],
+    alias: {
+      fs: path.resolve(__dirname, './sc_map_io_lib/src/lib/thirdparty/dummy-fs.js')
+    }
+  },
   target: "web",
   plugins: [
     new MiniCssExtractPlugin({})
   ],
   module: {
     rules: [
+      // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+      {
+        enforce: "pre",
+        test: /\.js$/,
+        loader: "source-map-loader"
+      },
+
+      // All files with a '.ts' extension will be handled by 'awesome-typescript-loader'.
+      {
+        test: /\.ts$/,
+        loader: "ts-loader"
+      },
       {
         test: /\.css$/,
         use: [{ loader: MiniCssExtractPlugin.loader }, "css-loader"]

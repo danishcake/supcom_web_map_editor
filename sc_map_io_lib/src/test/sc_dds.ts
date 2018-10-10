@@ -1,8 +1,7 @@
 import { sc_dds, sc_dds_pixelformat } from '../lib/sc_dds';
-const assert = require('chai').assert;
-const fs = require('fs');
+import { assert } from 'chai';
+import * as fs from 'fs';
 const ByteBuffer = require('bytebuffer');
-
 
 
 describe('sc_dxt5', function() {

@@ -1,5 +1,5 @@
 import { sc_bitfield } from '../lib/sc_bitfield';
-const assert = require('chai').assert;
+import { assert } from 'chai';
 
 
 describe('sc_bitfield', function() {

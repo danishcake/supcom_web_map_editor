@@ -1,5 +1,5 @@
 const angular = require('angular');
-const sc_map_io_lib = require('../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+import { sc_edit_view_methods } from '../../../sc_map_io_lib/src/lib/views/sc_edit_view_methods';
 
 // TODO: Pass in edit_heightmap via attribute
 angular.module('sc_map_edit_bin.directives').directive('histogram', ["editor_state", function(editor_state) {
@@ -26,7 +26,7 @@ angular.module('sc_map_edit_bin.directives').directive('histogram', ["editor_sta
 
     const display_bins = Math.max(1, canvas.width - 10);
     const display_height = canvas.height - 10;
-    const histogram = sc_map_io_lib.sc.edit.view.methods.calculate_histogram(editor_state.edit_heightmap)[0];
+    const histogram = sc_edit_view_methods.calculate_histogram(editor_state.edit_heightmap)[0];
     const max_count = Math.max(...histogram);
     const bin_to_x = (bin) => {
       return 6 + display_bins *
@@ -45,7 +45,7 @@ angular.module('sc_map_edit_bin.directives').directive('histogram', ["editor_sta
     ctx.stroke();
 
     // Find signals above water
-    const sorted_signals = sc_map_io_lib.sc.edit.view.methods.find_histogram_signals(histogram, 5,
+    const sorted_signals = sc_edit_view_methods.find_histogram_signals(histogram, 5,
       editor_state.map.water.has_water ? editor_state.map.water.elevation / editor_state.map.heightmap.scale : 0).slice(0, number_of_layers);
     // Orange highlight
     ctx.beginPath();

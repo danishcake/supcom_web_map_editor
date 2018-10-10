@@ -124,7 +124,7 @@ export class sc_script_base {
   run_script(input) {
     if (typeof input === 'string') {
       lua.luaL_dostring(this.__lua_state, input);
-    } else if (input instanceof ByteBuffer || (dcodeIO && dcodeIO.ByteBuffer && input instanceof dcodeIO.ByteBuffer)) {
+    } else if (input instanceof ByteBuffer) {
       // The above is a nasty hack to get this working in the browser
       // It would be better to not have a second version of ByteBuffer kicking around!
 
@@ -580,7 +580,11 @@ export class sc_script_save extends sc_script_base {
     super.close_lua();
   }
 
-  save() {
+  /**
+   *
+   * @param {sc_edit_heightmap} heightmap
+   */
+  save(heightmap) {
     let output =
     `Scenario = {\n`            +
     `  MasterChain = {\n`       +
@@ -590,6 +594,10 @@ export class sc_script_save extends sc_script_base {
     for (let marker_idx of Object.keys(this.__markers))
     {
       let marker = this.__markers[marker_idx];
+      // Clamp marker to terrain
+      const marker_position = [marker.position.x, marker.position.z];
+      const height_at_position = heightmap.get_pixel(marker_position)[0] * heightmap.scale;
+      marker.position.y = height_at_position;
       output = output + marker.save();
     }
 

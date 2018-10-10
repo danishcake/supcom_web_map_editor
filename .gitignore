@@ -1,4 +1,2 @@
-*/dist/
-*/browserified/
+dist/
 node_modules/
-sc_map_edit_bin/lib

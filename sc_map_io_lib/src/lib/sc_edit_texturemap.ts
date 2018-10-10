@@ -9,15 +9,21 @@
  * Each pixel has 8 components
  */
 
-import {sc_rect} from "./sc_rect"
-import {sc_edit_view_base} from "./views/sc_edit_view"
-import {_} from "underscore";
+import { sc_rect } from "./sc_rect"
+import { sc_edit_view_base } from "./views/sc_edit_view"
+import * as _ from "underscore";
+import { sc_map_texturemap } from "./sc_map";
+import { sc_vec2, sc_pixel } from "./sc_vec";
 
 
 export class sc_edit_texturemap extends sc_edit_view_base {
-  constructor(source_heightmap) {
-    super(null);
+  private __source_heightmap: sc_map_texturemap;
+  private __dirty_region: sc_rect | null;
+
+  constructor(source_heightmap: sc_map_texturemap) {
+    super();
     this.__source_heightmap = source_heightmap;
+    this.__dirty_region = null;
     this.mark_dirty_region(new sc_rect(0, 0, this.width, this.height));
   }
 
@@ -25,7 +31,7 @@ export class sc_edit_texturemap extends sc_edit_view_base {
   /**
    * Clears the dirty region
    */
-  reset_dirty_region() {
+  public reset_dirty_region(): void {
     this.__dirty_region = null;
   }
 
@@ -33,7 +39,7 @@ export class sc_edit_texturemap extends sc_edit_view_base {
   /**
    * Mark a region as dirty
    */
-  mark_dirty_region(rect) {
+  public mark_dirty_region(rect: sc_rect): void {
     this.__dirty_region = (this.__dirty_region || rect).expand(rect);
   }
 
@@ -41,19 +47,19 @@ export class sc_edit_texturemap extends sc_edit_view_base {
   /**
    * Gets the width
    */
-  __get_width_impl() { return this.__source_heightmap.width; }
+  protected __get_width_impl(): number { return this.__source_heightmap.width; }
 
 
   /**
    * Gets the height
    */
-  __get_height_impl() { return this.__source_heightmap.height; }
+  protected __get_height_impl(): number { return this.__source_heightmap.height; }
 
 
   /**
    * Returns the value of a pixel at the given coordinate
    */
-  __get_pixel_impl(position) {
+  protected __get_pixel_impl(position: sc_vec2): sc_pixel {
     const index_base  = (position[0] + position[1] * this.width) * 4;
     return [this.__source_heightmap.chan0_3.readUint8(index_base + 0),
             this.__source_heightmap.chan0_3.readUint8(index_base + 1),
@@ -69,7 +75,7 @@ export class sc_edit_texturemap extends sc_edit_view_base {
   /**
    * Sets the value of a pixel at the given coordinate
    */
-  __set_pixel_impl(position, value) {
+  protected __set_pixel_impl(position: sc_vec2, value: sc_pixel): void {
     const index_base = (position[0] + position[1] * this.width) * 4;
     this.__source_heightmap.chan0_3.writeUint8(Math.floor(value[0]), index_base + 0);
     this.__source_heightmap.chan0_3.writeUint8(Math.floor(value[1]), index_base + 1);
@@ -91,31 +97,47 @@ export class sc_edit_texturemap extends sc_edit_view_base {
   /**
    * Returns the default pixel value (all zeroes)
    */
-  __oob_pixel_value_impl(position) { return [0,0,0,0,0,0,0,0]; }
+  protected __oob_pixel_value_impl(position: sc_vec2): sc_pixel {
+    return [0,0,0,0,0,0,0,0];
+  }
 
 
-  /** Returns the number of subpixels */
-  __get_subpixel_count_impl() { return 8; }
+  /**
+   *  Returns the number of subpixels
+   */
+  protected __get_subpixel_count_impl(): number {
+    return 8;
+  }
 
 
-  /** Returns the maximum value of a subpixel */
-  __get_subpixel_max_impl() { return 255; }
+  /**
+   * Returns the maximum value of a subpixel
+   */
+  protected __get_subpixel_max_impl(): number {
+    return 255;
+  }
 
 
   /**
    * Get the region marked as region since it was last reset
    */
-  get dirty_region() { return this.__dirty_region; }
+  public get dirty_region(): sc_rect | null {
+    return this.__dirty_region;
+  }
 
 
   /**
    * Gets the texturemap channels 0-3
    */
-  get chan0_3() { return this.__source_heightmap.chan0_3; }
+  public get chan0_3(): ByteBuffer {
+    return this.__source_heightmap.chan0_3;
+  }
 
 
   /**
    * Gets the texturemap channels 4-7
    */
-  get chan4_7() { return this.__source_heightmap.chan4_7; }
+  public get chan4_7(): ByteBuffer {
+    return this.__source_heightmap.chan4_7;
+  }
 };

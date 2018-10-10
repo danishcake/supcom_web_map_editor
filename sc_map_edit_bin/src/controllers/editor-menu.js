@@ -1,5 +1,9 @@
 const angular = require('angular');
-const sc_map_io_lib = require('../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+import { sc_edit_tool_data } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_args';
+import { sc_edit_global_tool_autotexture } from '../../../sc_map_io_lib/src/lib/global_tools/sc_edit_global_tool_autotexture';
+import { sc_edit_global_tool_enforce_symmetry } from '../../../sc_map_io_lib/src/lib/global_tools/sc_edit_global_tool_enforce_symmetry';
+import { sc_edit_global_tool_enforce_marker_symmetry } from '../../../sc_map_io_lib/src/lib/global_tools/sc_edit_global_tool_enforce_marker_symmetry';
+import { sc_edit_global_tool_smooth } from '../../../sc_map_io_lib/src/lib/global_tools/sc_edit_global_tool_smooth';
 const modal_dlg_opts = require('../constants').modal_dlg_opts;
 
 angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
@@ -34,22 +38,22 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
 
   // Uses current symmetry mode to set all secondary pixels to their primary value
   $scope.enforce_terrain_symmetry = () => {
-    const symmetry_tool = new sc_map_io_lib.sc.edit.global_tool.enforce_symmetry(editor_state.symmetry);
-    const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
-                                                          editor_state.edit_texturemap_view,
-                                                          editor_state.scripts.save,
-                                                          editor_state.edit_target_view,
-                                                          editor_state.map);
+    const symmetry_tool = new sc_edit_global_tool_enforce_symmetry(editor_state.symmetry);
+    const tool_data = new sc_edit_tool_data(editor_state.edit_heightmap_view,
+                                            editor_state.edit_texturemap_view,
+                                            editor_state.scripts.save,
+                                            editor_state.edit_target_view,
+                                            editor_state.map);
     symmetry_tool.apply(tool_data);
   };
 
   $scope.enforce_marker_symmetry = () => {
-    const symmetry_tool = new sc_map_io_lib.sc.edit.global_tool.enforce_marker_symmetry(editor_state.symmetry);
-    const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
-                                                          editor_state.edit_texturemap_view,
-                                                          editor_state.scripts.save,
-                                                          editor_state.edit_target_view,
-                                                          editor_state.map);
+    const symmetry_tool = new sc_edit_global_tool_enforce_marker_symmetry(editor_state.symmetry);
+    const tool_data = new sc_edit_tool_data(editor_state.edit_heightmap_view,
+                                            editor_state.edit_texturemap_view,
+                                            editor_state.scripts.save,
+                                            editor_state.edit_target_view,
+                                            editor_state.map);
     symmetry_tool.apply(tool_data);
   };
 
@@ -61,36 +65,36 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-menu",
                              },
                              modal_dlg_opts);
     dlg.result.then(function(signals) {
-      const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
-                                                            editor_state.edit_texturemap_view,
-                                                            editor_state.scripts.save,
-                                                            editor_state.edit_target_view,
-                                                            editor_state.map);
+      const tool_data = new sc_edit_tool_data(editor_state.edit_heightmap_view,
+                                              editor_state.edit_texturemap_view,
+                                              editor_state.scripts.save,
+                                              editor_state.edit_target_view,
+                                              editor_state.map);
 
-      const autotexture_tool = new sc_map_io_lib.sc.edit.global_tool.autotexture(signals);
+      const autotexture_tool = new sc_edit_global_tool_autotexture(signals);
       autotexture_tool.apply(tool_data);
     });
   };
 
   $scope.smooth_texturemap = () => {
-    const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
-                                                          editor_state.edit_texturemap_view,
-                                                          editor_state.scripts.save,
-                                                          editor_state.edit_texturemap_view,
-                                                          editor_state.map);
+    const tool_data = new sc_edit_tool_data(editor_state.edit_heightmap_view,
+                                            editor_state.edit_texturemap_view,
+                                            editor_state.scripts.save,
+                                            editor_state.edit_texturemap_view,
+                                            editor_state.map);
 
-    const global_smooth_tool = new sc_map_io_lib.sc.edit.global_tool.smooth($scope.tool.smoothing_radius);
+    const global_smooth_tool = new sc_edit_global_tool_smooth($scope.tool.smoothing_radius);
     global_smooth_tool.apply(tool_data);
   };
 
   $scope.smooth_heightmap = () => {
-    const tool_data = new sc_map_io_lib.sc.edit.tool.data(editor_state.edit_heightmap_view,
-                                                          editor_state.edit_texturemap_view,
-                                                          editor_state.scripts.save,
-                                                          editor_state.edit_heightmap_view,
-                                                          editor_state.map);
+    const tool_data = new sc_edit_tool_data(editor_state.edit_heightmap_view,
+                                            editor_state.edit_texturemap_view,
+                                            editor_state.scripts.save,
+                                            editor_state.edit_heightmap_view,
+                                            editor_state.map);
 
-    const global_smooth_tool = new sc_map_io_lib.sc.edit.global_tool.smooth($scope.tool.smoothing_radius);
+    const global_smooth_tool = new sc_edit_global_tool_smooth($scope.tool.smoothing_radius);
     global_smooth_tool.apply(tool_data);
   };
 

@@ -1,8 +1,26 @@
+import { sc_edit_heightmap } from "../sc_edit_heightmap";
+import { sc_edit_texturemap } from "../sc_edit_texturemap";
+import { sc_script_save } from "../sc_script";
+import { sc_edit_view_base } from "../views/sc_edit_view";
+import { sc_map } from "../sc_map";
+import { sc_vec2 } from "../sc_vec";
+import { sc_edit_symmetry_base } from "../sc_edit_symmetry";
+
 /**
  * Represents the data passed to editing tool to be operated upon
  */
 export class sc_edit_tool_data {
-  constructor(edit_heightmap, edit_texturemap, save_script, target_view, map) {
+  private __edit_heightmap: sc_edit_heightmap;
+  private __edit_texturemap: sc_edit_texturemap;
+  private __save_script: sc_script_save;
+  private __map: sc_map;
+  private __target: sc_edit_view_base;
+
+  constructor(edit_heightmap: sc_edit_heightmap,
+              edit_texturemap: sc_edit_texturemap,
+              save_script: sc_script_save,
+              target_view: sc_edit_view_base,
+              map: sc_map) {
     this.__edit_heightmap = edit_heightmap;
     this.__edit_texturemap = edit_texturemap;
     this.__save_script = save_script;
@@ -12,22 +30,23 @@ export class sc_edit_tool_data {
     this.__target = target_view || edit_heightmap || edit_texturemap;
   }
 
-  /** @return {sc_edit_view_base} */
-  get edit_heightmap() { return this.__edit_heightmap; }
+  /** @return {sc_edit_heightmap} */
+  public get edit_heightmap(): sc_edit_heightmap { return this.__edit_heightmap; }
+
+  /** @return {sc_edit_texturemap} */
+  public get edit_texturemap(): sc_edit_texturemap { return this.__edit_texturemap; }
 
   /** @return {sc_edit_view_base} */
-  get edit_texturemap() { return this.__edit_texturemap; }
+  public get target(): sc_edit_view_base { return this.__target; }
 
-  /** @return {sc_edit_view_base} */
-  get target() { return this.__target; }
   /** @param {sc_edit_view_base} value */
-  set target(value) { this.__target = value; }
+  public set target(value: sc_edit_view_base) { this.__target = value; }
 
   /** @return {sc_script_save} */
-  get save_script() { return this.__save_script; }
+  public get save_script(): sc_script_save { return this.__save_script; }
 
   /** @return {sc_map} */
-  get map() { return this.__map; }
+  public get map(): sc_map { return this.__map; }
 }
 
 
@@ -39,7 +58,12 @@ export class sc_edit_tool_args {
   static get modifier_none() { return 0; }
   static get modifier_shift() { return 1; }
 
-  constructor(position, modifiers, symmetry) {
+  private __position: sc_vec2;
+  private __shift: boolean;
+  private __heightmap_target: boolean;
+  private __symmetry: sc_edit_symmetry_base;
+
+  constructor(position: sc_vec2, modifiers: number, symmetry: sc_edit_symmetry_base) {
     this.__position = position;
     this.__shift = (modifiers & sc_edit_tool_args.modifier_shift) !== 0;
     this.__heightmap_target = true;
@@ -51,7 +75,7 @@ export class sc_edit_tool_args {
    * Returns the position to apply the tool on the heightmap
    * @return {sc_vec2}
    */
-  get heightmap_position() {
+  public get heightmap_position(): sc_vec2 {
     return this.__position;
   }
 
@@ -60,7 +84,7 @@ export class sc_edit_tool_args {
    * the heightmap
    * @return {sc_vec2}
    */
-  get texturemap_position() {
+  public get texturemap_position(): sc_vec2 {
     return [ this.__position[0] / 2,
              this.__position[1] / 2 ];
   }
@@ -69,7 +93,7 @@ export class sc_edit_tool_args {
    * Returns the grid position (eg integer components) to apply the tool on the heightmap
    * @return {sc_vec2}
    */
-  get heightmap_grid_position() {
+  public get heightmap_grid_position(): sc_vec2 {
     return [ Math.round(this.__position[0]),
              Math.round(this.__position[1]) ];
   }
@@ -79,7 +103,7 @@ export class sc_edit_tool_args {
    * which is half the size of the heightmap
    * @return {sc_vec2}
    */
-  get texturemap_grid_position() {
+  public get texturemap_grid_position(): sc_vec2 {
     return [ Math.round(this.__position[0] / 2),
              Math.round(this.__position[1] / 2) ];
   }
@@ -89,7 +113,7 @@ export class sc_edit_tool_args {
    * the value of __heightmap_target
    * @return {sc_vec2}
    */
-  get position() {
+  public get position(): sc_vec2 {
     if (this.__heightmap_target) {
       return this.heightmap_position;
     } else {
@@ -102,7 +126,7 @@ export class sc_edit_tool_args {
    * depending on the value of __heightmap_target
    * @return {sc_vec2}
    */
-  get grid_position() {
+  public get grid_position(): sc_vec2 {
     if (this.__heightmap_target) {
       return this.heightmap_grid_position;
     } else {
@@ -110,7 +134,7 @@ export class sc_edit_tool_args {
     }
   }
 
-  get shift() { return this.__shift; }
+  public get shift(): boolean { return this.__shift; }
 
   /**
    * Sets the heightmap target flag. If true this will scale positions for heightmaps. If false
@@ -123,7 +147,9 @@ export class sc_edit_tool_args {
    * @param {sc_edit_view_base} texturemap_target The texturemap target
    *
    */
-  set_target(target, heightmap_target, texturemap_target) {
+  public set_target(target: sc_edit_view_base,
+                    heightmap_target: sc_edit_view_base,
+                    texturemap_target: sc_edit_view_base): void {
     if (target && heightmap_target && target.width === heightmap_target.width) {
       this.__heightmap_target = true;
     } else if (target && texturemap_target && target.width === texturemap_target.width) {
@@ -137,5 +163,5 @@ export class sc_edit_tool_args {
    * Gets the current symmetry mode. This is usually only of interest
    * to the marker tools, as the other tools can rely on the symmetry view target
    */
-  get symmetry() { return this.__symmetry; }
+  public get symmetry(): sc_edit_symmetry_base { return this.__symmetry; }
 }

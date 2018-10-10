@@ -1325,7 +1325,7 @@ class sc_map_normalmap {
  * Formed of two individual texturemaps for a total of 8 layers
  * TODO: Document the slightly fruity blending and layer priority
  */
-class sc_map_texturemap {
+export class sc_map_texturemap {
   constructor() {
     this.__chan0_3 = undefined;
     this.__chan4_7 = undefined;
