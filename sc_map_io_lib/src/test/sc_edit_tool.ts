@@ -1,16 +1,19 @@
 import { sc_edit_heightmap } from '../lib/sc_edit_heightmap';
-import { sc_edit_tool_base } from '../lib/tools/sc_edit_tool.js';
-import { sc_edit_tool_data, sc_edit_tool_args } from "../lib/tools/sc_edit_tool_args.js"
+import { sc_edit_tool_base } from '../lib/tools/sc_edit_tool';
+import { sc_edit_tool_data, sc_edit_tool_args } from '../lib/tools/sc_edit_tool_args'
 import { sc_map } from '../lib/sc_map';
-import { sc_rect } from '../lib/sc_rect';
+import { sc_edit_texturemap } from '../lib/sc_edit_texturemap';
+import { sc_script_save } from '../lib/sc_script';
+import { sc_edit_symmetry } from '../lib/sc_edit_symmetry';
 const assert = require('chai').assert;
 const sinon = require('sinon');
 
 describe('sc_edit_tool', function() {
   beforeEach('build a flat heightmap', function() {
-    let map = new sc_map();
-    map.create({size: 0, default_height: 1000});
-    this.edit_heightmap = new sc_edit_heightmap(map.heightmap);
+    this.map = new sc_map();
+    this.map.create({size: 0, default_height: 1000});
+    this.hm = new sc_edit_heightmap(this.map.heightmap);
+    this.tm = new sc_edit_texturemap(this.map.texturemap);
   });
 
 
@@ -29,28 +32,28 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let start_impl_spy = sinon.spy(tool, '__start_impl');
 
-      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null),
-                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-      assert(start_impl_spy.withArgs(this.edit_heightmap, [0, 0]).calledOnce);
+      tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),
+                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
+      assert(start_impl_spy.withArgs(this.hm, [0, 0]).calledOnce);
     });
 
     it('should call __apply_impl immediately on start', function () {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null),
-                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-      assert(apply_impl_spy.withArgs(this.edit_heightmap, [0, 0]).calledOnce);
+      tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),
+                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
+      assert(apply_impl_spy.withArgs(this.hm, [0, 0]).calledOnce);
     });
 
     it('should call __end_impl on end call', function () {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let end_impl_spy = sinon.spy(tool, '__end_impl');
 
-      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null),
-                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-      tool.end(new sc_edit_tool_data(this.edit_heightmap, null),
-                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
+      tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),
+                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
+      tool.end(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),
+                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
       assert(end_impl_spy.calledOnce);
     });
 
@@ -58,8 +61,8 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.apply(new sc_edit_tool_data(this.edit_heightmap, null, null),
-                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
+      tool.apply(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),
+                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
       assert(!apply_impl_spy.called);
     });
 
@@ -67,8 +70,8 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let end_impl_spy = sinon.spy(tool, '__end_impl');
 
-      tool.end(new sc_edit_tool_data(this.edit_heightmap, null, null),
-               new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
+      tool.end(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),
+               new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
       assert(!end_impl_spy.called);
     });
   });
@@ -80,10 +83,10 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null),
-                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-      tool.apply(new sc_edit_tool_data(this.edit_heightmap, null, null),
-                 new sc_edit_tool_args([10, 0], sc_edit_tool_args.modifier_none));
+      tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),
+                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
+      tool.apply(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),
+                 new sc_edit_tool_args([10, 0], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
       assert.equal(apply_impl_spy.callCount, 6);
 
       assert.closeTo(apply_impl_spy.getCall(0).args[1][0], 0,  0.0001);
@@ -104,10 +107,10 @@ describe('sc_edit_tool', function() {
       let tool = new sc_edit_tool_base(16, 8, 10);
       let apply_impl_spy = sinon.spy(tool, '__apply_impl');
 
-      tool.start(new sc_edit_tool_data(this.edit_heightmap, null, null),
-                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none));
-      tool.apply(new sc_edit_tool_data(this.edit_heightmap, null, null),
-                 new sc_edit_tool_args([9, 0], sc_edit_tool_args.modifier_none));
+      tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),
+                 new sc_edit_tool_args([0, 0], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
+      tool.apply(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),
+                 new sc_edit_tool_args([9, 0], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
       assert.equal(apply_impl_spy.callCount, 5);
     });
   });

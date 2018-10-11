@@ -64,4 +64,11 @@ export class sc_edit_view_convolution extends sc_edit_view_passthrough {
 
     return sum;
   }
+
+  /**
+   * This view supports OOB queries, so pass it directly to get_pixel
+   */
+  protected __oob_pixel_value_impl(position: sc_vec2): sc_pixel {
+    return this.__get_pixel_impl(position);
+  }
 }

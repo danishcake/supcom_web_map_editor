@@ -50,6 +50,6 @@
   "scripts": {
     "build_dev": "webpack --config=./webpack.dev.config.js",
     "build_prod": "webpack --config=./webpack.prod.config.js",
-    "test": "mocha --require ts-node/register ./sc_map_io_lib/src/test/*.ts"
+    "test": "mocha --require ts-node/register --colors ./sc_map_io_lib/src/test/*.ts"
   }
 }

@@ -1,4 +1,7 @@
-import { sc } from '../lib/sc';
+import { sc_zip } from "../lib/sc_zip";
+import { sc_map } from "../lib/sc_map";
+import { sc_script_scenario, sc_script_save, sc_script_script } from "../lib/sc_script";
+
 const fs = require('fs');
 const _ = require('underscore');
 const JSZip = require('jszip');
@@ -10,7 +13,7 @@ describe('sc_zip', function() {
   describe('loading', function() {
     it('should fail if scripts or map is missing', function(done) {
       let map_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley_without_scmap.zip");
-      sc.zip.load(map_data)
+      sc_zip.load(map_data)
       .then((map) => {
         assert.equal(true, false, "Should not succeed");
         done();
@@ -22,7 +25,7 @@ describe('sc_zip', function() {
 
     it('should load scenario and determine other filenames', function(done) {
       let map_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley_with_weird_names.zip");
-      sc.zip.load(map_data)
+      sc_zip.load(map_data)
       .then((map) => {
         assert.equal("/maps/Shuriken_Valley/Shuriken_Valley_a.scmap", map.scripts.scenario.map_filename);
         done();
@@ -33,7 +36,7 @@ describe('sc_zip', function() {
 
     it('should load the scmap and save files', function(done) {
       let map_data = fs.readFileSync(__dirname + "/data/Shuriken_Valley_with_weird_names.zip");
-      sc.zip.load(map_data)
+      sc_zip.load(map_data)
       .then((map) => {
         // .scmap is loaded
         assert.equal(map.scmap.textures.terrain_shader, "TTerrain");
@@ -55,11 +58,11 @@ describe('sc_zip', function() {
   describe('saving', function() {
     it('should save the files with names that match the scenario', function(done) {
       const map_data = {
-        map: new sc.map(),
+        map: new sc_map(),
         scripts: {
-          scenario: new sc.script.scenario(),
-          save: new sc.script.save(),
-          script: new sc.script.script()
+          scenario: new sc_script_scenario(),
+          save: new sc_script_save(),
+          script: new sc_script_script()
         }
       };
       const map_args = {
@@ -79,20 +82,20 @@ describe('sc_zip', function() {
       const expected_map_filename      = map_data.scripts.scenario.map_filename.split('/').slice(-2).join('/');
       const expected_script_filename   = map_data.scripts.scenario.script_filename.split('/').slice(-2).join('/');
 
-      sc.zip.save(map_data).then((zip_arraybuffer) => {
+      sc_zip.save(map_data).then((zip_arraybuffer: any) => {
         // Verify the presence of expected files
-        JSZip.loadAsync(zip_arraybuffer).then((zip) => {
+        JSZip.loadAsync(zip_arraybuffer).then((zip: any) => {
 
           // Uncomment this line if you need to verify the zip file manually
           //fs.writeFileSync(__dirname + "/data/temp.zip", Buffer.from(zip_arraybuffer));
 
-          assert.isTrue(_.any(zip.files, (file) => { return file.name.endsWith(expected_scenario_filename); }));
-          assert.isTrue(_.any(zip.files, (file) => { return file.name.endsWith(expected_save_filename); }));
-          assert.isTrue(_.any(zip.files, (file) => { return file.name.endsWith(expected_map_filename); }));
-          assert.isTrue(_.any(zip.files, (file) => { return file.name.endsWith(expected_script_filename); }));
+          assert.isTrue(_.any(zip.files, (file: any) => { return file.name.endsWith(expected_scenario_filename); }));
+          assert.isTrue(_.any(zip.files, (file: any) => { return file.name.endsWith(expected_save_filename); }));
+          assert.isTrue(_.any(zip.files, (file: any) => { return file.name.endsWith(expected_map_filename); }));
+          assert.isTrue(_.any(zip.files, (file: any) => { return file.name.endsWith(expected_script_filename); }));
           done();
         });
-      }).catch((err) => {
+      }).catch((err: any) => {
         assert.equal(true, false, "Should not fail");
         done();
       });;
