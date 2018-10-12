@@ -1,5 +1,4 @@
-import { sc } from '../lib/sc';
-import { sc_map_layer } from '../lib/sc_map';
+import { sc_map_layer, sc_map } from '../lib/sc_map';
 const assert = require('chai').assert;
 const fs = require('fs');
 const ByteBuffer = require('bytebuffer');
@@ -12,7 +11,7 @@ describe('sc_map', function() {
 
     it('should load header', function () {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       assert.equal(map.header.width, 256);
@@ -21,7 +20,7 @@ describe('sc_map', function() {
 
     it('should load preview image', function () {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       // Preview image is a 256x256 image uncompressed DDS image
@@ -30,7 +29,7 @@ describe('sc_map', function() {
 
     it('should load heightmap', function() {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       assert.equal(map.heightmap.width, 256);
@@ -42,7 +41,7 @@ describe('sc_map', function() {
 
     it('should load textures', function() {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       assert.equal(map.textures.terrain_shader, "TTerrain");
@@ -55,7 +54,7 @@ describe('sc_map', function() {
 
     it('should load lighting', function() {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       assert.closeTo(map.lighting.lighting_multiplier, 1.5, 0.001);
@@ -94,7 +93,7 @@ describe('sc_map', function() {
 
     it('should load water', function(){
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       assert.isTrue(map.water.has_water);
@@ -168,7 +167,7 @@ describe('sc_map', function() {
 
     it('should load layers', function() {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       assert.equal(map.layers.albedo_data.length, 10);
@@ -183,7 +182,7 @@ describe('sc_map', function() {
 
     it('should load decals', function() {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       // TODO: Find a map with decals to test
@@ -193,7 +192,7 @@ describe('sc_map', function() {
 
     it('should load normal maps', function() {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       assert.equal(map.normalmap.data.remaining(), 256 * 256 * 4);
@@ -203,7 +202,7 @@ describe('sc_map', function() {
 
     it('should load texture maps', function() {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       assert.equal(map.texturemap.chan0_3.remaining(), 128 * 128 * 4);
@@ -215,7 +214,7 @@ describe('sc_map', function() {
 
     it('should load water maps', function() {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       assert.equal(map.watermap.watermap_width, 128);
@@ -239,7 +238,7 @@ describe('sc_map', function() {
 
     it('should load props', function() {
       let map_data_bb = ByteBuffer.wrap(map_data, ByteBuffer.LITTLE_ENDIAN);
-      let map = new sc.map();
+      let map = new sc_map();
       map.load(map_data_bb);
 
       assert.equal(map.props.props.length, 908);
@@ -280,20 +279,20 @@ describe('sc_map', function() {
     };
 
     it('should create correct size preview image', function() {
-      let map = new sc.map();
+      let map = new sc_map();
       map.create(default_5x5_map_args);
 
       assert.equal(256 * 256 * 4, map.preview_image.data.capacity());
     });
 
     it('should create correct size heightmap', function() {
-      let map_5x5 = new sc.map();
+      let map_5x5 = new sc_map();
       map_5x5.create(default_5x5_map_args);
 
       assert.equal(256, map_5x5.header.width);
       assert.equal(256, map_5x5.header.height);
 
-      let map_20x20 = new sc.map();
+      let map_20x20 = new sc_map();
       map_20x20.create(default_20x20_map_args);
 
       assert.equal(1024, map_20x20.header.width);
@@ -301,7 +300,7 @@ describe('sc_map', function() {
     });
 
     it('should fill heightmap with default height if not specified', function() {
-      let map = new sc.map();
+      let map = new sc_map();
       map.create(default_5x5_map_args);
 
       assert.equal(1024 * 32, map.heightmap.data.readUint16());
@@ -315,14 +314,14 @@ describe('sc_map', function() {
         size: 0, // 5x5
         default_height: 42
       };
-      let map = new sc.map();
+      let map = new sc_map();
       map.create(custom_height_map_args);
 
       assert.equal(42, map.heightmap.data.readUint16());
     });
 
     it('should set default textures if not specified', function() {
-      let map = new sc.map();
+      let map = new sc_map();
       map.create(default_5x5_map_args);
 
       assert.equal(map.textures.terrain_shader, "TTerrain");
@@ -334,7 +333,7 @@ describe('sc_map', function() {
     });
 
     it('should set default lighting if not specified', function() {
-      let map = new sc.map();
+      let map = new sc_map();
       map.create(default_5x5_map_args);
 
       assert.closeTo(map.lighting.lighting_multiplier, 1.5, 0.001);
@@ -372,7 +371,7 @@ describe('sc_map', function() {
     });
 
     it('should set default water parameters if not specified', function() {
-      let map = new sc.map();
+      let map = new sc_map();
       map.create(default_5x5_map_args);
 
       // Water levels will default to 75%, 50% and 25% of default height, multiplied
@@ -427,7 +426,7 @@ describe('sc_map', function() {
     });
 
     it('should create default layers if not specified', function() {
-      let map = new sc.map();
+      let map = new sc_map();
       map.create(default_5x5_map_args);
 
       assert.equal(map.layers.albedo_data.length, 10);
@@ -494,7 +493,7 @@ describe('sc_map', function() {
     });
 
     it('should create empty decals', function() {
-      let map = new sc.map();
+      let map = new sc_map();
       map.create(default_5x5_map_args);
 
       assert.equal(map.decals.decals.length, 0);
@@ -502,7 +501,7 @@ describe('sc_map', function() {
     });
 
     it('should create correct size normalmap', function() {
-      let map = new sc.map();
+      let map = new sc_map();
       map.create(default_5x5_map_args);
 
       // TBD - is this the correct direction for the normals?
@@ -522,13 +521,13 @@ describe('sc_map', function() {
     });
 
     it('should create correct size texturemap', function() {
-      let map_5x5 = new sc.map();
+      let map_5x5 = new sc_map();
       map_5x5.create(default_5x5_map_args);
 
       assert.equal(128 * 128 * 4, map_5x5.texturemap.chan0_3.capacity());
       assert.equal(128 * 128 * 4, map_5x5.texturemap.chan4_7.capacity());
 
-      let map_20x20 = new sc.map();
+      let map_20x20 = new sc_map();
       map_20x20.create(default_20x20_map_args);
 
       assert.equal(512 * 512 * 4, map_20x20.texturemap.chan0_3.capacity());
@@ -536,7 +535,7 @@ describe('sc_map', function() {
     });
 
     it('should create zeroed texturemap', function() {
-      let map_5x5 = new sc.map();
+      let map_5x5 = new sc_map();
       map_5x5.create(default_5x5_map_args);
 
 
@@ -547,7 +546,7 @@ describe('sc_map', function() {
     });
 
     it('should create correct watermap', function() {
-      let map_5x5 = new sc.map();
+      let map_5x5 = new sc_map();
       map_5x5.create(default_5x5_map_args);
 
       assert.equal(128 * 128 * 4, map_5x5.watermap.watermap_data.capacity());
@@ -575,7 +574,7 @@ describe('sc_map', function() {
     });
 
     it('should create empty prop list', function() {
-      let map_5x5 = new sc.map();
+      let map_5x5 = new sc_map();
       map_5x5.create(default_5x5_map_args);
 
       assert.equal(0, map_5x5.props.props.length);
@@ -591,7 +590,7 @@ describe('sc_map', function() {
     this.timeout(10000);
 
     before('create a map, save it and reload it', function() {
-      this.src_map = new sc.map();
+      this.src_map = new sc_map();
       this.src_map.create({
         name: 'x',
         author: 'x',
@@ -601,7 +600,7 @@ describe('sc_map', function() {
 
       const roundtrip_buffer = this.src_map.save();
 
-      this.dest_map = new sc.map();
+      this.dest_map = new sc_map();
       this.dest_map.load(roundtrip_buffer);
     });
 

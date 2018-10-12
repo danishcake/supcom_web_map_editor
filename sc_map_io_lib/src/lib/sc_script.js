@@ -586,8 +586,8 @@ export class sc_script_save extends sc_script_base {
    */
   save(heightmap) {
     let output =
-    `Scenario = {\n`            +
-    `  MasterChain = {\n`       +
+    `Scenario = {\n`              +
+    `  MasterChain = {\n`         +
     `    ['_MASTERCHAIN_'] = {\n` +
     `      Markers = {\n`;
 
@@ -595,7 +595,8 @@ export class sc_script_save extends sc_script_base {
     {
       let marker = this.__markers[marker_idx];
       // Clamp marker to terrain
-      const marker_position = [marker.position.x, marker.position.z];
+      // TBD: Make a Bilinear/trilinear view?
+      const marker_position = [Math.floor(marker.position.x), Math.floor(marker.position.z)];
       const height_at_position = heightmap.get_pixel(marker_position)[0] * heightmap.scale;
       marker.position.y = height_at_position;
       output = output + marker.save();
