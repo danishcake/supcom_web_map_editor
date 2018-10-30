@@ -1,4 +1,7 @@
-import { sc_dds, sc_dds_pixelformat } from '../lib/sc_dds';
+import { sc_dds } from '../lib/dds/sc_dds';
+import { sc_dds_pixelformat_argb } from "../lib/dds/pixelformats/sc_dds_pixelformat_argb";
+import { sc_dds_pixelformat_rgb } from "../lib/dds/pixelformats/sc_dds_pixelformat_rgb";
+import { sc_dds_pixelformat_dxt5 } from "../lib/dds/pixelformats/sc_dds_pixelformat_dxt5";
 import { assert } from 'chai';
 import * as fs from 'fs';
 const ByteBuffer = require('bytebuffer');
@@ -31,7 +34,7 @@ describe('sc_dxt5', function() {
         let output_buffer = new ByteBuffer();
 
         // I expect a 128 byte header followed by 128x128x4 bytes
-        sc_dds.save(output_buffer, black_blob, 128, 128, sc_dds_pixelformat.RawARGB);
+        sc_dds.save(output_buffer, black_blob, 128, 128, new sc_dds_pixelformat_argb());
 
         assert.equal(output_buffer.offset, 128 + 128 * 128 * 4);
       });
@@ -43,7 +46,7 @@ describe('sc_dxt5', function() {
         let output_buffer = new ByteBuffer();
 
         // I expect a 128 byte header followed by 128x128x3 bytes
-        sc_dds.save(output_buffer, black_blob, 128, 128, sc_dds_pixelformat.RawRGB);
+        sc_dds.save(output_buffer, black_blob, 128, 128, new sc_dds_pixelformat_rgb());
 
         assert.equal(output_buffer.offset, 128 + 128 * 128 * 3);
       });
@@ -55,7 +58,7 @@ describe('sc_dxt5', function() {
         let output_buffer = new ByteBuffer();
 
         // I expect a 128 byte header followed by 128x128 bytes (4:1 compression)
-        sc_dds.save(output_buffer, black_blob, 128, 128, sc_dds_pixelformat.DXT5);
+        sc_dds.save(output_buffer, black_blob, 128, 128, new sc_dds_pixelformat_dxt5());
 
         assert.equal(output_buffer.offset, 128 + 128 * 128);
       });
@@ -155,7 +158,7 @@ describe('sc_dxt5', function() {
 
 
         let output_buffer = new ByteBuffer();
-        sc_dds.save(output_buffer, multihued_blob, 128, 128, sc_dds_pixelformat.DXT5);
+        sc_dds.save(output_buffer, multihued_blob, 128, 128, new sc_dds_pixelformat_dxt5());
 
         // Rewind and load the compressed texture
         output_buffer.reset();

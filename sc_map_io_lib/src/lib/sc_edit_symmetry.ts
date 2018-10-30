@@ -6,7 +6,7 @@
  * 3. get_primary_bounding_points()
  */
 
-import {sc_rect} from "./sc_rect"
+import { sc_rect } from "./sc_rect"
 import * as _ from "underscore"
 import * as glm from 'gl-matrix';
 import { sc_vec2, sc_mat2 } from "./sc_vec";

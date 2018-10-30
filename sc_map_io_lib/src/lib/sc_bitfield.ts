@@ -1,4 +1,4 @@
-const ByteBuffer = require('bytebuffer');
+import * as ByteBuffer from 'bytebuffer';
 import check from "./sc_check";
 
 /**
@@ -21,12 +21,15 @@ import check from "./sc_check";
  * of each byte.
  */
 export class sc_bitfield {
+  private __data: number[];
+  private __offset: number; // Measured in bits
+
   /**
    * Wraps a Uint8Array, an array of bytes, a ByteBuffer, or if a Number is provided it is treated as a uint32
    * It seems to be significantly faster to use JS arrays rather than a Uint8Array, so each is tranformed
    * to an array first
    */
-  constructor(data) {
+  constructor(data: Uint8Array | ByteBuffer | number[] | number) {
     if (data instanceof Uint8Array) {
       this.__data = [];
       for (let i = 0; i < data.length; i++) {
@@ -38,8 +41,6 @@ export class sc_bitfield {
       this.__data = [(data & 0x000000FF) >> 0,  (data & 0x0000FF00) >> 8,
                      (data & 0x00FF0000) >> 16, (data & 0xFF000000) >> 24];
     } else if (data instanceof ByteBuffer) {
-      // The above is a nasty hack to get this working in the browser
-      // It would be better to not have a second version of ByteBuffer kicking around!
       this.__data = [];
       while(data.remaining() > 0) {
         this.__data.push(data.readUint8());
@@ -48,19 +49,18 @@ export class sc_bitfield {
       throw new Error(`sc_bitfield requires a Uint8Array, Array, ByteBuffer or Number, got ${typeof(data)}`)
     }
 
-    this.__offset = 0; // Units: bits
+    this.__offset = 0;
   }
 
 
   /**
    * Reads the specified number of bits and returns an integer result
    */
-  read_bits(bits) {
-    let result = 0;
-    let op_bit = 0;
+  public read_bits(bits: number): number {
+    let result: number = 0;
+    let op_bit: number = 0;
 
     while (op_bit < bits) {
-
       let byte_index = Math.trunc(this.__offset / 8);
       let bit_index = this.__offset % 8;
       let bit = this.__data[byte_index] & (1 << bit_index);
@@ -84,7 +84,7 @@ export class sc_bitfield {
    * If the value is too large to be represented in that many bits
    * the least significant part will be written
    */
-  write_bits(bits, value) {
+  public write_bits(bits: number, value: number): void {
     let op_bit = 0;
     // Only allow numbers to be written
     check.type_is('number', value, `Attempt to write_bits with non-numeric value '${value}'`);
@@ -109,14 +109,14 @@ export class sc_bitfield {
   /**
    * Unpacks the specified number of bits, but returns nothing
    */
-  skip_bits(bits) {
-    read(bits);
+  public skip_bits(bits: number): void {
+    this.read_bits(bits);
   }
 
   /**
    * Sets the bit offset
    */
-   seek_bits(bits) {
+   public seek_bits(bits: number): void {
     this.__offset = bits;
    }
 
@@ -124,14 +124,24 @@ export class sc_bitfield {
   /**
    * Rewinds the unpacker position to the start
    */
-  reset() {
+  public reset(): void {
     this.__offset = 0;
   }
 
   /**
    * Gets the underlying buffer
    */
-   get data() {
+  public get data(): number[] {
     return this.__data;
-   }
+  }
+
+
+  public get data_as_bytebuffer(): ByteBuffer {
+    const block_bb: ByteBuffer = new ByteBuffer(this.__data.length);
+    for (const byte of this.__data) {
+      block_bb.writeUint8(byte);
+    }
+    block_bb.reset();
+    return block_bb;
+  }
 }

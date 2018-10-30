@@ -125,9 +125,6 @@ export class sc_script_base {
     if (typeof input === 'string') {
       lua.luaL_dostring(this.__lua_state, input);
     } else if (input instanceof ByteBuffer) {
-      // The above is a nasty hack to get this working in the browser
-      // It would be better to not have a second version of ByteBuffer kicking around!
-
       // It's weirdly hard to convert the entire ByteBuffer to a String.
       // Copy the entire thing, append a NULL byte and read a NULL terminated string
       let input_copy = new ByteBuffer(input.capacity() + 1);

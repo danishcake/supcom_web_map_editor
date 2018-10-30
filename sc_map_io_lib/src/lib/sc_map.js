@@ -9,8 +9,10 @@
  * TODO: Add readFloat32Array helper function
  */
 import check from "./sc_check";
-import {sc_dds, sc_dds_pixelformat} from "./sc_dds";
-import {_} from "underscore";
+import { sc_dds } from "./dds/sc_dds";
+import { sc_dds_pixelformat_argb } from "./dds/pixelformats/sc_dds_pixelformat_argb";
+import { sc_dds_pixelformat_dxt5 } from "./dds/pixelformats/sc_dds_pixelformat_dxt5";
+import { _ } from "underscore";
 const ByteBuffer = require('bytebuffer');
 
 
@@ -150,7 +152,8 @@ class sc_map_preview_image {
     const output = new ByteBuffer(4 + 256 * 256 * 4 + 128 + 4, ByteBuffer.LITTLE_ENDIAN);
     output.writeInt32(256 * 256 * 4 + 128);                                   // Length of DDS texture
 
-    sc_dds.save(output, this.data, 256, 256, sc_dds_pixelformat.RawARGB);     // Preview image (Uncompressed DDS)
+
+    sc_dds.save(output, this.data, 256, 256, new sc_dds_pixelformat_argb());  // Preview image (Uncompressed DDS)
 
     output.writeInt32(56);                                                    // Minor version
 
@@ -1299,7 +1302,7 @@ class sc_map_normalmap {
     // Note: DXT5 is capable of lossless compression if there are only a few distinct values,
     // but it does so in RGB565, which causes the bottom 2-3 bits of each channel to be dropped
     // This also means that the 2-3 bottom bits are likely to be zero after loading
-    sc_dds.save(output, this.__data, this.__width, this.__height, sc_dds_pixelformat.DXT5);
+    sc_dds.save(output, this.__data, this.__width, this.__height, new sc_dds_pixelformat_dxt5());
 
     return output;
   }
@@ -1376,10 +1379,10 @@ export class sc_map_texturemap {
     const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
 
     output.writeInt32(dds_raw_sz(this.__width, this.__height));
-    sc_dds.save(output, this.__chan0_3, this.__width, this.__height, sc_dds_pixelformat.RawARGB);
+    sc_dds.save(output, this.__chan0_3, this.__width, this.__height, new sc_dds_pixelformat_argb());
 
     output.writeInt32(dds_raw_sz(this.__width, this.__height));
-    sc_dds.save(output, this.__chan4_7, this.__width, this.__height, sc_dds_pixelformat.RawARGB);
+    sc_dds.save(output, this.__chan4_7, this.__width, this.__height, new sc_dds_pixelformat_argb());
 
     return output;
   }
@@ -1487,7 +1490,7 @@ class sc_map_watermap {
     }
 
     output.writeInt32(dds_dxt5_sz2(this.__heightmap.width / 2, this.__heightmap.height / 2));
-    sc_dds.save(output, this.__watermap_data, this.__heightmap.width / 2, this.__heightmap.height / 2, sc_dds_pixelformat.DXT5);
+    sc_dds.save(output, this.__watermap_data, this.__heightmap.width / 2, this.__heightmap.height / 2, new sc_dds_pixelformat_dxt5());
 
     output.append(this.__foam_mask_data);
     output.append(this.__flatness_data);
