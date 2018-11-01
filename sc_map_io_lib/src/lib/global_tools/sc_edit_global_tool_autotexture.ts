@@ -4,12 +4,15 @@ import {sc_edit_view_convolution} from '../views/sc_edit_view_convolution'
 import {sc_edit_view_snapshot} from '../views/sc_edit_view_snapshot'
 import {sc_edit_view_oob_clamp} from '../views/sc_edit_view_oob_clamp'
 import {sc_edit_view_mask} from '../views/sc_edit_view_mask'
+import { sc_edit_tool_data } from '../tools/sc_edit_tool_args';
 
 /**
  * Apply autotexture to the entire height/texture maps
  */
 export class sc_edit_global_tool_autotexture extends sc_edit_global_tool_base {
-  constructor(signals) {
+  private __signals: number[];
+
+  constructor(signals: number[]) {
     super();
 
     this.__signals = signals;
@@ -20,7 +23,7 @@ export class sc_edit_global_tool_autotexture extends sc_edit_global_tool_base {
    * @param {sc_edit_tool_data} data
    * @private
    */
-  __apply_impl(data) {
+  protected __apply_impl(data: sc_edit_tool_data): void {
     /**
      * Texturing algorithm:
      * 1. Terrain below abyssal water is set to base;
@@ -98,9 +101,10 @@ export class sc_edit_global_tool_autotexture extends sc_edit_global_tool_base {
     }
 
     // Finally blur the bejesus out of it
+    // Channel 6 is used to indicate cliffs, so receives a small blur
     const snapshot = new sc_edit_view_snapshot(data.edit_texturemap);
-    const big_blur_mask = new sc_edit_view_mask(snapshot, [true, true, true, true, true, false, true, true]);
-    const small_blur_mask = new sc_edit_view_mask(snapshot, [false, false, false, false, false, true, false, false]);
+    const big_blur_mask = new sc_edit_view_mask(snapshot, [1, 1, 1, 1, 1, 0, 1, 1]);
+    const small_blur_mask = new sc_edit_view_mask(snapshot, [0, 0, 0, 0, 0, 1, 0, 0]);
 
     // Apply a big blur (11x11)
     const big_blur_weights = sc_edit_view_methods.make_pixel(11*11, 1);
