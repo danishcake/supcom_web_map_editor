@@ -1,39 +1,57 @@
-import {sc_edit_tool_base} from "./sc_edit_tool"
-import {sc_edit_patch} from "../views/sc_edit_patch"
-import {sc_edit_view_snapshot} from "../views/sc_edit_view_snapshot"
-import {sc_edit_view_convolution} from "../views/sc_edit_view_convolution"
-import {sc_edit_view_methods} from "../views/sc_edit_view_methods"
-import {_} from "underscore"
+import { sc_edit_tool_base } from "./sc_edit_tool"
+import { sc_edit_patch } from "../views/sc_edit_patch"
+import { sc_edit_view_snapshot } from "../views/sc_edit_view_snapshot"
+import { sc_edit_view_convolution } from "../views/sc_edit_view_convolution"
+import { sc_edit_view_methods } from "../views/sc_edit_view_methods"
+import * as _ from "underscore"
+import { sc_vec2, sc_pixel } from "../sc_vec";
+import { sc_edit_view_base } from "../views/sc_edit_view";
+
+
+/**
+ * The type of blur to use
+ */
+export enum blur_type {
+  gaussian,
+  average
+}
+
 
 /**
  * Terrain smoothing tool
  * @property {sc_edit_view_snapshot} __snapshot Value of the view prior to changes
  * @property {sc_edit_view_convolution} __convolution View of __snapshot with a blur applied
- * @property {string} __blur_type The type of blur to apply. @see blur_gaussian or blur_average
+ * @property {blur_type} __blur_type The type of blur to apply
  */
 export class sc_edit_tool_smooth extends sc_edit_tool_base {
+  private __blur_type: blur_type;
+  private __patch: sc_edit_view_base | null;
+  private __blending_patch: sc_edit_view_base | null;
+  private __snapshot: sc_edit_view_base | null;
+  private __convolution: sc_edit_view_base | null;
+
+
   /**
    * Height smoothing tool
    * @param {number} outer_radius Maximum radius of effect
    * @param {number} inner_radius Maximum radius of full intensity effect
    * @param {number} strength Intensity of effect. At 255 the inner radius will be fully set to the smoothed value
-   * @property {string} __blur_type The type of blur to apply. @see blur_gaussian or blur_average
+   * @property {blur_type} type_of_blur The type of blur to apply
    */
-  constructor(outer_radius, inner_radius, strength, blur_type) {
+  constructor(outer_radius: number, inner_radius: number, strength: number, type_of_blur: blur_type) {
     super(outer_radius, inner_radius, strength);
-
-    if (blur_type !== sc_edit_tool_smooth.blur_gaussian &&
-        blur_type !== sc_edit_tool_smooth.blur_average) {
-      throw new Error(`Parameter 'blur_type' must be a known blur type`);
-    }
-    this.__blur_type = blur_type;
+    this.__blur_type = type_of_blur;
+    this.__patch = null;
+    this.__blending_patch = null;
+    this.__snapshot = null;
+    this.__convolution = null;
   }
 
 
   /**
    * Prepares a heightmap patch to apply using blend
    */
-  __start_impl(target_view, position) {
+  protected __start_impl(target_view: sc_edit_view_base, position: sc_vec2): void {
     // Create the patch that will be applied periodically
     this.__patch = new sc_edit_patch([this.__outer_radius * 2 + 1, this.__outer_radius * 2 + 1],
                                      target_view.subpixel_count,
@@ -54,15 +72,15 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
     // Create a cache of the original heightmap
     this.__snapshot = new sc_edit_view_snapshot(target_view);
     // Create a flat average filter
-    let weights;
+    let weights: sc_pixel;
     switch (this.__blur_type) {
-      case sc_edit_tool_smooth.blur_average:
+      case blur_type.average:
         weights = sc_edit_view_methods.make_pixel((this.__outer_radius * 2 + 1) * (this.__outer_radius * 2 + 1), 1);
         break;
+
       default:
-      case sc_edit_tool_smooth.blur_gaussian:
+      case blur_type.gaussian:
         throw new Error("Not implemented");
-        break;
     }
 
     this.__convolution = new sc_edit_view_convolution(this.__snapshot, weights, weights.length);
@@ -72,19 +90,19 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
   /**
    * Smooths the terrain around the application site
    */
-  __apply_impl(target_view, position) {
+  protected __apply_impl(target_view: sc_edit_view_base, position: sc_vec2): void {
     // Find average value of the tools region every time it is applied
-    const average_value = this.__convolution.get_pixel(position);
+    const average_value = (this.__convolution as sc_edit_view_base) .get_pixel(position);
 
     // Fill entire patch with average
-    sc_edit_view_methods.fill(this.__patch, average_value);
+    sc_edit_view_methods.fill(this.__patch as sc_edit_view_base, average_value);
 
     // Move the tool region towards that average
     sc_edit_view_methods.ratcheted_weighted_blend(target_view, // To edit_heightmap
                                                   [position[0] - this.__outer_radius, position[1] - this.__outer_radius],  // At this position
-                                                  this.__patch, // From this source
-                                                  this.__snapshot, // And this source
-                                                  this.__blending_patch); // Weighting the first by this
+                                                  this.__patch as sc_edit_view_base, // From this source
+                                                  this.__snapshot as sc_edit_view_base, // And this source
+                                                  this.__blending_patch as sc_edit_view_base); // Weighting the first by this
   }
 
 
@@ -94,7 +112,4 @@ export class sc_edit_tool_smooth extends sc_edit_tool_base {
     this.__snapshot = null;
     this.__convolution = null;
   }
-
-  static get blur_gaussian() { return 'gaussian'; }
-  static get blur_average() { return 'average'; }
 }

@@ -20,9 +20,9 @@ describe('sc_edit_tool', function() {
   describe('heightmap tool construction', function() {
     it('stores radii and stength', function () {
       let tool = new sc_edit_tool_base(16, 8, 10);
-      assert.equal(16, tool.__outer_radius);
-      assert.equal(8,  tool.__inner_radius);
-      assert.equal(10, tool.__strength);
+      assert.equal(16, tool.outer_radius);
+      assert.equal(8,  tool.inner_radius);
+      assert.equal(10, tool.strength);
     });
   });
 

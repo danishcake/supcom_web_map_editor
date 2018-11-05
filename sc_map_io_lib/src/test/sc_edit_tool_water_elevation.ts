@@ -1,4 +1,4 @@
-import { sc_edit_tool_water_elevation } from '../lib/tools/sc_edit_tool_water_elevation';
+import { sc_edit_tool_water_elevation, water_depth } from '../lib/tools/sc_edit_tool_water_elevation';
 import { sc_edit_tool_data, sc_edit_tool_args } from '../lib/tools/sc_edit_tool_args'
 import { sc_map } from '../lib/sc_map';
 import { sc_edit_heightmap } from '../lib/sc_edit_heightmap';
@@ -32,7 +32,7 @@ describe('sc_edit_tool_water_elevation', function() {
   });
 
   describe('applying tool', function() {
-    const tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.shallow);
+    const tool = new sc_edit_tool_water_elevation(water_depth.shallow);
 
     it('enables water', function () {
       this.map.water.has_water = false;
@@ -48,7 +48,7 @@ describe('sc_edit_tool_water_elevation', function() {
 
 
   describe('changing shallow', function() {
-    const tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.shallow);
+    const tool = new sc_edit_tool_water_elevation(water_depth.shallow);
     describe('lowering shallow', function() {
 
       it('should lower the shallow elevation', function() {
@@ -95,7 +95,7 @@ describe('sc_edit_tool_water_elevation', function() {
   });
 
   describe('changing deep', function() {
-    const tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.deep);
+    const tool = new sc_edit_tool_water_elevation(water_depth.deep);
     describe('lowering deep', function() {
 
       it('should lower the deep elevation', function() {
@@ -160,7 +160,7 @@ describe('sc_edit_tool_water_elevation', function() {
   });
 
   describe('changing abyssal', function() {
-    const tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.abyssal);
+    const tool = new sc_edit_tool_water_elevation(water_depth.abyssal);
     describe('lowering abyssal', function() {
       it('should lower the abyssal elevation', function() {
         tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, this.map),

@@ -2,8 +2,9 @@ const angular = require('angular');
 import { sc_edit_view_methods } from '../../../sc_map_io_lib/src/lib/views/sc_edit_view_methods';
 import { sc_edit_tool_lower, sc_edit_tool_lower_peak, sc_edit_tool_raise, sc_edit_tool_raise_peak }
   from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_raise';
+import { sc_edit_tool_clear_higher } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_clear_higher';
 import { sc_edit_tool_flatten } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_flatten';
-import { sc_edit_tool_smooth } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_smooth';
+import { sc_edit_tool_smooth, blur_type } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_smooth';
 import { sc_edit_tool_set } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_set';
 import { sc_edit_tool_water_elevation } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_water_elevation';
 import { sc_edit_tool_select_marker } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_select_marker';
@@ -112,7 +113,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
             break;
 
           case 'smooth':
-            service.tool = new sc_edit_tool_smooth(outer, inner, strength * 5, sc_edit_tool_smooth.blur_average);
+            service.tool = new sc_edit_tool_smooth(outer, inner, strength * 5, blur_type.average);
             break;
 
           default:

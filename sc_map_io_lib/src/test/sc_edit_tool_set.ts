@@ -15,7 +15,7 @@ describe('sc_edit_tool_set', function() {
   });
 
   it('sets all pixels within outer radius', function() {
-    let tool = new sc_edit_tool_set(16, 1, [10]);
+    let tool = new sc_edit_tool_set(16, 1, 10);
     tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),
                new sc_edit_tool_args([128, 128], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
     tool.end(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),

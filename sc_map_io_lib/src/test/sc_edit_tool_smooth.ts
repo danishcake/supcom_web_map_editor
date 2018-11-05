@@ -1,4 +1,4 @@
-import { sc_edit_tool_smooth } from '../lib/tools/sc_edit_tool_smooth';
+import { sc_edit_tool_smooth, blur_type } from '../lib/tools/sc_edit_tool_smooth';
 import { sc_edit_tool_data, sc_edit_tool_args } from '../lib/tools/sc_edit_tool_args'
 import { sc_edit_patch } from '../lib/views/sc_edit_patch';
 import { sc_script_save } from '../lib/sc_script';
@@ -24,7 +24,7 @@ describe('sc_edit_tool_smooth', function() {
   });
 
   it('moves inner region towards average', function() {
-    let tool = new sc_edit_tool_smooth(16, 8, 64, sc_edit_tool_smooth.blur_average);
+    let tool = new sc_edit_tool_smooth(16, 8, 64, blur_type.average);
     tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),
                new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
     tool.end(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),
@@ -38,7 +38,7 @@ describe('sc_edit_tool_smooth', function() {
   });
 
   it('has full effect at 255 intensity', function() {
-    let tool = new sc_edit_tool_smooth(16, 8, 255, sc_edit_tool_smooth.blur_average);
+    let tool = new sc_edit_tool_smooth(16, 8, 255, blur_type.average);
     tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),
                new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
     tool.end(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),
@@ -50,7 +50,7 @@ describe('sc_edit_tool_smooth', function() {
   });
 
   it('has radial falloff in the effect around periphery', function() {
-    let tool = new sc_edit_tool_smooth(16, 8, 255, sc_edit_tool_smooth.blur_average);
+    let tool = new sc_edit_tool_smooth(16, 8, 255, blur_type.average);
     tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),
                new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
     tool.end(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),
@@ -63,7 +63,7 @@ describe('sc_edit_tool_smooth', function() {
   });
 
   it('has no effect at 0 intensity', function() {
-    let tool = new sc_edit_tool_smooth(16, 8, 0, sc_edit_tool_smooth.blur_average);
+    let tool = new sc_edit_tool_smooth(16, 8, 0, blur_type.average);
     tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),
                new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
     tool.end(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),
@@ -74,7 +74,7 @@ describe('sc_edit_tool_smooth', function() {
   });
 
   it('ratchets towards smoothness', function() {
-    let tool = new sc_edit_tool_smooth(16, 8, 255, sc_edit_tool_smooth.blur_average);
+    let tool = new sc_edit_tool_smooth(16, 8, 255, blur_type.average);
     tool.start(new sc_edit_tool_data(this.hm, this.tm, null as any as sc_script_save, this.hm, null as any as sc_map),
                new sc_edit_tool_args([128, 64], sc_edit_tool_args.modifier_none, new sc_edit_symmetry.none()));
     // 4 pixels into falloff region on left should be 50% effect
