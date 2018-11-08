@@ -1,6 +1,8 @@
 import { sc_zip } from "../lib/sc_zip";
 import { sc_map } from "../lib/sc_map";
-import { sc_script_scenario, sc_script_save, sc_script_script } from "../lib/sc_script";
+import { sc_script_scenario } from "../lib/script/sc_script_scenario";
+import { sc_script_save } from "../lib/script/sc_script_save";
+import { sc_script_script, } from "../lib/script/sc_script_script";
 
 const fs = require('fs');
 const _ = require('underscore');

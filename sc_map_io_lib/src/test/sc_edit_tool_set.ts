@@ -2,7 +2,7 @@ import { sc_edit_tool_set } from '../lib/tools/sc_edit_tool_set';
 import { sc_edit_tool_data, sc_edit_tool_args } from "../lib/tools/sc_edit_tool_args"
 import { sc_edit_view_methods } from '../lib/views/sc_edit_view_methods'
 import { sc_edit_patch } from '../lib/views/sc_edit_patch';
-import { sc_script_save } from '../lib/sc_script';
+import { sc_script_save } from '../lib/script/sc_script_save';
 import { sc_map } from '../lib/sc_map';
 import { sc_edit_symmetry } from '../lib/sc_edit_symmetry';
 const assert = require('chai').assert;

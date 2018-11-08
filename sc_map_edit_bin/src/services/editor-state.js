@@ -14,7 +14,8 @@ import { sc_edit_view_mask } from '../../../sc_map_io_lib/src/lib/views/sc_edit_
 import { sc_edit_view_symmetry } from '../../../sc_map_io_lib/src/lib/views/sc_edit_view_symmetry';
 import { sc_edit_heightmap } from '../../../sc_map_io_lib/src/lib/sc_edit_heightmap';
 import { sc_edit_texturemap } from '../../../sc_map_io_lib/src/lib/sc_edit_texturemap';
-import { sc_script_scenario, sc_script_save } from '../../../sc_map_io_lib/src/lib/sc_script';
+import { sc_script_scenario } from '../../../sc_map_io_lib/src/lib/script/sc_script_scenario';
+import { sc_script_save } from '../../../sc_map_io_lib/src/lib/script/sc_script_save';
 import { sc_map } from '../../../sc_map_io_lib/src/lib/sc_map';
 
 const _ = require('underscore');

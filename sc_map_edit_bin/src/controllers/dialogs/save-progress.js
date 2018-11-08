@@ -1,5 +1,5 @@
 const angular = require('angular');
-import { sc_script_script } from '../../../../sc_map_io_lib/src/lib/sc_script';
+import { sc_script_script } from '../../../../sc_map_io_lib/src/lib/script/sc_script_script';
 import { sc_zip } from '../../../../sc_map_io_lib/src/lib/sc_zip';
 const async = require('async');
 const saveAs = require('file-saver').saveAs;

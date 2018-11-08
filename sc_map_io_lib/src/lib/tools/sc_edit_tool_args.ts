@@ -1,6 +1,6 @@
 import { sc_edit_heightmap } from "../sc_edit_heightmap";
 import { sc_edit_texturemap } from "../sc_edit_texturemap";
-import { sc_script_save } from "../sc_script";
+import { sc_script_save } from "../script/sc_script_save";
 import { sc_edit_view_base } from "../views/sc_edit_view";
 import { sc_map } from "../sc_map";
 import { sc_vec2 } from "../sc_vec";

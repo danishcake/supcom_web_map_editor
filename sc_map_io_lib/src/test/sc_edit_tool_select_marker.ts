@@ -1,6 +1,6 @@
 import { sc_edit_tool_select_marker } from '../lib/tools/sc_edit_tool_select_marker';
 import { sc_edit_tool_data, sc_edit_tool_args } from "../lib/tools/sc_edit_tool_args"
-import { sc_script_save } from '../lib/sc_script';
+import { sc_script_save } from '../lib/script/sc_script_save';
 import { sc_edit_heightmap } from '../lib/sc_edit_heightmap';
 import { sc_edit_texturemap } from '../lib/sc_edit_texturemap';
 import { sc_map } from '../lib/sc_map';

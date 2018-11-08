@@ -1,5 +1,5 @@
 import { _ } from "underscore";
-import { sc_script_marker } from "../sc_script";
+import { sc_script_marker } from "../script/sc_script_marker";
 
 /**
  * Marker creation tool
@@ -59,11 +59,11 @@ export class sc_edit_tool_add_marker {
       for (const position of all_positions) {
         // First application, so place marker at current position
         // Find a unique name
-        const marker_name = sc_script_marker.find_unique_name(data.save_script.markers, this.__marker_template.name);
+        const markers_array = Object.keys(data.save_script.markers).map(marker_name => data.save_script.markers[marker_name]);
+        const marker_name = sc_script_marker.find_unique_name(markers_array, this.__marker_template.name);
 
         // Load fields from template
-        const marker = new sc_script_marker();
-        marker.load(marker_name, this.__marker_template);
+        const marker = new sc_script_marker(marker_name, this.__marker_template);
 
         // Position marker under cursor
         marker.position.x = position[0];

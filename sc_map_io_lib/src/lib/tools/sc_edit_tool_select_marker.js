@@ -1,5 +1,5 @@
-import {_} from "underscore"
-import { sc_script_marker } from "../sc_script";
+import { _ } from "underscore"
+import { sc_script_marker } from "../script/sc_script_marker";
 
 /**
  * Selection and marker movement tool

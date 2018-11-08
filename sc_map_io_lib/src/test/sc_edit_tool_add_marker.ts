@@ -1,4 +1,4 @@
-import { sc_script_save } from '../lib/sc_script';
+import { sc_script_save } from '../lib/script/sc_script_save';
 import { sc_edit_tool_add_marker } from '../lib/tools/sc_edit_tool_add_marker.js';
 import { sc_edit_tool_data, sc_edit_tool_args } from "../lib/tools/sc_edit_tool_args"
 import { sc_edit_heightmap } from '../lib/sc_edit_heightmap';

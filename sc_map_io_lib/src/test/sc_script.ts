@@ -1,5 +1,6 @@
-import { sc_script_base, sc_script_scenario, sc_script_save } from "../lib/sc_script";
-import { sc_edit_patch } from "../lib/views/sc_edit_patch";
+import { sc_script_base } from "../lib/script/sc_script_base";
+import { sc_script_scenario } from "../lib/script/sc_script_scenario";
+import { sc_script_save } from "../lib/script/sc_script_save";
 import { sc_map } from "../lib/sc_map";
 import { sc_edit_heightmap } from "../lib/sc_edit_heightmap";
 import { sc_edit_view_methods } from "../lib/views/sc_edit_view_methods";

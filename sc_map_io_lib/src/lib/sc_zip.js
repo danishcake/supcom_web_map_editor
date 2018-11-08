@@ -1,8 +1,9 @@
 const JSZip = require("jszip");
 const ByteBuffer = require('bytebuffer');
 const _ = require('underscore');
-import {sc_script_scenario, sc_script_save} from "./sc_script"
-import {sc_map} from "./sc_map"
+import { sc_script_scenario } from "./script/sc_script_scenario";
+import { sc_script_save } from "./script/sc_script_save";
+import { sc_map } from "./sc_map";
 
 
 

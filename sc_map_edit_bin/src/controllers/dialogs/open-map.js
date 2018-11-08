@@ -1,7 +1,8 @@
 const angular = require('angular');
 import { sc_map } from '../../../../sc_map_io_lib/src/lib/sc_map';
 import { sc_zip } from '../../../../sc_map_io_lib/src/lib/sc_zip';
-import { sc_script_save, sc_script_scenario } from '../../../../sc_map_io_lib/src/lib/sc_script';
+import { sc_script_save } from '../../../../sc_map_io_lib/src/lib/script/sc_script_save';
+import { sc_script_scenario } from '../../../../sc_map_io_lib/src/lib/script/sc_script_scenario';
 const ByteBuffer = require('bytebuffer');
 
 angular.module('sc_map_edit_bin.controllers').controller("open-map",

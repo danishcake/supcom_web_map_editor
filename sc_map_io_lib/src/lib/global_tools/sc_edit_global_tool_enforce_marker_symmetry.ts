@@ -1,5 +1,5 @@
 import { sc_edit_global_tool_base } from './sc_edit_global_tool'
-import { sc_script_marker } from '../sc_script';
+import { sc_script_marker } from '../script/sc_script_marker';
 import { sc_edit_symmetry_base } from '../sc_edit_symmetry';
 import { sc_edit_tool_data } from '../tools/sc_edit_tool_args';
 import { sc_vec2 } from '../sc_vec';
@@ -42,8 +42,7 @@ export class sc_edit_global_tool_enforce_marker_symmetry extends sc_edit_global_
       const reflected_positions = this.__symmetry.get_secondary_pixels([marker.position.x, marker.position.z], size);
       for (const reflected_position of reflected_positions) {
         const marker_name = sc_script_marker.find_unique_name(markers, marker.name);
-        const reflected_marker = new sc_script_marker();
-        reflected_marker.load(marker_name, marker);
+        const reflected_marker = new sc_script_marker(marker_name, marker);
 
         // TODO: This is a bodge to make Typescript stop complaining that postion may be undefined
         // Remove bodge when porting marker to Typescript
