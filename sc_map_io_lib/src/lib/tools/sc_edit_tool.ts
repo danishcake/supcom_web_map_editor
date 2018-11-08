@@ -16,8 +16,8 @@ import { sc_edit_view_base } from "../views/sc_edit_view";
  */
 
 export class sc_edit_tool_base {
-  private __active: boolean;
-  private __position: sc_vec2;
+  protected __active: boolean;
+  protected __position: sc_vec2;
   protected __outer_radius: number;
   protected __inner_radius: number;
   protected __strength: number;

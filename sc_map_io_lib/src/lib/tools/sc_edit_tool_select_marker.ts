@@ -1,5 +1,11 @@
-import { _ } from "underscore"
+import * as _ from "underscore"
+import { sc_edit_tool_base } from "./sc_edit_tool";
+import { sc_vec2 } from "../sc_vec";
+import { sc_edit_tool_data, sc_edit_tool_args } from "./sc_edit_tool_args";
 import { sc_script_marker } from "../script/sc_script_marker";
+import { sc_script_save } from "../script/sc_script_save";
+import { sc_edit_symmetry_base } from "../sc_edit_symmetry";
+
 
 /**
  * Selection and marker movement tool
@@ -12,9 +18,13 @@ import { sc_script_marker } from "../script/sc_script_marker";
  * radius and strength are ignored
  */
 
-export class sc_edit_tool_select_marker {
+export class sc_edit_tool_select_marker extends sc_edit_tool_base {
+  private __moved: boolean;
+  private __last_position: sc_vec2;
+  private __started_over_selected_marker = false;
+
   constructor() {
-    this.__active = false;
+    super(1, 1, 1);
     this.__moved = false;
     this.__last_position = [0, 0];
     this.__started_over_selected_marker = false;
@@ -22,39 +32,17 @@ export class sc_edit_tool_select_marker {
 
 
   /**
-   * Setter for outer radius
-   */
-  set_outer_radius(outer_radius) {}
-
-
-  /**
-   * Setter for inner radius
-   */
-  set_inner_radius(inner_radius) {}
-
-
-  /**
-   * Setter for stength
-   */
-  set_strength(strength) {}
-
-  /** @type {number} */
-  get outer_radius() { return 1; }
-  /** @type {number} */
-  get inner_radius() { return 1; }
-
-  /**
    * Start function. This can either select a marker, or if the marker is already selected
    * start a move
    * @param {sc_edit_tool_data} data Data to edit
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
-  start(data, args) {
+  public start(data: sc_edit_tool_data, args: sc_edit_tool_args): void {
     // Adjust scale to account for different targets
     args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
 
     if (!this.__active) {
-      const size = [data.edit_heightmap.width, data.edit_heightmap.height];
+      const size: sc_vec2 = [data.edit_heightmap.width, data.edit_heightmap.height];
       // First application, so toggle selection of what's under the cursor
       const clicked_marker = this.__get_clicked_marker(data.save_script, args.position);
 
@@ -90,7 +78,8 @@ export class sc_edit_tool_select_marker {
       } else {
         // If shift not held then deselect all markers
         if (!args.shift) {
-          Object.values(data.save_script.markers).forEach(marker => {
+          const markers = Object.keys(data.save_script.markers).map(marker_name => data.save_script.markers[marker_name]);
+          markers.forEach(marker => {
             delete marker.selected;
           });
         }
@@ -108,12 +97,12 @@ export class sc_edit_tool_select_marker {
    * @param {sc_edit_tool_data} data Data to edit
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
-  apply(data, args) {
+  public apply(data: sc_edit_tool_data, args: sc_edit_tool_args): void {
     // Adjust scale to account for different targets
     args.set_target(data.target, data.edit_heightmap, data.edit_texturemap);
-    const size = [data.edit_heightmap.width, data.edit_heightmap.height];
+    const size: sc_vec2 = [data.edit_heightmap.width, data.edit_heightmap.height];
 
-    const delta = [args.grid_position[0] - this.__last_position[0], args.grid_position[1] - this.__last_position[1]];
+    const delta: sc_vec2 = [args.grid_position[0] - this.__last_position[0], args.grid_position[1] - this.__last_position[1]];
 
     if (!this.__moved) {
       const distance_moved = Math.sqrt(delta[0] * delta[0] + delta[1] * delta[1]);
@@ -131,9 +120,10 @@ export class sc_edit_tool_select_marker {
       // Now: Find the markers in the primary region
       // Move those. All others should then reflected
       // Any leftover should be moved as per primary
-      const moved_markers = [];
-      const selected_markers = Object.values(data.save_script.markers)
-                                     .filter((marker) => marker.selected);
+      const moved_markers: sc_script_marker[] = [];
+      const selected_markers = Object.keys(data.save_script.markers)
+                                     .map(marker_name => data.save_script.markers[marker_name])
+                                     .filter(marker => marker.selected);
       const primary_markers = selected_markers.filter((marker) => args.symmetry.is_primary_pixel([marker.position.x, marker.position.z], size));
 
       for (const primary_marker of primary_markers) {
@@ -185,7 +175,7 @@ export class sc_edit_tool_select_marker {
    * @param {sc_edit_tool_data} data Data to edit
    * @param {sc_edit_tool_args} args How and where to apply tool
    */
-  end(data, args) {
+  public end(data: sc_edit_tool_data, args: sc_edit_tool_args): void {
     // TBD: At end of application I should snap moved markers to grid
     this.__active = false;
   }
@@ -197,10 +187,11 @@ export class sc_edit_tool_select_marker {
    * @param {number} position x/y-coordinate of centre of tool, measured from top/left
    * @return The closest marker under the cursor, or null if no marker close enough
    */
-  __get_clicked_marker(save_script, position) {
+  private __get_clicked_marker(save_script: sc_script_save, position: sc_vec2): sc_script_marker | null {
     if (_.isEmpty(save_script.markers)) {
       return null;
     }
+
     const closest_marker = _.chain(save_script.markers)
       .map((marker) => {
         const delta = [position[0] - marker.position.x,
@@ -231,14 +222,17 @@ export class sc_edit_tool_select_marker {
    * @param {sc_script_marker} primary_marker The primary (eg just clicked) marker
    * @param {sc_script_save} save_script The save script containing all markers
    * @param {sc_edit_symmetry_base} symmetry The symmetry in use
-   * @param {Array<number>[2]} size Heightmap/marker units size
+   * @param {sc_vec2} size Heightmap/marker units size
    */
-  __get_secondary_markers(primary_marker, save_script, symmetry, size) {
+  private __get_secondary_markers(primary_marker: sc_script_marker,
+                                  save_script: sc_script_save,
+                                  symmetry: sc_edit_symmetry_base,
+                                  size: sc_vec2): sc_script_marker[] {
     if (primary_marker == null) {
       return [];
     }
 
-    const markers = Object.values(save_script.markers);
+    const markers = Object.keys(save_script.markers).map(marker_name => save_script.markers[marker_name]);
     const primary_position = symmetry.get_primary_pixel([primary_marker.position.x, primary_marker.position.z], size);
     const secondary_positions = symmetry.get_secondary_pixels(primary_position, size);
     const all_positions = [primary_position].concat(secondary_positions);
@@ -265,8 +259,10 @@ export class sc_edit_tool_select_marker {
   }
 
 
-  __get_marker_of_same_type_near(marker_type, save_script, position) {
-    const markers = Object.values(save_script.markers);
+  private __get_marker_of_same_type_near(marker_type: string,
+                                         save_script: sc_script_save,
+                                         position: sc_vec2): sc_script_marker | null {
+    const markers = Object.keys(save_script.markers).map(maker_name => save_script.markers[maker_name]);
 
     const distance_sorted_markers_of_same_type = markers
       .filter((marker) => marker.type === marker_type)
