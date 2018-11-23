@@ -101,7 +101,7 @@ angular.module('sc_map_edit_bin.controllers').controller("save-progress",
     $scope.data.progress_value = 10;
 
     const map_data = {
-      map: $scope.data.map,
+      scmap: $scope.data.map,
       scripts: {
         scenario: $scope.data.scripts.scenario,
         save: $scope.data.scripts.save,

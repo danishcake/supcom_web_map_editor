@@ -3,6 +3,8 @@ import { sc_map } from "../lib/sc_map";
 import { sc_script_scenario } from "../lib/script/sc_script_scenario";
 import { sc_script_save } from "../lib/script/sc_script_save";
 import { sc_script_script, } from "../lib/script/sc_script_script";
+import { sc_edit_patch } from "../lib/views/sc_edit_patch";
+import { sc_edit_heightmap } from "../lib/sc_edit_heightmap";
 
 const fs = require('fs');
 const _ = require('underscore');
@@ -60,13 +62,15 @@ describe('sc_zip', function() {
   describe('saving', function() {
     it('should save the files with names that match the scenario', function(done) {
       const map_data = {
-        map: new sc_map(),
+        scmap: new sc_map(),
         scripts: {
           scenario: new sc_script_scenario(),
           save: new sc_script_save(),
           script: new sc_script_script()
-        }
+        },
+        edit_heightmap: null as any as sc_edit_heightmap // Something of a bodge
       };
+
       const map_args = {
         name: "Awesome Volcano",               // Used to determine filenames
         author: "1337 internet tag",
@@ -74,10 +78,11 @@ describe('sc_zip', function() {
         size: 0,
         default_height: 0
       };
-      map_data.map.create(map_args);
+      map_data.scmap.create(map_args);
       map_data.scripts.scenario.create(map_args);
       map_data.scripts.save.create(map_args);
       map_data.scripts.script.create(map_args);
+      map_data.edit_heightmap = new sc_edit_heightmap(map_data.scmap.heightmap);
 
       const expected_scenario_filename = 'Awesome_Volcano/Awesome_Volcano_scenario.lua';
       const expected_save_filename     = map_data.scripts.scenario.save_filename.split('/').slice(-2).join('/');
