@@ -62,7 +62,7 @@ describe('sc_zip', function() {
   describe('saving', function() {
     it('should save the files with names that match the scenario', function(done) {
       const map_data = {
-        scmap: new sc_map(),
+        scmap: sc_map.create({size: 0, default_height: 1000, author: "", description: "", name: ""}),
         scripts: {
           scenario: new sc_script_scenario(),
           save: new sc_script_save(),
@@ -78,7 +78,7 @@ describe('sc_zip', function() {
         size: 0,
         default_height: 0
       };
-      map_data.scmap.create(map_args);
+
       map_data.scripts.scenario.create(map_args);
       map_data.scripts.save.create(map_args);
       map_data.scripts.script.create(map_args);

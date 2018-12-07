@@ -17,8 +17,7 @@ describe('sc_edit_tool_clear_higher', function() {
       size: 0, // 5x5.
       default_height: 1000
     };
-    this.map = new sc_map();
-    this.map.create(map_args);
+    this.map = sc_map.create(map_args);
     this.hm = new sc_edit_heightmap(this.map.heightmap);
     this.tm = new sc_edit_texturemap(this.map.texturemap);
     this.save_script = new sc_script_save();

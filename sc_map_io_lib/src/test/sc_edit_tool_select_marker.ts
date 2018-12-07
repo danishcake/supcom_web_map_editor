@@ -30,8 +30,7 @@ describe('sc_edit_tool_select_marker', function() {
       position: {x: 100, y: 0, z: 100}
     };
 
-    this.map = new sc_map()
-    this.map.create(map_args);
+    this.map = sc_map.create(map_args);
     this.hm = new sc_edit_heightmap(this.map.heightmap);
     this.tm = new sc_edit_texturemap(this.map.texturemap);
   });

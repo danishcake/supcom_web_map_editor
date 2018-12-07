@@ -45,8 +45,7 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
       // Retrive scmap from localstorage and load
       const b64_serialised_scmap = localStorage.getItem("sc_map_edit_bin.save.scmap");
       const serialised_scmap = ByteBuffer.wrap(b64_serialised_scmap, "base64", ByteBuffer.LITTLE_ENDIAN);
-      const scmap = new sc_map();
-      scmap.load(serialised_scmap);
+      const scmap = sc_map.load(serialised_scmap);
 
       const b64_serialised_script_scenario = localStorage.getItem("sc_map_edit_bin.save.scenario");
       const serialised_script_scenario = ByteBuffer.wrap(b64_serialised_script_scenario, "base64", ByteBuffer.LITTLE_ENDIAN);
@@ -124,8 +123,7 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
 
   $scope.open_scmap = function(scmap_buffer) {
     try {
-      let scmap = new sc_map();
-      scmap.load(ByteBuffer.wrap(scmap_buffer, ByteBuffer.LITTLE_ENDIAN));
+      let scmap = sc_map.load(ByteBuffer.wrap(scmap_buffer, ByteBuffer.LITTLE_ENDIAN));
 
       // Sucessfully loaded .scmap
       $scope.data.map.scmap = scmap;

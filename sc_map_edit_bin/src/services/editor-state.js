@@ -337,13 +337,12 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
    * Create a new map
    */
   service.create_map = function(map_params) {
-    service.map = new sc_map();
+    service.map = sc_map.create(map_params);
     service.scripts = {
       scenario: new sc_script_scenario(),
       save: new sc_script_save()
     };
 
-    service.map.create(map_params);
     service.scripts.scenario.create(map_params);
     service.scripts.save.create(map_params);
 
@@ -361,7 +360,8 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
     name: "Unnamed map",
     author: localStorage.getItem("sc_map_edit_bin.default_author") || "",
     description: "No description",
-    size: 0
+    size: 0,
+    default_height: 32 * 1024
   };
   service.create_map(initial_map_params);
 

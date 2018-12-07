@@ -9,8 +9,7 @@ const c: number = 20;
 describe('sc_edit_heightmap', function() {
   describe('imports existing heightmap', function() {
     beforeEach('create heightmap', function() {
-      let map = new sc_map();
-      map.create({size: 0, default_height: 1000});
+      let map = sc_map.create({size: 0, default_height: 1000, author: "", description: "", name: ""});
       this.edit_heightmap = new sc_edit_heightmap(map.heightmap);
     });
 
@@ -26,8 +25,7 @@ describe('sc_edit_heightmap', function() {
   });
 
   describe('exports to existing heightmap', function() {
-    let map = new sc_map();
-    map.create({size: 0, default_height: 1000});
+    let map = sc_map.create({size: 0, default_height: 1000, author: "", description: "", name: ""});
     let edit_heightmap = new sc_edit_heightmap(map.heightmap);
     edit_heightmap.set_pixel([0, 0], [50]);
     edit_heightmap.export_to_heightmap(map.heightmap);
@@ -41,8 +39,7 @@ describe('sc_edit_heightmap', function() {
   });
 
   describe('dirty region tracking', function() {
-    let map = new sc_map();
-    map.create({size: 0, default_height: 1000});
+    let map = sc_map.create({size: 0, default_height: 1000, author: "", description: "", name: ""});
     let edit_heightmap = new sc_edit_heightmap(map.heightmap);
 
     it('should initially be entirely dirty', function() {

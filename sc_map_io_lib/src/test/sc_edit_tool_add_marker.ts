@@ -18,8 +18,7 @@ describe('sc_edit_tool_add_marker', function() {
       default_height: 1000
     };
 
-    this.map = new sc_map();
-    this.map.create(map_args);
+    this.map = sc_map.create(map_args);
     this.edit_heightmap = new sc_edit_heightmap(this.map.heightmap);
     this.edit_texturemap = new sc_edit_texturemap(this.map.texturemap);
 

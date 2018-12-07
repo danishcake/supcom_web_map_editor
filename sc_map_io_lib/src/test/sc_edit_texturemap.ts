@@ -1,12 +1,20 @@
 import { sc_edit_texturemap } from '../lib/sc_edit_texturemap';
 import { sc_map } from '../lib/sc_map';
 import { sc_rect } from '../lib/sc_rect';
+import { sc_map_args } from '../lib/sc_map_args';
 const assert = require('chai').assert;
 
 describe('sc_edit_texturemap', function() {
+  const default_5x5_map_args: sc_map_args = {
+    name: 'x',
+    author: 'x',
+    description: 'x',
+    size: 0, // 5x5
+    default_height: 10000
+  };
+
   describe('basic characteristics', function() {
-    let map = new sc_map();
-    map.create({size: 0});
+    let map = sc_map.create(default_5x5_map_args);
     let edit_texturemap = new sc_edit_texturemap(map.texturemap);
 
     it('should have 8 subpixels', function() {
@@ -19,8 +27,7 @@ describe('sc_edit_texturemap', function() {
   });
 
   describe('imports existing texturemap', function() {
-    let map = new sc_map();
-    map.create({size: 0});
+    let map = sc_map.create(default_5x5_map_args);
     let edit_texturemap = new sc_edit_texturemap(map.texturemap);
 
     it('should have same size', function () {
@@ -43,8 +50,7 @@ describe('sc_edit_texturemap', function() {
   });
 
   describe('writes directly to existing texturemap', function() {
-    let map = new sc_map();
-    map.create({size: 0});
+    let map = sc_map.create(default_5x5_map_args);
     let edit_texturemap = new sc_edit_texturemap(map.texturemap);
     edit_texturemap.set_pixel([0, 0], [1, 2, 3, 4, 5, 6, 7, 8]);
 
@@ -69,8 +75,7 @@ describe('sc_edit_texturemap', function() {
   });
 
   describe('dirty region tracking', function() {
-    let map = new sc_map();
-    map.create({size: 0});
+    let map = sc_map.create(default_5x5_map_args);
     let edit_texturemap = new sc_edit_texturemap(map.texturemap);
 
     it('should initially be entirely dirty', function() {

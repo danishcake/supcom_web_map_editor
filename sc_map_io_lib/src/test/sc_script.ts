@@ -174,10 +174,7 @@ describe('sc_script', function() {
         let save_data_bb = ByteBuffer.wrap(save_data, ByteBuffer.LITTLE_ENDIAN);
         let save_script = new sc_script_save();
 
-        let map = new sc_map();
-        map.create({
-          size: 1
-        });
+        let map = sc_map.create({size: 1, default_height: 1000, author: "", description: "", name: ""});
         map.heightmap.scale = 1;
         let hm = new sc_edit_heightmap(map.heightmap);
         sc_edit_view_methods.fill(hm, [10]);
@@ -217,10 +214,7 @@ describe('sc_script', function() {
         let save_data_bb = ByteBuffer.wrap(save_data, ByteBuffer.LITTLE_ENDIAN);
         let save_script = new sc_script_save();
 
-        let map = new sc_map();
-        map.create({
-          map_size: 1
-        });
+        let map = sc_map.create({size: 1, default_height: 1000, author: "", description: "", name: ""});
         let hm = new sc_edit_heightmap(map.heightmap);
         sc_edit_view_methods.fill(hm, [10]);
 

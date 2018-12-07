@@ -9,12 +9,12 @@ const assert = require('chai').assert;
 
 describe('sc_edit_tool_water_elevation', function() {
   beforeEach('create a map with height ramp', function () {
-    this.map = new sc_map();
-    this.map.create({
+    this.map = sc_map.create({
       name: 'x',
       author: 'x',
       description: 'x',
-      size: 0 // 5x5
+      size: 0, // 5x5
+      default_height: 10000
     });
 
     this.hm = new sc_edit_heightmap(this.map.heightmap);

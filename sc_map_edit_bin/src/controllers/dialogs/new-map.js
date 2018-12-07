@@ -6,7 +6,8 @@ angular.module('sc_map_edit_bin.controllers').controller("new-map",
     size: 1, // 0=Tiny 5x5, 4=Huge 80x80
     name: '',
     description: '',
-    author: localStorage.getItem("sc_map_edit_bin.default_author") || ""
+    author: localStorage.getItem("sc_map_edit_bin.default_author") || "",
+    default_height: 32 * 1024
   };
 
   $scope.validity = {

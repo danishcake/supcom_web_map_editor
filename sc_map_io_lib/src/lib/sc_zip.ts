@@ -79,7 +79,7 @@ export const sc_zip = {
      * A sort of templated method that can be used to load anything that has two stage
      * construction (eg new/load - scripts, maps etc)
      */
-    const template_load = function <T extends two_phase_constructable>(type_arraybuffer: ArrayBuffer,
+    const two_stage_load = function <T extends two_phase_constructable>(type_arraybuffer: ArrayBuffer,
       type: constructor_of<T>): Promise<T> {
       const type_instance = new type();
       type_instance.load(ByteBuffer.wrap(type_arraybuffer, ByteBuffer.LITTLE_ENDIAN))
@@ -98,7 +98,7 @@ export const sc_zip = {
       .then((zip: JSZip) => {
         return identify_filename(zip, "_scenario.lua")
           .then((scenario_zip_object) => { return scenario_zip_object.async('arraybuffer'); })
-          .then((scenario_arraybuffer) => { return template_load(scenario_arraybuffer, sc_script_scenario); })
+          .then((scenario_arraybuffer) => { return two_stage_load(scenario_arraybuffer, sc_script_scenario); })
           .then((scenario_script) => {
             // Identifying the save scripts requires taking the last component of the
             // path in the scenario (typically mapname_save.lua) and looking for it in the zip file
@@ -119,8 +119,8 @@ export const sc_zip = {
           .then(([scmap_arraybuffer, save_script_arraybuffer, scenario_script]) => {
             // Load the other files
             return Promise.all([
-              template_load(scmap_arraybuffer, sc_map),
-              template_load(save_script_arraybuffer, sc_script_save),
+              Promise.resolve(sc_map.load(ByteBuffer.wrap(scmap_arraybuffer, ByteBuffer.LITTLE_ENDIAN))),
+              two_stage_load(save_script_arraybuffer, sc_script_save),
               scenario_script
             ]);
           });
