@@ -287,4 +287,17 @@ export class sc_edit_tool_select_marker extends sc_edit_tool_base {
 
     return null;
   }
+
+  protected __keyup_impl(data: sc_edit_tool_data, key_code: number): void {
+    // If delete key pressed delete selected markers
+    if (key_code === 46) {
+      const selected_markers = Object.keys(data.save_script.markers)
+        .map(marker_name => data.save_script.markers[marker_name])
+        .filter(marker => marker.selected);
+
+      for (const marker of selected_markers) {
+        delete data.save_script.markers[marker.name];
+      }
+    }
+  }
 }

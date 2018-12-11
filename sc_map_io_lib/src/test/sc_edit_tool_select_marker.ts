@@ -22,12 +22,14 @@ describe('sc_edit_tool_select_marker', function() {
     this.save_script.create(map_args);
     this.save_script.markers["MASSPOINT_0"] = {
       type: "mass",
-      position: {x: 50, y: 0, z: 50}
+      position: {x: 50, y: 0, z: 50},
+      name: "MASSPOINT_0"
     };
 
     this.save_script.markers["MASSPOINT_1"] = {
       type: "mass",
-      position: {x: 100, y: 0, z: 100}
+      position: {x: 100, y: 0, z: 100},
+      name: "MASSPOINT_1"
     };
 
     this.map = sc_map.create(map_args);
@@ -181,5 +183,13 @@ describe('sc_edit_tool_select_marker', function() {
 
     assert.closeTo(75, this.save_script.markers["MASSPOINT_0"].position.x, 0.001);
     assert.closeTo(50, this.save_script.markers["MASSPOINT_0"].position.z, 0.001);
+  });
+
+  it('will delete any selected markers on delete press', function() {
+    let tool = new sc_edit_tool_select_marker();
+    this.save_script.markers["MASSPOINT_0"].selected = true;
+
+    tool.keyup(new sc_edit_tool_data(this.hm, this.tm, this.save_script, this.hm, this.map), 46);
+    assert.equal(1, Object.keys(this.save_script.markers).length);
   });
 });
