@@ -170,7 +170,7 @@ describe('sc_map', function() {
       assert.equal(map.layers.albedo_data[0].texture_file, "/env/evergreen/layers/rockmed_albedo.dds");
       assert.closeTo(map.layers.albedo_data[0].texture_scale, 10.0, 0.001);
 
-      assert.equal(map.layers.normal_data[0].texture_file, "/env/evergreen/layers/SandLight_normals.dds");
+      assert.equal(map.layers.normal_data[0].texture_file, "/env/evergreen/layers/sandlight_normals.dds");
       assert.closeTo(map.layers.normal_data[0].texture_scale, 4.0, 0.001);
     });
 
@@ -285,12 +285,6 @@ describe('sc_map', function() {
 
       assert.equal(1024, map_20x20.header.width);
       assert.equal(1024, map_20x20.header.height);
-    });
-
-    it('should fill heightmap with default height if not specified', function() {
-      let map = sc_map.create(default_5x5_map_args);
-
-      assert.equal(1024 * 32, map.heightmap.data.readUint16());
     });
 
     it('should fill heightmap with custom height if specified', function() {
