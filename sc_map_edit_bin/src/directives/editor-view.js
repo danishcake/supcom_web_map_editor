@@ -31,6 +31,10 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
     }
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
+    // Update camera movement
+    scope.camera.pan_steps(editor_state.scroll_vector);
+
+    // Update camera transforms
     scope.camera.tick(editor_state.edit_heightmap.maximum_height * editor_state.edit_heightmap.scale);
 
     // Clear the color and depth buffers

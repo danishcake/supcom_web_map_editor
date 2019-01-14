@@ -31,7 +31,10 @@ export class webgl_camera {
   constructor(gl, scene_size) {
     this.__gl = gl;
     this.__scene_size = scene_size;
+
     this.__long_edge = Math.max(this.__scene_size[0], this.__scene_size[1]);
+    this.__nearest_length = 22.6;
+    this.__farthest_length = this.__long_edge * 1.1 / 2.0;
     this.__fov = 90;
     this.__world_space_focus = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, 0);
 
@@ -43,7 +46,7 @@ export class webgl_camera {
     this.__perspective = mat4.create();
 
     // Define camera position. Look-at position is directly below this at z=0
-    this.__camera_position = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, 22.6);
+    this.__camera_position = vec3.fromValues(this.__scene_size[0] / 2, this.__scene_size[1] / 2, this.__nearest_length);
 
     // Calculate initial view/perspective matrices
     this.tick(0);
@@ -52,7 +55,7 @@ export class webgl_camera {
 
   /**
    * Updates matrices based on current focus, zoom etc
-   * @param {number] height_datum The suggested height datum. The lookat and camera origin
+   * @param {number} height_datum The suggested height datum. The lookat and camera origin
    *  will be translated vertically by this value to ensure that all terrain remains visble.
    */
   tick(height_datum) {
@@ -88,15 +91,13 @@ export class webgl_camera {
   zoom_steps(steps) {
     this.__zoom = Math.max(0, Math.min(1, this.__zoom + steps / this.__steps));
 
-    const nearest_length = 22.6;
-    const farthest_length = this.__long_edge * 1.1 / 2.0;
     const previous_height_above_terrain = this.__camera_position[2];
-    const new_height_above_terrain = nearest_length + (farthest_length - nearest_length) * this.__zoom;
+    const new_height_above_terrain = this.__nearest_length +
+      (this.__farthest_length - this.__nearest_length) * this.__zoom;
 
     // We now need to maintain the screenspace-worldspace mapping, given our new camera height
     // we can do this by moving the xy camera offset along the line cast from the worldspace focus
     // to the camera position
-    // TODO: Constrain by map bounds
     const z_change = new_height_above_terrain - previous_height_above_terrain;
     if (z_change < 0) {
       // Find ray from focus to camera and scale so that z is z_change, then offset camera by that
@@ -108,11 +109,41 @@ export class webgl_camera {
       this.__camera_position[2] += z_change;
     }
 
-    // Constrain to a fulcrum cast from the center at max distance
-    // Maximum distance from centre is a function of the FOV and distance from apex
-    // We allow half a screen off the edge, so the apex is moved up slightly
+    this.__constrain_to_fulcrum();
+  }
 
-    const distance_from_apex = farthest_length - this.__camera_position[2] + 22.6;
+  /**
+   * Move the camera in the x-y plain
+   * @param {sc_vec2} steps
+   */
+  pan_steps(steps) {
+    // The distance travelled scales with distance
+    const xy_movement = vec3.fromValues(steps[0], steps[1], 0);
+    console.log(`Pan [${steps[0]}, ${steps[1]}]`);
+
+    vec3.scale(xy_movement, xy_movement, this.__camera_position[2] / this.__nearest_length);
+    vec3.add(this.__camera_position, this.__camera_position, xy_movement);
+    vec3.add(this.__world_space_focus, this.__world_space_focus, xy_movement);
+
+    // Constrain position within fulcrum with cheeky zoom by zero
+    this.__constrain_to_fulcrum();
+  }
+
+  /**
+   * Sets the centre of the zoom process
+   * @param {sc_vec2} screen_space_focus Screen-space coordinates (non-normalised) of cursor
+   */
+  set_focus(screen_space_focus) {
+    this.__world_space_focus = this.project_to_world(vec3.fromValues(...screen_space_focus, 0));
+  }
+
+  /**
+   * Constrain to a fulcrum cast from the center at max distance
+   * Maximum distance from centre is a function of the FOV and distance from apex
+   * We allow half a screen off the edge, so the apex is moved up slightly
+   */
+  __constrain_to_fulcrum() {
+    const distance_from_apex = this.__farthest_length - this.__camera_position[2] + this.__nearest_length;
     const maximum_distance_from_axis = Math.sin((this.__fov * Math.PI / 180) * 0.5) * distance_from_apex;
     let x_axial_distance = this.__camera_position[0] - (this.__scene_size[0] / 2);
     let y_axial_distance = this.__camera_position[1] - (this.__scene_size[1] / 2);
@@ -123,16 +154,6 @@ export class webgl_camera {
 
     this.__camera_position[0] = (this.__scene_size[0] / 2) + x_axial_distance;
     this.__camera_position[1] = (this.__scene_size[1] / 2) + y_axial_distance;
-
-  }
-
-
-  /**
-   * Sets the centre of the zoom process
-   * @param {sc_vec2} screen_space_focus Screen-space coordinates (non-normalised) of cursor
-   */
-  set_focus(screen_space_focus) {
-    this.__world_space_focus = this.project_to_world(vec3.fromValues(...screen_space_focus, 0));
   }
 
 
