@@ -18,6 +18,7 @@
     "jquery": "^3.3.1",
     "mini-css-extract-plugin": "^0.4.1",
     "mocha": "^5.2.0",
+    "shx": "^0.3.2",
     "source-map-loader": "^0.2.4",
     "ts-loader": "^4.5.0",
     "ts-node": "^7.0.1",
@@ -49,8 +50,9 @@
     "underscore": "^1.8.3"
   },
   "scripts": {
-    "build_dev": "webpack --config=./webpack.dev.config.js",
-    "build_prod": "webpack --config=./webpack.prod.config.js",
+    "copy_index": "shx mkdir -p ./dist && shx cp ./sc_map_edit_bin/index.html ./dist/index.html",
+    "build_dev": "yarn run copy_index && webpack --config=./webpack.dev.config.js",
+    "build_prod": "yarn run copy_index && webpack --config=./webpack.prod.config.js",
     "test": "mocha --require ts-node/register --colors ./sc_map_io_lib/src/test/*.ts"
   }
 }
