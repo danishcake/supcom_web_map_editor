@@ -29,6 +29,9 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
    * Updates the zoom focus, and if a tool is in use applies tool
    */
   $scope.on_mousemove = function(evt) {
+    // Give focus to the view so that keyboard navigation works
+    evt.target.focus();
+
     // This now needs to be reverse projected from screen to camera unit vector, then intersected with the z=0 plane
     // This is then the new focus for the zoom
     let world_position = $scope.camera.project_to_world([evt.offsetX, evt.offsetY]);

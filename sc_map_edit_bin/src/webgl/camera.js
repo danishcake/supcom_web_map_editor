@@ -119,7 +119,6 @@ export class webgl_camera {
   pan_steps(steps) {
     // The distance travelled scales with distance
     const xy_movement = vec3.fromValues(steps[0], steps[1], 0);
-    console.log(`Pan [${steps[0]}, ${steps[1]}]`);
 
     vec3.scale(xy_movement, xy_movement, this.__camera_position[2] / this.__nearest_length);
     vec3.add(this.__camera_position, this.__camera_position, xy_movement);
