@@ -191,7 +191,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
             break;
 
           case 'smooth_edges':
-            service.tool = new sc_edit_tool_smooth(outer, inner, strength * 5, sc_edit_tool_smooth.blur_average);
+            service.tool = new sc_edit_tool_smooth(outer, inner, strength * 5, blur_type.average);
             break;
 
           default:
