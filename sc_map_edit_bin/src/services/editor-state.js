@@ -79,6 +79,14 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
             service.tool = new sc_map_io_lib.sc.edit.tool.lower(outer, inner, strength);
             break;
 
+          case 'raise_peak':
+            service.tool = new sc_map_io_lib.sc.edit.tool.raise_peak(outer, 1.0, strength / inner);
+            break;
+
+          case 'lower_peak':
+            service.tool = new sc_map_io_lib.sc.edit.tool.lower_peak(outer, 1.0, strength / inner);
+            break;
+
           case 'flatten':
             service.tool = new sc_map_io_lib.sc.edit.tool.flatten(outer, inner, strength);
             break;

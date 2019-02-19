@@ -1,0 +1,14 @@
+<div>
+  <div class="btn-group-vertical">
+    <label class="btn btn-default" ng-model="tool.smoothing_radius" uib-btn-radio="3" uib-tooltip="Apply a 3x3 smoothing convolution" tooltip-placement="right">3x3</label>
+    <label class="btn btn-default" ng-model="tool.smoothing_radius" uib-btn-radio="5" uib-tooltip="Apply a 5x5 smoothing convolution" tooltip-placement="right">5x5</label>
+    <label class="btn btn-default" ng-model="tool.smoothing_radius" uib-btn-radio="7" uib-tooltip="Apply a 7x7 smoothing convolution" tooltip-placement="right">7x7</label>
+    <label class="btn btn-default" ng-model="tool.smoothing_radius" uib-btn-radio="9" uib-tooltip="Apply a 9x9 smoothing convolution" tooltip-placement="right">9x9</label>
+    <label class="btn btn-default" ng-model="tool.smoothing_radius" uib-btn-radio="11" uib-tooltip="Apply a 11x11 smoothing convolution" tooltip-placement="right">11x11</label>
+    <label class="btn btn-default" ng-model="tool.smoothing_radius" uib-btn-radio="13" uib-tooltip="Apply a 13x13 smoothing convolution" tooltip-placement="right">13x13</label>
+    <label class="btn btn-default" ng-model="tool.smoothing_radius" uib-btn-radio="15" uib-tooltip="Apply a 15x15 smoothing convolution" tooltip-placement="right">15x15</label>
+  </div>
+
+  <button class="btn btn-default" uib-tooltip="Applies a smoothing convolution over the entire map" tooltip-placement="bottom" ng-click="smooth_texturemap()">Smooth textures</button>
+  <button class="btn btn-default" uib-tooltip="Applies a smoothing convolution over the entire map" tooltip-placement="bottom" ng-click="smooth_heightmap()">Smooth heightmap</button>
+</div>

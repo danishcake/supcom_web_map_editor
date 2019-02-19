@@ -5,7 +5,7 @@
 import {sc_edit_heightmap} from "./sc_edit_heightmap"
 import {sc_edit_texturemap} from "./sc_edit_texturemap"
 import {sc_edit_tool_args, sc_edit_tool_data} from "./tools/sc_edit_tool_args"
-import {sc_edit_tool_raise, sc_edit_tool_lower} from "./tools/sc_edit_tool_raise"
+import {sc_edit_tool_raise, sc_edit_tool_lower, sc_edit_tool_raise_peak, sc_edit_tool_lower_peak} from "./tools/sc_edit_tool_raise"
 import {sc_edit_tool_flatten} from "./tools/sc_edit_tool_flatten"
 import {sc_edit_tool_smooth} from "./tools/sc_edit_tool_smooth"
 import {sc_edit_tool_set} from "./tools/sc_edit_tool_set"
@@ -14,6 +14,8 @@ import {sc_edit_tool_select_marker} from "./tools/sc_edit_tool_select_marker"
 import {sc_edit_tool_add_marker} from "./tools/sc_edit_tool_add_marker"
 import {sc_edit_tool_water_elevation} from "./tools/sc_edit_tool_water_elevation"
 import {sc_edit_global_tool_autotexture} from './global_tools/sc_edit_global_tool_autotexture'
+import {sc_edit_global_tool_enforce_symmetry} from './global_tools/sc_edit_global_tool_enforce_symmetry'
+import {sc_edit_global_tool_smooth} from './global_tools/sc_edit_global_tool_smooth'
 import {sc_edit_symmetry} from "./sc_edit_symmetry"
 import {sc_edit_view_symmetry} from "./views/sc_edit_view_symmetry"
 import {sc_edit_patch} from "./views/sc_edit_patch"
@@ -31,6 +33,8 @@ let sc_edit = {
     data: sc_edit_tool_data,
     raise: sc_edit_tool_raise,
     lower: sc_edit_tool_lower,
+    raise_peak: sc_edit_tool_raise_peak,
+    lower_peak: sc_edit_tool_lower_peak,
     flatten: sc_edit_tool_flatten,
     set: sc_edit_tool_set,
     clear_higher: sc_edit_tool_clear_higher,
@@ -40,7 +44,9 @@ let sc_edit = {
     water_elevation: sc_edit_tool_water_elevation
   },
   global_tool: {
-    autotexture: sc_edit_global_tool_autotexture
+    autotexture: sc_edit_global_tool_autotexture,
+    enforce_symmetry: sc_edit_global_tool_enforce_symmetry,
+    smooth: sc_edit_global_tool_smooth
   },
   symmetry: sc_edit_symmetry,
   view: {
