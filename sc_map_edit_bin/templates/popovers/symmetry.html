@@ -9,5 +9,6 @@
     <label class="btn btn-default" ng-model="tool.symmetry" uib-btn-radio="'octants'" uib-tooltip="Octagonal symmetry around centre" tooltip-placement="right"><span class="glyphicon glyphicon-map-marker"></span></label>
   </div>
 
-  <button class="btn btn-default" uib-tooltip="Symmetry is normally enforced only on the parts of the map that change. This enforces symmetry over the entire map" tooltip-placement="bottom" ng-click="enforce_symmetry()">Enforce</button>
+  <button class="btn btn-default" uib-tooltip="Symmetry is normally enforced only on the parts of the map that change. This enforces symmetry over the entire map" tooltip-placement="bottom" ng-click="enforce_terrain_symmetry()">Enforce terrain</button>
+  <button class="btn btn-default" uib-tooltip="Symmetry is normally enforced when markers are placed. This enforces symmetry over the entire map" tooltip-placement="bottom" ng-click="enforce_marker_symmetry()">Enforce markers</button>
 </div>

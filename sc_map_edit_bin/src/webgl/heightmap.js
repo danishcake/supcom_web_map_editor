@@ -332,7 +332,7 @@ export class webgl_heightmap {
     effect.set_uniform_float("uShadeMax", height_max);
 
     if (drawNavigabilityOverlay) {
-      effect.set_uniform_float("uNavigabilityThreshold", 1.0 / this.__heightmap.scale);
+      effect.set_uniform_float("uNavigabilityThreshold", 0.75 / this.__heightmap.scale);
     } else {
       effect.set_uniform_float("uNavigabilityThreshold", 65536);
     }
