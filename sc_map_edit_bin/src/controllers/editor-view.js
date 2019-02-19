@@ -29,10 +29,13 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
    * Updates the zoom focus, and if a tool is in use applies tool
    */
   $scope.on_mousemove = function(evt) {
+    // Give focus to the view so that keyboard navigation works
+    evt.target.focus();
+
     // This now needs to be reverse projected from screen to camera unit vector, then intersected with the z=0 plane
     // This is then the new focus for the zoom
     let world_position = $scope.camera.project_to_world([evt.offsetX, evt.offsetY]);
-    $scope.data.cursor_info = `[${Math.floor(world_position[0])}, ${Math.floor(world_position[0])}]`;
+    $scope.data.cursor_info = `[${Math.floor(world_position[0])}, ${Math.floor(world_position[1])}]`;
 
     editor_state.tool_position = world_position;
 
@@ -45,7 +48,6 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
                                               editor_state.symmetry);
 
       editor_state.tool.apply(tool_data, tool_args);
-
     }
   };
 
@@ -113,6 +115,9 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
       const tool_data = make_tool_data();
       editor_state.tool.keyup(tool_data, event.keyCode);
     }
+
+    // WASD and UDLR keys drive camera, but communicate their state via editor_state
+    editor_state.on_keyup(evt.keyCode);
   };
 
 
@@ -124,5 +129,6 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
       const tool_data = make_tool_data();
       editor_state.tool.keydown(tool_data, event.keyCode);
     }
+    editor_state.on_keydown(evt.keyCode);
   };
 }]);

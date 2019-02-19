@@ -50,6 +50,41 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
   };
 
   /**
+   * Current state of keys
+   */
+  service.keystate = {};
+
+  /**
+   * How the viewport should scroll
+   */
+  service.scroll_vector = [0, 0];
+  const recalculate_scroll_vector = () => {
+    const key_w = 87;
+    const key_s = 83;
+    const key_a = 65;
+    const key_d = 68;
+    const key_up = 38;
+    const key_down = 40;
+    const key_left = 37;
+    const key_right = 39;
+
+    service.scroll_vector[0] = ((service.keystate[key_d] | service.keystate[key_right]) ? 1 : 0) -
+                               ((service.keystate[key_a] | service.keystate[key_left]) ? 1 : 0);
+    service.scroll_vector[1] = ((service.keystate[key_w] | service.keystate[key_up]) ? 1 : 0) -
+                               ((service.keystate[key_s] | service.keystate[key_down]) ? 1 : 0)
+  };
+
+
+  service.on_keydown = (keycode) => {
+    service.keystate[keycode] = true;
+    recalculate_scroll_vector();
+  }
+  service.on_keyup = (keycode) => {
+    service.keystate[keycode] = false;
+    recalculate_scroll_vector();
+  }
+
+  /**
    * Returns the location the map was most recently saved to or loaded from
    */
   service.get_save_location = () => { return service.save_location; };

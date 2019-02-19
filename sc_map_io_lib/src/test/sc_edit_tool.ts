@@ -18,9 +18,9 @@ describe('sc_edit_tool', function() {
       size: 0, // 5x5
       default_height: 10000
     };
-    let map = sc_map.create(default_5x5_map_args);
-    this.hm = new sc_edit_heightmap(this.map.heightmap);
-    this.tm = new sc_edit_texturemap(this.map.texturemap);
+    const map = sc_map.create(default_5x5_map_args);
+    this.hm = new sc_edit_heightmap(map.heightmap);
+    this.tm = new sc_edit_texturemap(map.texturemap);
   });
 
 
