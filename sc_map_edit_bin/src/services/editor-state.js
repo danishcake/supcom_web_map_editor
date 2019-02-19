@@ -137,11 +137,11 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
             break;
 
           case 'raise_peak':
-            service.tool = new sc_edit_tool_raise_peak(outer, 1.0, strength / inner);
+            service.tool = new sc_edit_tool_raise_peak(outer, 1.0, strength * 5);
             break;
 
           case 'lower_peak':
-            service.tool = new sc_edit_tool_lower_peak(outer, 1.0, strength / inner);
+            service.tool = new sc_edit_tool_lower_peak(outer, 1.0, strength * 5);
             break;
 
           case 'flatten':
@@ -191,7 +191,7 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
             break;
 
           case 'smooth_edges':
-            service.tool = new sc_edit_tool_smooth(outer, inner, strength * 5, sc_edit_tool_smooth.blur_average);
+            service.tool = new sc_edit_tool_smooth(outer, inner, strength * 5, blur_type.average);
             break;
 
           default:
