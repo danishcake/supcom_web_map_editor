@@ -1,3 +1,15 @@
+const angular = require('angular');
+const _ = require('underscore');
+const async = require('async');
+const webgl_camera = require('../webgl/camera').webgl_camera;
+const webgl_effect = require('../webgl/effect').webgl_effect;
+const webgl_heightmap = require('../webgl/heightmap').webgl_heightmap;
+const webgl_marker = require('../webgl/marker').webgl_marker;
+const webgl_ring = require('../webgl/ring').webgl_ring;
+const webgl_symmetry = require('../webgl/symmetry').webgl_symmetry;
+const webgl_water_overlay = require('../webgl/water_overlay').webgl_water_overlay;
+
+
 angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_state", "game_resources", "dialogs", "$rootScope", function(editor_state, game_resources, dialogs, $rootScope) {
 
   /**
@@ -203,7 +215,7 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
 
   return {
     restrict: 'E',
-    templateUrl: 'templates/editor-view.html',
+    template: require('../../templates/editor-view.html'),
     link: function(scope, element) {
       const canvas = element.find("canvas")[0];
 
@@ -229,28 +241,14 @@ angular.module('sc_map_edit_bin.directives').directive('editorView', ["editor_st
         });
       };
 
-      // Show progress until resources are loaded
-      dialogs.create("templates/dialogs/progress.html",
-                      "progress",
-                      {
-                        title: "Loading resources",
-                        message: "Loading resources"
-                      },
-                      modal_dlg_opts);
-
       // Wait for loading to complete before we start doing anything at all
-      game_resources.load_resources(scope.gl,
-        (message, progress) => {
-          $rootScope.$broadcast("dialogs.progress.progress", { message: message, progress: progress});
-        },
-        (error) => {
-          if (error) {
-            $rootScope.$broadcast("dialogs.progress.error", { message: error });
-          } else {
-            $rootScope.$broadcast("dialogs.progress.complete");
-            update_map();
-            editor_state.on_new_map(update_map);
-          }
+      game_resources.load_resources(scope.gl)
+        .then(() => {
+          update_map();
+          editor_state.on_new_map(update_map);
+        })
+        .catch(error => {
+          dialogs.error("Resource initialisation error", `${error}`);
         });
 
       // Store the editor state so we can direct tool events to it

@@ -1,3 +1,5 @@
+const angular = require('angular');
+
 angular.module('sc_map_edit_bin.controllers').controller("configure-water",
 ["$scope", "$uibModalInstance", "data", function($scope, $uibModalInstance, data) {
 
@@ -42,4 +44,6 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-water",
   $scope.ok = function() {
     $uibModalInstance.close($scope.data);
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/configure-water.html', require('../../../templates/dialogs/configure-water.html'));
 }]);

@@ -12,7 +12,7 @@
  * @property {webgl_textureparameter[]} __tex_parameters The list of parameters to set on the texture unit during binding
  * @property {number|null} __last_bound_texture_unit The texture unit last used, or null if not used
  */
-class webgl_texture {
+export class webgl_texture {
   /**
    * Generates an empty texture ID
    * @param {WebGLRenderingContext} gl

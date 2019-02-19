@@ -1,3 +1,5 @@
+const angular = require('angular');
+const _ = require('underscore');
 
 /**
  * String used to represent an army with no allocated spawn position
@@ -72,6 +74,8 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-forces",
   $scope.accept = function() {
     $uibModalInstance.close($scope.data.armies);
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/configure-forces.html', require('../../../templates/dialogs/configure-forces.html'));
 }]);
 
 

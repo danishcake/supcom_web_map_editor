@@ -1,3 +1,7 @@
+const vec2 = require('gl-matrix').vec2;
+const vec3 = require('gl-matrix').vec3;
+const vec4 = require('gl-matrix').vec4;
+const mat4 = require('gl-matrix').mat4;
 
 /**
  * Represents a camera that can pan/zoom within the bounds of map
@@ -23,7 +27,7 @@
  * @property {number} __steps The number of zoom steps
  *
  */
-class webgl_camera {
+export class webgl_camera {
   constructor(gl, scene_size) {
     this.__gl = gl;
     this.__scene_size = scene_size;

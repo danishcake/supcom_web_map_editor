@@ -83,7 +83,8 @@ describe('sc_zip', function() {
         // Verify the presence of expected files
         JSZip.loadAsync(zip_arraybuffer).then((zip) => {
 
-          fs.writeFileSync(__dirname + "/data/temp.zip", Buffer.from(zip_arraybuffer));
+          // Uncomment this line if you need to verify the zip file manually
+          //fs.writeFileSync(__dirname + "/data/temp.zip", Buffer.from(zip_arraybuffer));
 
           assert.isTrue(_.any(zip.files, (file) => { return file.name.endsWith(expected_scenario_filename); }));
           assert.isTrue(_.any(zip.files, (file) => { return file.name.endsWith(expected_save_filename); }));

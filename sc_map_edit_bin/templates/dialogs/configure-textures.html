@@ -36,8 +36,8 @@
             <div class="col-lg-8">
               <select class="form-control" ng-model="data.textures.terrain_shader">
                 <option ng-repeat = "terrain_shader in game_resources.shaders"
-                        value     = "{{terrain_shader.value}}"
-                        selected  = "{{terrain_shader.value == data.textures.terrain_shader ? 'selected' : ''}}">
+                        value     = "{{terrain_shader.id}}"
+                        selected  = "{{terrain_shader.id == data.textures.terrain_shader ? 'selected' : ''}}">
                   {{terrain_shader.name}}
                 </option>
               </select>
@@ -49,8 +49,8 @@
             <div class="col-lg-7">
               <select class="form-control" ng-model="data.textures.background_texture_path">
                 <option ng-repeat = "background_texture in game_resources.backgrounds"
-                        value     = "{{background_texture.value}}"
-                        selected  = "{{background_texture.value == data.textures.background_texture_path ? 'selected' : ''}}">
+                        value     = "{{background_texture.id}}"
+                        selected  = "{{background_texture.id == data.textures.background_texture_path ? 'selected' : ''}}">
                   {{background_texture.name}}
                 </option>
               </select>
@@ -65,8 +65,8 @@
             <div class="col-lg-7">
               <select class="form-control" ng-model="data.textures.sky_cubemap_texture_path">
                 <option ng-repeat = "sky_cubemap_texture in game_resources.sky_cubemaps"
-                        value     = "{{sky_cubemap_texture.value}}"
-                        selected  = "{{sky_cubemap_texture.value == data.textures.sky_cubemap_texture_path ? 'selected' : ''}}">
+                        value     = "{{sky_cubemap_texture.id}}"
+                        selected  = "{{sky_cubemap_texture.id == data.textures.sky_cubemap_texture_path ? 'selected' : ''}}">
                   {{sky_cubemap_texture.name}}
                 </option>
               </select>
@@ -108,8 +108,8 @@
             <div class="col-xs-4">
               <select class="form-control" ng-model="data.layers.albedo_data[$index].texture_file">
                 <option ng-repeat = "albedo_texture in game_resources.albedo_textures"
-                        value     = "{{albedo_texture.value}}"
-                        selected  = "{{albedo_texture.value == data.layers.albedo_data[$index].texture_file ? 'selected' : ''}}">
+                        value     = "{{albedo_texture.id}}"
+                        selected  = "{{albedo_texture.id== data.layers.albedo_data[$index].texture_file ? 'selected' : ''}}">
                   {{albedo_texture.tileset}}/{{albedo_texture.name}}
                 </option>
               </select>
@@ -120,8 +120,8 @@
             <div class="col-xs-5">
               <select class="form-control" ng-model="data.layers.normal_data[$index].texture_file">
                 <option ng-repeat = "normal_texture in game_resources.normal_textures"
-                        value     = "{{normal_texture.value}}"
-                        selected  = "{{normal_texture.value == data.layers.normal_data[$index].texture_file ? 'selected': ''}}">
+                        value     = "{{normal_texture.id}}"
+                        selected  = "{{normal_texture.id == data.layers.normal_data[$index].texture_file ? 'selected': ''}}">
                   {{normal_texture.tileset}}/{{normal_texture.name}}
                 </option>
               </select>
@@ -132,8 +132,8 @@
             <div class="col-xs-4">
               <select class="form-control" ng-model="data.layers.albedo_data[9].texture_file">
                 <option ng-repeat = "albedo_texture in game_resources.albedo_textures"
-                        value     = "{{albedo_texture.value}}"
-                        selected  = "{{albedo_texture.value == data.layers.albedo_data[9].texture_file ? 'selected': ''}}">
+                        value     = "{{albedo_texture.id}}"
+                        selected  = "{{albedo_texture.id == data.layers.albedo_data[9].texture_file ? 'selected': ''}}">
                   {{albedo_texture.tileset}}/{{albedo_texture.name}}
                 </option>
               </select>

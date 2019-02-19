@@ -1,3 +1,6 @@
+const angular = require('angular');
+const _ = require('underscore');
+
 angular.module('sc_map_edit_bin.controllers').controller("configure-textures",
 ["$scope", "$uibModalInstance", "dialogs", "game_resources", "data", function($scope, $uibModalInstance, dialogs, game_resources, data) {
 
@@ -127,4 +130,6 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-textures",
       layers: $scope.data.layers
     });
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/configure-textures.html', require('../../../templates/dialogs/configure-textures.html'));
 }]);

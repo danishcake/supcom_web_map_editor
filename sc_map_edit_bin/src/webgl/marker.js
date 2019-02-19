@@ -1,10 +1,15 @@
+const vec2 = require('gl-matrix').vec2;
+const vec3 = require('gl-matrix').vec3;
+const vec4 = require('gl-matrix').vec4;
+const mat4 = require('gl-matrix').mat4;
+
 /**
  * Marker
  * Renders a marker over the map. Each version of this class
  * will render a different marker - mass, energy, unknown etc
  * It can then be called to render many times
  */
-class webgl_marker {
+export class webgl_marker {
   /**
    * Creates a webgl_marker
    * @param {WebGLRenderingContext} gl The WebGL rendering context to use

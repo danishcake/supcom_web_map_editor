@@ -34,7 +34,7 @@
  * @property {webgl_effect_uniform[]} __uniforms List of uniforms stored by name as it appears in the shader source
  * @property {number} __textures_bound Count of the textures bound. Used to address a new texture unit for each texture
  */
-class webgl_effect {
+export class webgl_effect {
   constructor(gl, vertex_shader_src, fragment_shader_src) {
     this.gl = gl;
 
@@ -47,7 +47,8 @@ class webgl_effect {
     this.__type_lut[gl.INT_VEC3]     = "INT_VEC3";
     this.__type_lut[gl.INT_VEC4]     = "INT_VEC4";
     this.__type_lut[gl.BOOL_VEC2]    = "BOOL_VEC2";
-    this.__type_lut[gl.BOOL_VEC3]    = "BOOL_VEC3";
+    this.__type_lut[gl.BOOL_VEC3]    = "BOOL_" +
+      "";
     this.__type_lut[gl.BOOL_VEC4]    = "BOOL_VEC4";
     this.__type_lut[gl.FLOAT_MAT2]   = "FLOAT_MAT2";
     this.__type_lut[gl.FLOAT_MAT3]   = "FLOAT_MAT3";

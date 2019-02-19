@@ -1,3 +1,6 @@
+const angular = require('angular');
+const sc_map_io_lib = require('../../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+
 angular.module('sc_map_edit_bin.controllers').controller("auto-texture",
 ["$scope", "$uibModalInstance", "data", "editor_state", function($scope, $uibModalInstance, data, editor_state) {
   $scope.options = {
@@ -15,4 +18,6 @@ angular.module('sc_map_edit_bin.controllers').controller("auto-texture",
 
     $uibModalInstance.close(sorted_signals);
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/auto-texture.html', require('../../../templates/dialogs/auto-texture.html'));
 }]);

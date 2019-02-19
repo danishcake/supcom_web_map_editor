@@ -1,3 +1,5 @@
+const angular = require('angular');
+
 angular.module('sc_map_edit_bin.controllers').controller("new-map",
 ["$scope", "$uibModalInstance", "data", function($scope, $uibModalInstance, data) {
   $scope.map = {
@@ -35,4 +37,6 @@ angular.module('sc_map_edit_bin.controllers').controller("new-map",
     localStorage.setItem("sc_map_edit_bin.default_author", $scope.map.author);
     $uibModalInstance.close($scope.map);
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/new-map.html', require('../../../templates/dialogs/new-map.html'));
 }]);

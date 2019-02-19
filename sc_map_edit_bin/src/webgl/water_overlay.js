@@ -1,3 +1,8 @@
+const vec2 = require('gl-matrix').vec2;
+const vec3 = require('gl-matrix').vec3;
+const vec4 = require('gl-matrix').vec4;
+const mat4 = require('gl-matrix').mat4;
+
 /**
  * @class webgl_water_overlay
  * Water overlay mesh class.
@@ -10,7 +15,7 @@
  * @property {number} __element_count Number of triangles
  * @property {sc_vec4} __water_colour Colour of water layer
  */
-class webgl_water_overlay {
+export class webgl_water_overlay {
   /**
    * Creates a webgl_heightmap
    * @param {WebGLRenderingContext} gl The WebGL rendering context to use

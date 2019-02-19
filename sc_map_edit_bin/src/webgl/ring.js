@@ -1,8 +1,13 @@
+const vec2 = require('gl-matrix').vec2;
+const vec3 = require('gl-matrix').vec3;
+const vec4 = require('gl-matrix').vec4;
+const mat4 = require('gl-matrix').mat4;
+
 /**
  * Ring
  * Renders a ring around a given point using single pixel lines
  */
-class webgl_ring {
+export class webgl_ring {
   constructor(gl) {
     this.__gl = gl;
     this.__model_matrix = mat4.create();

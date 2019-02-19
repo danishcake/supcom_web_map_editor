@@ -1,3 +1,6 @@
+const angular = require('angular');
+const sc_map_io_lib = require('../../../../sc_map_io_lib/dist/sc_map_io_lib.bundle');
+
 angular.module('sc_map_edit_bin.controllers').controller("open-map",
 ["$scope", "$uibModalInstance", "dialogs", "data", function($scope, $uibModalInstance, dialogs, data) {
 
@@ -130,4 +133,6 @@ angular.module('sc_map_edit_bin.controllers').controller("open-map",
       dialogs.error('Error parsing .scmap', error.message);
     }
   };
+}]).run(['$templateCache', function($templateCache) {
+  $templateCache.put('templates/dialogs/open-map.html', require('../../../templates/dialogs/open-map.html'));
 }]);
