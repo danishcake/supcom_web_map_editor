@@ -13,8 +13,10 @@ import { sc_edit_view_base } from "../views/sc_edit_view";
  * 1. start_impl() will be called
  * 2. One or more calls will be made to apply_impl. These will not correspond 1:1 with
  *    the mouse move events, as intermediate positions will be calculated
+ *
+ * Additionally, keypresses while the main canvas has focus will be delivered to the current tool.
+ * These can be handled by overriding __keydown_impl and __keyup_impl
  */
-
 export class sc_edit_tool_base {
   protected __active: boolean;
   protected __position: sc_vec2;
@@ -140,6 +142,25 @@ export class sc_edit_tool_base {
 
 
   /**
+   * Handle keydown events while tool is in use
+   * @param {sc_edit_tool_data} data Data to edit
+   * @param keycode The key code of the depressed key
+   */
+  public keydown(data: sc_edit_tool_data, key_code: number): void {
+    this.__keydown_impl(data, key_code);
+  }
+
+  /**
+   * Handle keyup events while tool is in use
+   * @param {sc_edit_tool_data} data Data to edit
+   * @param keycode The key code of the released key
+   */
+  public keyup(data: sc_edit_tool_data, key_code: number): void {
+    this.__keyup_impl(data, key_code);
+  }
+
+
+  /**
    * Returns the ideal spacing of tool applications.
    */
   get ideal_spacing(): number {
@@ -176,6 +197,14 @@ export class sc_edit_tool_base {
   }
 
   protected __end_impl() {
+
+  }
+
+  protected __keydown_impl(data: sc_edit_tool_data, key_code: number): void {
+
+  }
+
+  protected __keyup_impl(data: sc_edit_tool_data, key_code: number): void {
 
   }
 }

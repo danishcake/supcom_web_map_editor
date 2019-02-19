@@ -5,7 +5,10 @@
         ng-mousemove="on_mousemove($event)"
         ng-mouseup="on_mouseup($event)"
         ng-mouseleave="on_mouseleave($event)"
-        ng-mousedown="on_mousedown($event)">
+        ng-mousedown="on_mousedown($event)"
+        ng-keydown="on_keydown($event)"
+        ng-keyup="on_keyup($event)"
+        tabindex="0"> <!-- Magical tab index allows for keyboard event delivery -->
     </canvas>
     <div id="overlay">{{data.cursor_info}}</div>
   </div>

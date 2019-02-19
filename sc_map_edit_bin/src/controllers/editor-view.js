@@ -16,6 +16,14 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
     $scope.camera.zoom_steps(dy);
   };
 
+  const make_tool_data = () => {
+    return new sc_edit_tool_data(editor_state.edit_heightmap_view,
+                                 editor_state.edit_texturemap_view,
+                                 editor_state.scripts.save,
+                                 editor_state.edit_target_view,
+                                 editor_state.map);
+  };
+
 
   /**
    * Updates the zoom focus, and if a tool is in use applies tool
@@ -30,11 +38,7 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
 
     // LMB held during move, start/apply a tool step
     if ((evt.buttons & 1) && editor_state.tool !== null) {
-      const tool_data = new sc_edit_tool_data(editor_state.edit_heightmap_view,
-                                              editor_state.edit_texturemap_view,
-                                              editor_state.scripts.save,
-                                              editor_state.edit_target_view,
-                                              editor_state.map);
+      const tool_data = make_tool_data();
       const tool_args = new sc_edit_tool_args(world_position,
                                               evt.shiftKey ? sc_edit_tool_args.modifier_shift :
                                                              sc_edit_tool_args.modifier_none,
@@ -51,11 +55,7 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
     if (evt.which === 1 && editor_state.tool !== null) {
       let world_position = $scope.camera.project_to_world([evt.offsetX, evt.offsetY]);
 
-      const tool_data = new sc_edit_tool_data(editor_state.edit_heightmap_view,
-                                              editor_state.edit_texturemap_view,
-                                              editor_state.scripts.save,
-                                              editor_state.edit_target_view,
-                                              editor_state.map);
+      const tool_data = make_tool_data();
       const tool_args = new sc_edit_tool_args(world_position,
                                               evt.shiftKey ? sc_edit_tool_args.modifier_shift :
                                                              sc_edit_tool_args.modifier_none,
@@ -73,11 +73,8 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
     // LMB released, end tool application
     if (evt.which === 1 && editor_state.tool !== null) {
       let world_position = $scope.camera.project_to_world([evt.offsetX, evt.offsetY]);
-      const tool_data = new sc_edit_tool_data(editor_state.edit_heightmap_view,
-                                              editor_state.edit_texturemap_view,
-                                              editor_state.scripts.save,
-                                              editor_state.edit_target_view,
-                                              editor_state.map);
+
+      const tool_data = make_tool_data();
       const tool_args = new sc_edit_tool_args(world_position,
                                               evt.shiftKey ? sc_edit_tool_args.modifier_shift :
                                                              sc_edit_tool_args.modifier_none,
@@ -94,11 +91,7 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
 
     // Cursor left, end tool application
     if (editor_state.tool !== null) {
-      const tool_data = new sc_edit_tool_data(editor_state.edit_heightmap_view,
-                                              editor_state.edit_texturemap_view,
-                                              editor_state.scripts.save,
-                                              editor_state.edit_target_view,
-                                              editor_state.map);
+      const tool_data = make_tool_data();
       const tool_args = new sc_edit_tool_args([0, 0],
                                               evt.shiftKey ? sc_edit_tool_args.modifier_shift :
                                                              sc_edit_tool_args.modifier_none,
@@ -109,5 +102,27 @@ angular.module('sc_map_edit_bin.controllers').controller("editor-view",
 
     // Clear the tool position
     editor_state.tool_position = null;
+  };
+
+
+  /**
+   * Handles keyup events
+   */
+  $scope.on_keyup = function(evt) {
+    if (editor_state.tool !== null) {
+      const tool_data = make_tool_data();
+      editor_state.tool.keyup(tool_data, event.keyCode);
+    }
+  };
+
+
+  /**
+   * Handles keyup events
+   */
+  $scope.on_keydown = function(evt) {
+    if (editor_state.tool !== null) {
+      const tool_data = make_tool_data();
+      editor_state.tool.keydown(tool_data, event.keyCode);
+    }
   };
 }]);
