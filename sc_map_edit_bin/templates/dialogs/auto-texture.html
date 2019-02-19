@@ -1,0 +1,37 @@
+<div class="modal-header dialog-header-notify">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <h4 class="modal-title"><span class="glyphicon glyphicon-tint"></span> Auto texture</h4>
+</div>
+
+<div class="modal-body">
+  <div class="row">
+    <div class="col-lg-4">Histogram</div>
+    <div class="col-lg-8">
+      <histogram layers="{{options.layers}}"/>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4"><h6>Distinct flat regions</h6></div>
+    <div class="col-lg-8">
+      <div class="btn-group">
+        <label class="btn btn-default" ng-model="options.layers" uib-btn-radio="1">1</label>
+        <label class="btn btn-default" ng-model="options.layers" uib-btn-radio="2">2</label>
+        <label class="btn btn-default" ng-model="options.layers" uib-btn-radio="3">3</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <span class="pull-left">
+    This automatically textures the entire map based on the height and gradient of the terrain. The rules are:<br/>
+    1. Terrain below abyssal water is set to base;<br/>
+    2. Terrain below any water is set to layer 1;<br/>
+    3. Terrain <i>just</i> above water is set to layer 1;<br/>
+    4. The number of flat regions is estimated. Flat regions are then assigned layer 2, 3 and 4 as they increase in height;<br/>
+    5. Layer 5 is mixed into all other layers based on gradient to indicate cliffs.<br/>
+    <br/>
+    Note that the edges of regions are blurred together automatically based on height.
+  </span>
+  <button type="button" class="btn btn-default pull-right" ng-click="ok()" >OK</button>
+</div>

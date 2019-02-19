@@ -183,4 +183,45 @@ describe('sc_edit_view_methods', function() {
       }
     });
   });
+
+  describe('calculate_histogram', function () {
+    it('returns one histogram per subpixel', function() {
+      const patch = new sc_edit_patch([32, 32], 3, 255);
+      const histogram = sc_edit_view_methods.calculate_histogram(patch);
+      assert.equal(3, histogram.length);
+    });
+
+    it('populates histogram with correct values in logp1 domain', function() {
+      const patch = new sc_edit_patch([32, 32], 1, 255);
+      const brush = new sc_edit_patch([16, 16], 1, 255);
+      sc_edit_view_methods.fill(brush, [64]);
+      sc_edit_view_methods.set(patch, [16, 0], brush);
+      sc_edit_view_methods.fill(brush, [128]);
+      sc_edit_view_methods.set(patch, [0, 16], brush);
+      // Patch is now 50% 0, 25% 64 and 25% 128
+      // Counting correctly should find logp1(512), logp1(256) and logp1(256)
+
+      const histogram = sc_edit_view_methods.calculate_histogram(patch);
+
+      assert.closeTo(Math.log1p(512), histogram[0][0], 0.0001);
+      assert.closeTo(Math.log1p(256), histogram[0][64], 0.0001);
+      assert.closeTo(Math.log1p(256), histogram[0][128], 0.0001);
+      // Remaining bins should all be zero
+      for (let i = 1; i < 64; i++) {
+        assert.closeTo(0, histogram[0][i], 0.0001);
+      }
+      for (let i = 65; i < 128; i++) {
+        assert.closeTo(0, histogram[0][i], 0.0001);
+      }
+      for (let i = 129; i < 256; i++) {
+        assert.closeTo(0, histogram[0][i], 0.0001);
+      }
+    });
+
+    it('returns correct number of bins', function() {
+      const patch = new sc_edit_patch([32, 32], 1, 511);
+      const histogram = sc_edit_view_methods.calculate_histogram(patch);
+      assert.equal(512, histogram[0].length);
+    });
+  });
 });

@@ -1,5 +1,5 @@
 /**
- * Base class for all tools. Subclasses should implement
+ * Base class for all local tools. Subclasses should implement
  * 1. apply_impl()
  * 2. start_impl()
  *

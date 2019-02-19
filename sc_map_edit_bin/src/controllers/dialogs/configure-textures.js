@@ -55,6 +55,42 @@ angular.module('sc_map_edit_bin.controllers').controller("configure-textures",
         ]
       }
     },
+    {
+      name: "Icy World",
+      textures: {
+        terrain_shader: "TTerrain",
+        background_texture_path: "/textures/environment/defaultbackground.dds",
+        sky_cubemap_texture_path: "/textures/environment/defaultskycube.dds",
+        environment_cubemaps: [
+          { name: "<default>", file: "/textures/environment/defaultenvcube.dds" }
+        ]
+      },
+      layers: {
+        albedo_data: [
+          {scale: 10,  texture_file: "/env/Tundra/Layers/Tund_Rock_albedo.dds"},
+          {scale: 4,   texture_file: "/env/Tundra/Layers/Tund_Rock03_albedo.dds"},
+          {scale: 4,   texture_file: "/env/Tundra/Layers/Tund_ice006_albedo.dds"},
+          {scale: 10,  texture_file: "/env/Tundra/Layers/Tund_Rock03_albedo.dds"},
+          {scale: 15,  texture_file: "/env/Tundra/Layers/Tund_Snow_albedo.dds"},
+          {scale: 4,   texture_file: "/env/Evergreen/layers/Dirt001_albedo.dds"},
+          {scale: 4,   texture_file: "/env/Evergreen2/Layers/EG_Snow.dds"},
+          {scale: 4,   texture_file: "/env/Tundra/Layers/Tund_iceRock_albedo.dds"},
+          {scale: 4,   texture_file: ""},
+          {scale: 128, texture_file: "/env/evergreen/layers/macrotexture000_albedo.dds"}
+        ],
+        normal_data: [ // Some of these are incorrect normals, as textures do not appear to have an obvious normal
+          {scale: 1, texture_file: "/env/Tundra/Layers/Tund_Rock_normal.dds"},
+          {scale: 1, texture_file: "/env/Tundra/Layers/Tund_Rock_normal.dds"},
+          {scale: 1, texture_file: "/env/paradise/layers/Ice002_normals.dds"},
+          {scale: 1, texture_file: "/env/Tundra/Layers/Tund_Rock_normal.dds"},
+          {scale: 1, texture_file: "/env/Tundra/Layers/Tund_Snow_normal.dds"},
+          {scale: 1, texture_file: "/env/Evergreen/layers/Dirt001_normals.dds"},
+          {scale: 1, texture_file: "/env/Evergreen2/Layers/EG_Snow_normal.dds"},
+          {scale: 1, texture_file: "/env/Tundra/Layers/Tund_Rock_normal.dds"},
+          {scale: 1, texture_file: ""}
+        ]
+      }
+    }
   ];
 
 
