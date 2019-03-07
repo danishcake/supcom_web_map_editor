@@ -6,7 +6,7 @@ import { sc_edit_tool_clear_higher } from '../../../sc_map_io_lib/src/lib/tools/
 import { sc_edit_tool_flatten } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_flatten';
 import { sc_edit_tool_smooth, blur_type } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_smooth';
 import { sc_edit_tool_set } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_set';
-import { sc_edit_tool_water_elevation } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_water_elevation';
+import { sc_edit_tool_water_elevation, water_depth } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_water_elevation';
 import { sc_edit_tool_select_marker } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_select_marker';
 import { sc_edit_tool_add_marker } from '../../../sc_map_io_lib/src/lib/tools/sc_edit_tool_add_marker';
 import { sc_edit_symmetry } from '../../../sc_map_io_lib/src/lib/sc_edit_symmetry';
@@ -253,15 +253,15 @@ angular.module('sc_map_edit_bin.services').factory('editor_state', function() {
       case 'water':
         switch (tool_data.water.type) {
           case 'elevation':
-            service.tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.shallow);
+            service.tool = new sc_edit_tool_water_elevation(water_depth.shallow);
             break;
 
           case 'elevation_deep':
-            service.tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.deep);
+            service.tool = new sc_edit_tool_water_elevation(water_depth.deep);
             break;
 
           case 'elevation_abyss':
-            service.tool = new sc_edit_tool_water_elevation(sc_edit_tool_water_elevation.abyssal);
+            service.tool = new sc_edit_tool_water_elevation(water_depth.abyssal);
             break;
 
           default:
