@@ -139,13 +139,18 @@ class sc_map_header {
  */
 class sc_map_preview_image {
   private __data: ByteBuffer;
+  private __minor_version: number;
 
-  private constructor(data: ByteBuffer) {
+  private constructor(data: ByteBuffer, minor_version: number) {
     this.__data = data;
+    this.__minor_version = minor_version;
   }
 
   /** The pixel data for the fixed size 256x256 preview image */
   public get data(): ByteBuffer { return this.__data; }
+
+  /** The minor version */
+  public get minor_version(): number {return this.__minor_version; }
 
   /**
    * Loads the preview image
@@ -165,10 +170,10 @@ class sc_map_preview_image {
 
     // Minor version is included in this section for lack of a better place to put it
     let minor_version = input.readInt32();
-    check.equal(56, minor_version, "Incorrect minor version in header");
+    check.one_of([56, 60], minor_version, "Incorrect minor version in header");
 
     // Record fields
-    return new sc_map_preview_image(preview_image_data.data);
+    return new sc_map_preview_image(preview_image_data.data, minor_version);
   }
 
   /**
@@ -194,7 +199,7 @@ class sc_map_preview_image {
     // TBD: Change this to store the DDS header and ARGB data (as is available post load?)
     const data = new ByteBuffer(256 * 256 * 4, ByteBuffer.LITTLE_ENDIAN);
     data.fill(0).reset();
-    return new sc_map_preview_image(data);
+    return new sc_map_preview_image(data, 56);
   }
 }
 
@@ -951,8 +956,10 @@ class sc_map_water {
 
 
     // Sanity checks
-    check.between(0, elevation, elevation_deep, "Deep elevation higher than elevation");
-    check.between(0, elevation_deep, elevation_abyss, "Abyss elevation higher than deep elevation");
+    if (has_water) {
+      check.between(0, elevation, elevation_deep, "Deep elevation higher than elevation");
+      check.between(0, elevation_deep, elevation_abyss, "Abyss elevation higher than deep elevation");
+    }
 
     // Record fields
     return new sc_map_water(has_water,
@@ -1150,7 +1157,54 @@ export class sc_map_layer {
   public static create(texture_file: string, texture_scale: number): sc_map_layer {
     return new sc_map_layer(texture_file, texture_scale);
   }
+}
 
+/**
+ * Represents a region of unknown data that isn't used by the editor
+ * The format of this data depends on the minor version, but will always
+ * be created as per version 56
+ */
+class sc_map_unknown_section {
+  private constructor() {
+  }
+
+  public static load(input: ByteBuffer, minor_version: number): sc_map_unknown_section {
+    switch(minor_version) {
+      case 56:
+        // Skip fixed length buffer of unknown purpose bytes
+        input.readBytes(24);
+        break;
+
+      case 60:
+        {
+          // Skip length prefixed unknown purpose bytes
+          const unknown_purpose_length = input.readInt32();
+          check.equal(24, unknown_purpose_length, "Suspicious minor version 60 unknown purpose array length");
+          input.readBytes(unknown_purpose_length);
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return new sc_map_unknown_section();
+  }
+
+  public save(): ByteBuffer {
+    const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
+
+    // Write 24 mystery bytes
+    for (let i = 0; i < 24; i++) {
+      output.writeByte(0);
+    }
+
+    return output;
+  }
+
+  public static create(map_args: sc_map_args): sc_map_unknown_section {
+    return new sc_map_unknown_section();
+  }
 }
 
 /**
@@ -1177,9 +1231,6 @@ class sc_map_layers {
    * @param {ByteBuffer} input File to load
    */
   public static load(input: ByteBuffer): sc_map_layers {
-    // Skip 24 unknown purpose char
-    input.readBytes(24);
-
     let albedo_data = [];
     for (let i = 0; i < 10; i++) {
       const layer = sc_map_layer.load(input);
@@ -1201,11 +1252,6 @@ class sc_map_layers {
    */
   public save(): ByteBuffer {
     const output = new ByteBuffer(1, ByteBuffer.LITTLE_ENDIAN);
-
-    // Write 24 mystery bytes
-    for (let i = 0; i < 24; i++) {
-      output.writeByte(0);
-    }
 
     for (let i = 0; i < 10; i++) {
       output.append(this.__albedo_data[i].save().flip().compact());
@@ -1879,6 +1925,65 @@ class sc_map_watermap {
 }
 
 /**
+ * @class sc_map_unknown_section_2
+ * An unknown section that follows the watermap in minor_version 60
+ *
+ * I /think/ it's related to decal glow, purely based on the textures in use,
+ * but I haven't been able to confirm this.
+ *
+ * We read this section if present, but as we always serialise in version 53 it's not written
+ *
+ * uint8_t unknown_1[0x40];                       // 40 bytes unknown purpose
+ * string unknown_2;                              // NULL terminated string (an albedo texture)
+ * string unknown_3;                              // NULL terminated string (an albedo glow texture)
+ * int32_t count_of_unknown_4;                    // A count of 0x28 byte structure to follow
+ * uint8_t unknown_4[0x28 * count_of_unknown_4];  // Array of unknown structures
+ * uint8_t unknown_5[0x13];                       // Fixed 13 byte trailer
+ * string unknown_6;                              // Null terminated string (clouds?)
+ * uint8_t unknown_7[0x58];                       // May be a length prefixed array,
+ *                                                // but length always appears to be 4, so we can roll it into 0x58
+ *
+ */
+class sc_map_unknown_section_2 {
+  private constructor() {
+  }
+
+  /**
+   * Loads the unknown section. Only has an effect on minor version 60
+   * @param {ByteBuffer} input File to load
+   * @param {Number} minor_version Minor version of map format
+   */
+  public static load(input: ByteBuffer, minor_version: number): sc_map_unknown_section_2 {
+    switch(minor_version) {
+      case 60:
+        {
+          input.skip(0x40);
+          input.readCString();
+          input.readCString();
+          const unknown_4_count = input.readInt32();
+          input.skip(unknown_4_count * 0x28);
+          input.skip(0x13);
+          input.readCString();
+          input.skip(0x58);
+
+          return new sc_map_unknown_section_2();
+        }
+      default:
+        return new sc_map_unknown_section_2();
+    }
+  }
+
+  public save(): ByteBuffer {
+    // This is never output, as we always save in version 56
+    return new ByteBuffer(0);
+  }
+
+  public static create(map_args: sc_map_args): sc_map_unknown_section_2 {
+    return new sc_map_unknown_section_2();
+  }
+}
+
+/**
  * @class sc_map_prop
  * Prop entry
  */
@@ -1967,6 +2072,7 @@ class sc_map_prop {
   // Create not implemented as not used
 }
 
+
 /**
  * @class sc_map_props
  * Collection of props
@@ -2047,11 +2153,13 @@ export class sc_map {
   private __textures: sc_map_textures;
   private __lighting: sc_map_lighting;
   private __water: sc_map_water;
+  private __unknown: sc_map_unknown_section;
   private __layers: sc_map_layers;
   private __decals: sc_map_decals;
   private __normalmap: sc_map_normalmap;
   private __texturemap: sc_map_texturemap;
   private __watermap: sc_map_watermap;
+  private __unknown_2: sc_map_unknown_section_2;
   private __props: sc_map_props;
 
 
@@ -2061,11 +2169,13 @@ export class sc_map {
                       textures: sc_map_textures,
                       lighting: sc_map_lighting,
                       water: sc_map_water,
+                      unknown: sc_map_unknown_section,
                       layers: sc_map_layers,
                       decals: sc_map_decals,
                       normalmap: sc_map_normalmap,
                       texturemap: sc_map_texturemap,
                       watermap: sc_map_watermap,
+                      unknown_2: sc_map_unknown_section_2,
                       props: sc_map_props) {
     this.__header = header;
     this.__preview_image = preview_image;
@@ -2073,11 +2183,13 @@ export class sc_map {
     this.__textures = textures;
     this.__lighting = lighting;
     this.__water = water;
+    this.__unknown = unknown;
     this.__layers = layers;
     this.__decals = decals;
     this.__normalmap = normalmap;
     this.__texturemap = texturemap;
     this.__watermap = watermap;
+    this.__unknown_2 = unknown_2;;
     this.__props = props;
   }
 
@@ -2093,6 +2205,8 @@ export class sc_map {
   public get lighting() { return this.__lighting; }
   /** Water data */
   public get water() { return this.__water; }
+  /** Unknown purpose blob */
+  public get unknown() { return this.__unknown; }
   /** Defines what textures are used to each layer */
   public get layers() { return this.__layers; }
   /** Decals to apply */
@@ -2103,6 +2217,8 @@ export class sc_map {
   public get texturemap() { return this.__texturemap; }
   /** Terrain type data */
   public get watermap() { return this.__watermap; }
+  /** Unknown section 2 */
+  public get unknown_2() { return this.__unknown_2; }
   /** Props to place around the map */
   public get props() { return this.__props; }
 
@@ -2118,11 +2234,13 @@ export class sc_map {
       const textures = sc_map_textures.load(input);
       const lighting = sc_map_lighting.load(input);
       const water = sc_map_water.load(input);
+      const unknown = sc_map_unknown_section.load(input, preview_image.minor_version);
       const layers = sc_map_layers.load(input);
       const decals = sc_map_decals.load(input);
       const normalmap = sc_map_normalmap.load(input);
       const texturemap = sc_map_texturemap.load(input);
       const watermap = sc_map_watermap.load(input, heightmap);
+      const unknown_2 = sc_map_unknown_section_2.load(input, preview_image.minor_version);
       const props = sc_map_props.load(input);
 
       return new sc_map(header,
@@ -2131,11 +2249,13 @@ export class sc_map {
                         textures,
                         lighting,
                         water,
+                        unknown,
                         layers,
                         decals,
                         normalmap,
                         texturemap,
                         watermap,
+                        unknown_2,
                         props);
     } catch(error) {
       // Log diagnostics and move on
@@ -2156,11 +2276,13 @@ export class sc_map {
       this.textures.save(),
       this.lighting.save(),
       this.water.save(),
+      this.unknown.save(),
       this.layers.save(),
       this.decals.save(),
       this.normalmap.save(),
       this.texturemap.save(),
       this.watermap.save(),
+      this.unknown_2.save(),
       this.props.save()
     ];
 
@@ -2195,11 +2317,13 @@ export class sc_map {
     const textures = sc_map_textures.create(map_args);
     const lighting = sc_map_lighting.create(map_args);
     const water = sc_map_water.create(map_args);
+    const unknown = sc_map_unknown_section.create(map_args);
     const layers = sc_map_layers.create(map_args);
     const decals = sc_map_decals.create(map_args);
     const normalmap = sc_map_normalmap.create(map_args);
     const texturemap = sc_map_texturemap.create(map_args);
     const watermap = sc_map_watermap.create(map_args);
+    const unknown_2 = sc_map_unknown_section_2.create(map_args);
     const props = sc_map_props.create(map_args);
 
     return new sc_map(header,
@@ -2208,11 +2332,13 @@ export class sc_map {
                       textures,
                       lighting,
                       water,
+                      unknown,
                       layers,
                       decals,
                       normalmap,
                       texturemap,
                       watermap,
+                      unknown_2,
                       props);
   }
 }
