@@ -1664,7 +1664,7 @@ class sc_map_normalmap {
  *
  * Firstly the base texture is applied at 100% intensity.
  * Then, each layer from 0 to 8 is blended in. The weighting given to the next
- * channel for a given channel value x is (x - 127) * 2
+ * channel for a given channel value x is Math.min(255, x  * 2)
  * This means that values < 127 have no effect on the texture /colour/
  *
  * The texture normal map is blended in a similar fashion, but without the odd
@@ -1931,7 +1931,7 @@ class sc_map_watermap {
  * I /think/ it's related to decal glow, purely based on the textures in use,
  * but I haven't been able to confirm this.
  *
- * We read this section if present, but as we always serialise in version 53 it's not written
+ * We read this section if present, but as we always serialise in version 56 it's not written
  *
  * uint8_t unknown_1[0x40];                       // 40 bytes unknown purpose
  * string unknown_2;                              // NULL terminated string (an albedo texture)
