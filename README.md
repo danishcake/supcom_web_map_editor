@@ -1,5 +1,10 @@
 # WebMapEdit
-A map editor for [Supreme Commander](https://store.steampowered.com/app/9420/Supreme_Commander_Forged_Alliance) that runs inside your browser, using WebGL to provide a smooth, zoomable map.
+A map editor for [Supreme Commander](https://store.steampowered.com/app/9420/Supreme_Commander_Forged_Alliance) that runs inside your browser, using WebGL to provide a smooth, zoomable map. [Try it!](https://danishcake.github.io/supcom_web_map_editor_pages/)
+
+![Screenshot 1](https://raw.githubusercontent.com/danishcake/supcom_web_map_editor/master/doc/screenshot_1.png "Screenshot 1")
+
+![Screenshot 1](https://raw.githubusercontent.com/danishcake/supcom_web_map_editor/master/screenshot_2.png "Screenshot 2")
+
 
 ## Background
 Sometime in 2015/2016 I was in the throes of learning Javascript for a project at work, using a somewhat elderly vanilla Javascript/Angular 1 stack. I thought it might be a good idea to productively use my daily commute to work on a personal project, and I had previously started a map editor in C++/Qt. It felt like a good place to start.
