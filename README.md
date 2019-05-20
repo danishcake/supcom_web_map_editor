@@ -3,7 +3,7 @@ A map editor for [Supreme Commander](https://store.steampowered.com/app/9420/Sup
 
 ![Screenshot 1](https://raw.githubusercontent.com/danishcake/supcom_web_map_editor/master/doc/screenshot_1.png "Screenshot 1")
 
-![Screenshot 1](https://raw.githubusercontent.com/danishcake/supcom_web_map_editor/master/screenshot_2.png "Screenshot 2")
+![Screenshot 2](https://raw.githubusercontent.com/danishcake/supcom_web_map_editor/master/doc/screenshot_2.png "Screenshot 2")
 
 
 ## Background
