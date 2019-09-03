@@ -6,10 +6,31 @@ angular.module('sc_map_edit_bin.controllers').controller("save-as",
 
   $scope.data = {
     // Save mode. This can be one of:
-    // 0 (localstorage), 1 (zip file)
-    mode: 0
+    // 0 (localstorage), 1 (zip file), 2 (STL), 3 (Raw heightmap)
+    mode: 0,
+    base_thickness: 4,
+    scale_exageration: 11
   };
 
+  $scope.base_thickness_change = function() {
+    if ($scope.data.base_thickness < 1) {
+      $scope.data.base_thickness = 1;
+    }
+    if ($scope.data.base_thickness > 50) {
+      $scope.data.base_thickness = 50;
+    }
+  };
+
+  // Units are 10%. To transform to percentage the function is
+  // $page * 10 + 90
+  $scope.scale_exageration_change = function() {
+    if ($scope.data.scale_exageration < 1) {
+      $scope.data.scale_exageration = 1;
+    }
+    if ($scope.data.scale_exageration > 40) {
+      $scope.data.scale_exageration = 40;
+    }
+  };
 
   // Note: For some reason I can't seem to put my buttons callbacks within $scope.buttons. Weird!
   $scope.cancel = function() {
@@ -17,7 +38,7 @@ angular.module('sc_map_edit_bin.controllers').controller("save-as",
   };
 
 
-  let save_to_localstorage = function() {
+  const save_to_localstorage = function() {
     editor_state.set_save_location('localstorage');
     dialogs.create("templates/dialogs/save-progress.html",
                    "save-progress",
@@ -31,12 +52,28 @@ angular.module('sc_map_edit_bin.controllers').controller("save-as",
   };
 
 
-  let save_to_zipfile = function() {
+  const save_to_zipfile = function() {
     editor_state.set_save_location('zipfile');
     dialogs.create('templates/dialogs/save-progress.html',
                    'save-progress',
                    {
                      dest: 'zipfile',
+                     map: editor_state.map,
+                     edit_heightmap: editor_state.edit_heightmap,
+                     scripts: editor_state.scripts
+                   },
+                   modal_dlg_opts);
+  };
+
+  const save_to_stl = function() {
+    dialogs.create('templates/dialogs/save-progress.html',
+                   'save-progress',
+                   {
+                     dest: 'stl',
+                     stl_options: {
+                       base_thickness: $scope.data.base_thickness,
+                       heightmap_scale: $scope.data.scale_exageration * 0.1 + 0.9
+                     },
                      map: editor_state.map,
                      edit_heightmap: editor_state.edit_heightmap,
                      scripts: editor_state.scripts
@@ -54,6 +91,14 @@ angular.module('sc_map_edit_bin.controllers').controller("save-as",
 
       case 1:
         save_to_zipfile();
+        break;
+
+      case 2:
+        save_to_stl();
+        break;
+
+      case 3:
+        // TODO: RAW heightmap
         break;
     }
     $uibModalInstance.close();

@@ -1,6 +1,7 @@
 const angular = require('angular');
 import { sc_script_script } from '../../../../sc_map_io_lib/src/lib/script/sc_script_script';
 import { sc_zip } from '../../../../sc_map_io_lib/src/lib/sc_zip';
+import { sc_stl_export } from '../../../../sc_map_io_lib/src/lib/stl/sc_stl_export';
 const async = require('async');
 const saveAs = require('file-saver').saveAs;
 
@@ -134,10 +135,43 @@ angular.module('sc_map_edit_bin.controllers').controller("save-progress",
   };
 
 
+  /**
+   * Saves the heightmap to an STL file
+   */
+  const save_to_stl = function() {
+    $scope.data.progress_text = "Serialising...";
+    $scope.data.progress_value = 10;
+
+    $timeout(() => {
+      try {
+        const stl_bb = sc_stl_export($scope.data.edit_heightmap,
+                                     data.stl_options.base_thickness,
+                                     data.stl_options.heightmap_scale);
+        const blob = new Blob([stl_bb.toArrayBuffer()], {type: "application/octet-stream"});
+        $timeout(() => {
+          $scope.data.progress_text = `Success`;
+          $scope.data.progress_value = 100;
+        }, 0);
+        $timeout(() => { $uibModalInstance.close(); }, 300);
+        saveAs(blob, `SupremeCommanderHeightmap.stl`)
+
+      } catch (err) {
+        $timeout(() => {
+          $scope.data.progress_text = `Error: ${err}`;
+          $scope.data.progress_value = 0;
+          $scope.data.finished = true;
+        });
+      }
+    }, 300);
+  }
+
+
   if (data.dest === 'localstorage') {
     save_to_localstorage();
   } else if (data.dest === 'zipfile') {
     save_to_zipfile();
+  } else if (data.dest === 'stl') {
+    save_to_stl();
   } else {
     $scope.data.progress_text = `Error: Unknown save destination '${data.dest}'`;
     $scope.data.progress_value = "0";

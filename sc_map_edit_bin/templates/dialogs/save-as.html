@@ -10,6 +10,89 @@
       <div class="btn-group">
         <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="0">Browser localstorage</label>
         <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="1">Zip file</label>
+        <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="2">STL file</label>
+        <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="3">Raw heightmap</label>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="data.mode === 0">
+    <div class="row">
+      <div class="col-lg-12">
+        <h4>Browser local storage</h4>
+        Save the map to the browser local storage area. Useful for quick edits, but limited in size, and can be more easily lost.
+      </div>
+    </div>
+  </div>
+
+
+  <div ng-if="data.mode === 1">
+    <div class="row">
+      <div class="col-lg-12">
+        <h4>Zip Export</h4>
+        Save the map to a zip file.
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="data.mode === 2">
+    <div class="row">
+      <div class="col-lg-12">
+        <h4>STL Export</h4>
+        Export the heightmap in STL format for 3D printing. You can use slicing software like
+        <a href="https://slic3r.org/">Slic3r</a>, <a href="https://ultimaker.com/software/ultimaker-cura">Cura</a> or
+        <a href="https://www.simplify3d.com/">Simplify3d</a> to convert an STL file to a format that can be printed.
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-4"><h4>Base thickness</h4></div>
+      <div class="col-lg-8">
+        <ul uib-pagination
+            total-items="20"
+            ng-model="data.base_thickness"
+            max-size="1"
+            items-per-page="1"
+            class="pagination-sm"
+            previous-text="-"
+            next-text="+"
+            ng-change="base_thickness_change();"
+            page-label="$page + 'mm'"></ul>
+        <div uib-alert class="alert-info">
+          This is additional thickness to add below the lowest point on the map, expressed in mm.
+          It assumes the longest edge of the print is 10cm long.
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4"><h4>Vertical scale</h4></div>
+        <div class="col-lg-8">
+            <ul uib-pagination
+            total-items="40"
+            ng-model="data.scale_exageration"
+            max-size="1"
+            items-per-page="1"
+            class="pagination-sm"
+            previous-text="-"
+            next-text="+"
+            ng-change="scale_exageration_change();"
+            page-label="($page * 10 + 90) + '%'"></ul>
+          <div uib-alert class="alert-info">
+            Heightmaps printed can appear excessively flat. Setting this value above 100% exagerates the
+            vertical height of the map without affecting the base thickness.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="data.mode === 3">
+      <div class="row">
+        <div class="col-lg-12">
+          <h4>Raw Heightmap Export</h4>
+          Save the heightmap only to a Raw file. This can be edited in an external Application for finer control, then re-imported
+          from the open dialog.
+        </div>
       </div>
     </div>
   </div>
@@ -17,5 +100,6 @@
 
 <div class="modal-footer">
   <span class="pull-left" ng-show="data.mode === 0">Remember that localstorage is deleted if you clear private browsing data</span>
+  <span class="pull-left" ng-show="data.mode === 3">NOT IMPLEMENTED</span>
   <button type="button" class="btn btn-default pull-right" ng-click="ok()">OK</button>
 </div>
