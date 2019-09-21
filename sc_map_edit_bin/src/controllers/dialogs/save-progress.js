@@ -2,6 +2,7 @@ const angular = require('angular');
 import { sc_script_script } from '../../../../sc_map_io_lib/src/lib/script/sc_script_script';
 import { sc_zip } from '../../../../sc_map_io_lib/src/lib/sc_zip';
 import { sc_stl_export } from '../../../../sc_map_io_lib/src/lib/stl/sc_stl_export';
+import { sc_raw_heightmap_export, sc_raw_texturemap_export } from '../../../../sc_map_io_lib/src/lib/raw/sc_raw_export';
 const async = require('async');
 const saveAs = require('file-saver').saveAs;
 
@@ -15,6 +16,7 @@ angular.module('sc_map_edit_bin.controllers').controller("save-progress",
 
     map:             data.map,
     edit_heightmap:  data.edit_heightmap,
+    edit_texturemap: data.edit_texturemap,
     scripts:         data.scripts
   };
 
@@ -153,8 +155,66 @@ angular.module('sc_map_edit_bin.controllers').controller("save-progress",
           $scope.data.progress_value = 100;
         }, 0);
         $timeout(() => { $uibModalInstance.close(); }, 300);
-        saveAs(blob, `SupremeCommanderHeightmap.stl`)
+        saveAs(blob, `${$scope.data.scripts.scenario.name}.stl`);
+      } catch (err) {
+        $timeout(() => {
+          $scope.data.progress_text = `Error: ${err}`;
+          $scope.data.progress_value = 0;
+          $scope.data.finished = true;
+        });
+      }
+    }, 300);
+  }
 
+
+    /**
+   * Saves the heightmap to an STL file
+   */
+  const save_to_raw_heightmap = function() {
+    $scope.data.progress_text = "Serialising...";
+    $scope.data.progress_value = 10;
+
+    $timeout(() => {
+      try {
+        const raw_bb = sc_raw_heightmap_export($scope.data.edit_heightmap);
+        const blob = new Blob([raw_bb.toArrayBuffer()], {type: "application/octet-stream"});
+        $timeout(() => {
+          $scope.data.progress_text = `Success`;
+          $scope.data.progress_value = 100;
+        }, 0);
+        $timeout(() => { $uibModalInstance.close(); }, 300);
+        saveAs(blob, `${$scope.data.scripts.scenario.name}_heightmap.raw`);
+      } catch (err) {
+        $timeout(() => {
+          $scope.data.progress_text = `Error: ${err}`;
+          $scope.data.progress_value = 0;
+          $scope.data.finished = true;
+        });
+      }
+    }, 300);
+  }
+
+
+  /**
+   * Saves the texturemap to a pair of raw files
+   */
+  const save_to_raw_texturemap = function() {
+    $scope.data.progress_text = "Serialising...";
+    $scope.data.progress_value = 10;
+
+    $timeout(() => {
+      try {
+        const {chan_03, chan_47} = sc_raw_texturemap_export($scope.data.edit_texturemap);
+        const blob_03 = new Blob([chan_03.toArrayBuffer()], {type: "application/octet-stream"});
+        const blob_47 = new Blob([chan_47.toArrayBuffer()], {type: "application/octet-stream"});
+
+        $timeout(() => {
+          $scope.data.progress_text = `Success`;
+          $scope.data.progress_value = 100;
+        }, 0);
+        $timeout(() => { $uibModalInstance.close(); }, 300);
+        saveAs(blob, `${$scope.data.scripts.scenario.name}_texturemap_03.raw`);
+        saveAs(blob, `${$scope.data.scripts.scenario.name}_texturemap_47.raw`);
       } catch (err) {
         $timeout(() => {
           $scope.data.progress_text = `Error: ${err}`;
@@ -172,6 +232,10 @@ angular.module('sc_map_edit_bin.controllers').controller("save-progress",
     save_to_zipfile();
   } else if (data.dest === 'stl') {
     save_to_stl();
+  } else if (data.dest === 'raw_heightmap') {
+    save_to_raw_heightmap();
+  } else if (data.dest === 'raw_texturemap') {
+    save_to_raw_texturemap();
   } else {
     $scope.data.progress_text = `Error: Unknown save destination '${data.dest}'`;
     $scope.data.progress_value = "0";

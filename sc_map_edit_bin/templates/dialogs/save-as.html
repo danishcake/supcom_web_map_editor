@@ -5,13 +5,14 @@
 
 <div class="modal-body">
   <div class="row">
-    <div class="col-lg-4">Location</div>
+    <div class="col-lg-4"></div>
     <div class="col-lg-8">
       <div class="btn-group">
         <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="0">Browser localstorage</label>
         <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="1">Zip file</label>
         <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="2">STL file</label>
         <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="3">Raw heightmap</label>
+        <label class="btn btn-default" ng-model="data.mode" uib-btn-radio="4">Raw texturemap</label>
       </div>
     </div>
   </div>
@@ -95,11 +96,20 @@
         </div>
       </div>
     </div>
+
+    <div ng-if="data.mode === 4">
+      <div class="row">
+        <div class="col-lg-12">
+          <h4>Raw Texturemap Export</h4>
+          Save the texturemap only to a Raw file. This can be edited in an external Application for finer control, then re-imported
+          from the open dialog.
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <div class="modal-footer">
   <span class="pull-left" ng-show="data.mode === 0">Remember that localstorage is deleted if you clear private browsing data</span>
-  <span class="pull-left" ng-show="data.mode === 3">NOT IMPLEMENTED</span>
   <button type="button" class="btn btn-default pull-right" ng-click="ok()">OK</button>
 </div>

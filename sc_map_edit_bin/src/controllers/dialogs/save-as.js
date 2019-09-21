@@ -81,6 +81,30 @@ angular.module('sc_map_edit_bin.controllers').controller("save-as",
                    modal_dlg_opts);
   };
 
+  const save_to_raw_heightmap = function() {
+    dialogs.create('templates/dialogs/save-progress.html',
+                   'save-progress',
+                   {
+                     dest: 'raw_heightmap',
+                     map: editor_state.map,
+                     edit_heightmap: editor_state.edit_heightmap,
+                     scripts: editor_state.scripts
+                   },
+                   modal_dlg_opts);
+  };
+
+  const save_to_raw_texturemap = function() {
+    dialogs.create('templates/dialogs/save-progress.html',
+                   'save-progress',
+                   {
+                     dest: 'raw_texturemap',
+                     map: editor_state.map,
+                     edit_heightmap: editor_state.edit_heightmap,
+                     scripts: editor_state.scripts
+                   },
+                   modal_dlg_opts);
+  };
+
 
   $scope.ok = function() {
     switch($scope.data.mode) {
@@ -98,7 +122,11 @@ angular.module('sc_map_edit_bin.controllers').controller("save-as",
         break;
 
       case 3:
-        // TODO: RAW heightmap
+        save_to_raw_heightmap();
+        break;
+
+      case 3:
+        save_to_raw_texturemap();
         break;
     }
     $uibModalInstance.close();
